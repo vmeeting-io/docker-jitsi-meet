@@ -1,0 +1,3 @@
+[submodule "web/jitsi-meet"]
+	path = web/jitsi-meet
+	url = https://github.com/theun0524/jitsi-meet.git
