@@ -28,9 +28,9 @@ ADD jitsi-meet/package.json /web/jitsi-meet/package.json
 ADD jitsi-meet/package-lock.json /web/jitsi-meet/package-lock.json
 WORKDIR /web/jitsi-meet
 RUN npm install
-RUN make
 
 ADD jitsi-meet/ /web/jitsi-meet/
+RUN make
 
 EXPOSE 80 443
 
