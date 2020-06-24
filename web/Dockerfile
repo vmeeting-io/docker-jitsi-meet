@@ -23,13 +23,11 @@ RUN \
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs git
 
-RUN mkdir -p /web/jitsi-meet
-ADD jitsi-meet/package.json /web/jitsi-meet/package.json
-ADD jitsi-meet/package-lock.json /web/jitsi-meet/package-lock.json
 WORKDIR /web/jitsi-meet
+COPY package*.json ./
 RUN npm install
 
-ADD jitsi-meet/ /web/jitsi-meet/
+COPY jitsi-meet/ /web/jitsi-meet/
 RUN make
 
 EXPOSE 80 443

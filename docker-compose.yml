@@ -38,6 +38,10 @@ services:
             - JIBRI_RECORDER_USER
             - JIBRI_RECORDER_PASSWORD
             - ENABLE_RECORDING
+            - VMEETING_API_BASE
+            - VMEETING_API_PORT
+            - VMEETING_FRONT_BASE
+            - VMEETING_FRONT_PORT
         networks:
             meet.jitsi:
                 aliases:
