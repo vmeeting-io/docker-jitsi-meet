@@ -1,4 +1,4 @@
-ARG JITSI_REPO=jitsi
+ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base
 
 ADD https://dl.eff.org/certbot-auto /usr/local/bin/
@@ -24,7 +24,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs git
 
 WORKDIR /web/jitsi-meet
-COPY package*.json ./
+COPY jitsi-meet/package*.json ./
 RUN npm install
 
 COPY jitsi-meet/ /web/jitsi-meet/

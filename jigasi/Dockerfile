@@ -1,4 +1,4 @@
-ARG JITSI_REPO=jitsi
+ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
 ENV GOOGLE_APPLICATION_CREDENTIALS /config/key.json
