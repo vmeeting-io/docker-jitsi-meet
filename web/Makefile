@@ -1,5 +1,3 @@
-include ../../.env
-
 ifdef VMEETING_API_BASE
 	BUILD_ARGS := $(BUILD_ARGS) --build-arg REACT_APP_AUTH_API_BASE=$(VMEETING_API_BASE)
 endif
