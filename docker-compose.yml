@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
     # Frontend
@@ -174,3 +174,5 @@ services:
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:
+        external: true
+        name: jitsi

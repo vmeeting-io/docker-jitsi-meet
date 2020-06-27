@@ -42,7 +42,19 @@ RUN \
         && apt-dpkg-wrap apt-get install -y jitsi-upload-integrations jq \
         && apt-cleanup
 
+RUN \
+        apt-dpkg-wrap apt-get update \
+        && apt-dpkg-wrap apt-get install -y dbus dbus-x11 pulseaudio pulseaudio-utils rtkit \
+        && apt-cleanup
+RUN adduser jibri rtkit
+
+RUN mkdir -p /home/jibri/.config/pulse
+COPY pulse/ /home/jibri/.config/pulse
+RUN chown jibri:jibri /home/jibri/.config -R
+
 COPY rootfs/ /
+
+RUN chmod 755 /usr/local/bin/ffmpeg
 
 VOLUME /config
 
