@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ARGS=$@
+ARGS=$(echo $ARGS | sed 's/-f alsa/-f pulse/')
+ARGS=$(echo $ARGS | sed 's/-i plug:cloop/-i default/')
+
+exec /usr/bin/ffmpeg $ARGS
