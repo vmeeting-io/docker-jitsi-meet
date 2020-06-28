@@ -3,5 +3,6 @@
 ARGS=$@
 ARGS=$(echo $ARGS | sed 's/-f alsa/-f pulse/')
 ARGS=$(echo $ARGS | sed 's/-i plug:cloop/-i default/')
+ARGS=$(echo $ARGS | sed 's/-i plug:bsnoop/-i default/')
 
-exec /usr/bin/ffmpeg $ARGS
+exec /usr/bin/ffmpeg-bin $ARGS

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ARGS=$@
+
+exec /usr/bin/google-chrome-bin --no-sandbox ARGS=$@
