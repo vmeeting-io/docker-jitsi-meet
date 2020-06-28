@@ -52,9 +52,11 @@ RUN mkdir -p /home/jibri/.config/pulse
 COPY pulse/ /home/jibri/.config/pulse
 RUN chown jibri:jibri /home/jibri/.config -R
 
+RUN mv /usr/bin/google-chrome /usr/bin/google-chrome-bin
+RUN mv /usr/bin/ffmpeg /usr/bin/ffmpeg-bin
 COPY rootfs/ /
-
-RUN chmod 755 /usr/local/bin/ffmpeg
+RUN chmod 755 /usr/bin/ffmpeg
+RUN chmod 755 /usr/bin/google-chrome
 
 VOLUME /config
 
