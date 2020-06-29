@@ -145,7 +145,7 @@ services:
 
     # Video bridge
     jvb:
-        image: theun/jvb:latest
+        image: dpnm/jvb:latest
         restart: ${RESTART_POLICY}
         ports:
             - '${JVB_PORT}:${JVB_PORT}/udp'
