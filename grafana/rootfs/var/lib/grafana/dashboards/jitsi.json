@@ -1,0 +1,2135 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "Performance metrics of Vmeeting cluster",
+    "editable": true,
+    "gnetId": 11969,
+    "graphTooltip": 0,
+    "id": 1,
+    "iteration": 1593476841852,
+    "links": [],
+    "panels": [
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            },
+            "id": 2,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "targets": [
+                {
+                    "alias": "",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "host"
+                            ],
+                            "type": "tag"
+                        }
+                    ],
+                    "hide": false,
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT sum(\"confs\") FROM (SELECT last(\"conferences\") AS \"confs\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "conferences"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Conferences running",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 4,
+                "y": 0
+            },
+            "id": 5,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "max"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "repeat": null,
+            "targets": [
+                {
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "hide": false,
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT max(\"x\") FROM (SELECT last(\"largest_conference\") AS \"x\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "largest_conference"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Largest Conference",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 8,
+                "y": 0
+            },
+            "id": 3,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "targets": [
+                {
+                    "groupBy": [
+                        {
+                            "params": [
+                                "host"
+                            ],
+                            "type": "tag"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT sum(\"x\") FROM (SELECT last(\"participants\") AS \"x\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "participants"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Total Participants",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 12,
+                "y": 0
+            },
+            "id": 20,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "targets": [
+                {
+                    "groupBy": [
+                        {
+                            "params": [
+                                "host"
+                            ],
+                            "type": "tag"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT sum(\"x\") FROM (SELECT last(\"total_conferences_created\") AS \"x\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "total_conferences_created"
+                                ],
+                                "type": "field"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Conferences created",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 1000
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 16,
+                "y": 0
+            },
+            "id": 13,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "targets": [
+                {
+                    "groupBy": [
+                        {
+                            "params": [
+                                "host"
+                            ],
+                            "type": "tag"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT sum(\"x\") FROM (SELECT last(\"videostreams\") AS \"x\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "videostreams"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Video Streams",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 20,
+                "y": 0
+            },
+            "id": 12,
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "targets": [
+                {
+                    "groupBy": [
+                        {
+                            "params": [
+                                "host"
+                            ],
+                            "type": "tag"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT sum(\"x\") FROM (SELECT last(\"videochannels\") AS \"x\" FROM \"jitsi_stats\" WHERE $timeFilter GROUP BY \"host\")",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "videochannels"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": []
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Video Channels",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "align": null
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 12,
+                "x": 0,
+                "y": 4
+            },
+            "id": 14,
+            "interval": "",
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "repeat": "jitsi_host",
+            "repeatDirection": "h",
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting2",
+                    "value": "vmeeting2"
+                }
+            },
+            "targets": [
+                {
+                    "alias": "CPU",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "cpu",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT last(\"usage_user\") FROM \"cpu\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter GROUP BY time($interval)",
+                    "rawQuery": false,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "usage_user"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "CPU: ${jitsi_host}",
+            "type": "stat"
+        },
+        {
+            "datasource": "InfluxDB",
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "align": null
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 12,
+                "x": 12,
+                "y": 4
+            },
+            "id": 21,
+            "interval": "",
+            "maxDataPoints": 50,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                }
+            },
+            "pluginVersion": "7.0.3",
+            "repeat": null,
+            "repeatDirection": "h",
+            "repeatIteration": 1593476841852,
+            "repeatPanelId": 14,
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting3",
+                    "value": "vmeeting3"
+                }
+            },
+            "targets": [
+                {
+                    "alias": "CPU",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "cpu",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT last(\"usage_user\") FROM \"cpu\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter GROUP BY time($interval)",
+                    "rawQuery": false,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "usage_user"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "CPU: ${jitsi_host}",
+            "type": "stat"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 4,
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "hiddenSeries": false,
+            "id": 10,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "sort": null,
+                "sortDesc": null,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "maxDataPoints": 50,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pluginVersion": "6.7.2",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": "jitsi_host",
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting2",
+                    "value": "vmeeting2"
+                }
+            },
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "total_memory",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "mem",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT last(\"total\") FROM \"mem\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter GROUP BY time($interval)",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "total"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "used_memory",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "mem",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "used"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Memory: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "decbytes",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 4,
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "hiddenSeries": false,
+            "id": 22,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "sort": null,
+                "sortDesc": null,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "maxDataPoints": 50,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pluginVersion": "6.7.2",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": null,
+            "repeatIteration": 1593476841852,
+            "repeatPanelId": 10,
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting3",
+                    "value": "vmeeting3"
+                }
+            },
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "total_memory",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "mem",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT last(\"total\") FROM \"mem\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter GROUP BY time($interval)",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "total"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "used_memory",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "mem",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "used"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Memory: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "decbytes",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 15
+            },
+            "hiddenSeries": false,
+            "id": 7,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "sort": "current",
+                "sortDesc": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": "jitsi_host",
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting2",
+                    "value": "vmeeting2"
+                }
+            },
+            "seriesOverrides": [
+                {
+                    "alias": "bit_rate_download",
+                    "transform": "negative-Y"
+                }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "bit_rate_download",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "bit_rate_download"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "bit_rate_upload",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "bit_rate_upload"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Bitrate: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "Kbits",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 15
+            },
+            "hiddenSeries": false,
+            "id": 23,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "sort": "current",
+                "sortDesc": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": null,
+            "repeatIteration": 1593476841852,
+            "repeatPanelId": 7,
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting3",
+                    "value": "vmeeting3"
+                }
+            },
+            "seriesOverrides": [
+                {
+                    "alias": "bit_rate_download",
+                    "transform": "negative-Y"
+                }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "bit_rate_download",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "bit_rate_download"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "bit_rate_upload",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "bit_rate_upload"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Bitrate: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "Kbits",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 23
+            },
+            "hiddenSeries": false,
+            "id": 18,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": "jitsi_host",
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting2",
+                    "value": "vmeeting2"
+                }
+            },
+            "seriesOverrides": [
+                {
+                    "alias": "loss_rate_download",
+                    "transform": "negative-Y"
+                }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "loss_rate_download",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "loss_rate_download"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "loss_rate_upload",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "loss_rate_upload"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Loss Rate: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "percent",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 23
+            },
+            "hiddenSeries": false,
+            "id": 24,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": null,
+            "repeatIteration": 1593476841852,
+            "repeatPanelId": 18,
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting3",
+                    "value": "vmeeting3"
+                }
+            },
+            "seriesOverrides": [
+                {
+                    "alias": "loss_rate_download",
+                    "transform": "negative-Y"
+                }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "loss_rate_download",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "loss_rate_download"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                },
+                {
+                    "alias": "loss_rate_upload",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "refId": "B",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "loss_rate_upload"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Loss Rate: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "percent",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 5,
+                "w": 12,
+                "x": 0,
+                "y": 30
+            },
+            "hiddenSeries": false,
+            "id": 9,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": "jitsi_host",
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting2",
+                    "value": "vmeeting2"
+                }
+            },
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "participants",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT \"participants\" FROM \"jitsi_stats\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter",
+                    "rawQuery": false,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "participants"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Participants: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "decimals": 0,
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": "0",
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "InfluxDB",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 5,
+                "w": 12,
+                "x": 12,
+                "y": 30
+            },
+            "hiddenSeries": false,
+            "id": 25,
+            "interval": "5s",
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "repeat": null,
+            "repeatIteration": 1593476841852,
+            "repeatPanelId": 9,
+            "scopedVars": {
+                "jitsi_host": {
+                    "selected": false,
+                    "text": "vmeeting3",
+                    "value": "vmeeting3"
+                }
+            },
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "alias": "participants",
+                    "groupBy": [
+                        {
+                            "params": [
+                                "$interval"
+                            ],
+                            "type": "time"
+                        }
+                    ],
+                    "measurement": "jitsi_stats",
+                    "orderByTime": "ASC",
+                    "policy": "default",
+                    "query": "SELECT \"participants\" FROM \"jitsi_stats\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter",
+                    "rawQuery": false,
+                    "refId": "A",
+                    "resultFormat": "time_series",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "participants"
+                                ],
+                                "type": "field"
+                            },
+                            {
+                                "params": [],
+                                "type": "last"
+                            }
+                        ]
+                    ],
+                    "tags": [
+                        {
+                            "key": "host",
+                            "operator": "=~",
+                            "value": "/^$jitsi_host$/"
+                        }
+                    ]
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Participants: $jitsi_host",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "decimals": 0,
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": "0",
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 25,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": [
+            {
+                "allValue": null,
+                "current": {
+                    "selected": true,
+                    "tags": [],
+                    "text": "All",
+                    "value": [
+                        "$__all"
+                    ]
+                },
+                "datasource": "InfluxDB",
+                "definition": "show tag values from \"jitsi_stats\" with key=\"host\"",
+                "hide": 0,
+                "includeAll": true,
+                "label": "Vmeeting Servers",
+                "multi": true,
+                "name": "jitsi_host",
+                "options": [],
+                "query": "show tag values from \"jitsi_stats\" with key=\"host\"",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "tagValuesQuery": "",
+                "tags": [],
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            }
+        ]
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {
+        "refresh_intervals": [
+            "10s",
+            "30s",
+            "1m",
+            "5m"
+        ]
+    },
+    "timezone": "",
+    "title": "Vmeeting",
+    "uid": "mcfIHGrZzcombined",
+    "version": 15
+}
