@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
     influxdb:
@@ -22,29 +22,6 @@ services:
             - GF_SECURITY_ADMIN_PASSWORD=admin
         volumes:
             - ./grafana/provisioning/datasources/telegraf.yaml:/etc/grafana/provisioning/datasources/telegraf.yaml:ro
-        depends_on:
-            - influxdb
-        networks:
-            meet.jitsi:
-
-    telegraf:
-        # https://www.jacobtomlinson.co.uk/monitoring/2016/06/23/running-telegraf-inside-a-container
-        image: telegraf:1.14
-        restart: ${RESTART_POLICY}
-        expose:
-            - '8125'
-            - '8092'
-            - '8094'
-        volumes:
-            - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-            - /sys:/rootfs/sys:ro
-            - /proc:/rootfs/proc:ro
-            - /etc:/rootfs/etc:ro
-        environment:
-            - HOST_PROC=/rootfs/proc
-            - HOST_SYS=/rootfs/sys
-            - HOST_ETC=/rootfs/etc
-        hostname: ${DOCKER_HOST_ADDRESS}
         depends_on:
             - influxdb
         networks:

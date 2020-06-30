@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv bash
+
+# get host hostname
+HOSTNAME=$(cat  ${HOST_ETC}/hostname | awk '{print $1;}')
+sed -i "s/{{ HOST_NAME }}/${HOSTNAME}/g" /etc/telegraf/telegraf.conf
+
+exec /bin/bash -c "/usr/bin/telegraf"
