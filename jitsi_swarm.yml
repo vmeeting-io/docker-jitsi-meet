@@ -72,8 +72,8 @@ services:
         env_file: .env
         environment:
             - DISPLAY=:0
-        # volumes:
-        #     - /dev/shm:/dev/shm
+        volumes:
+            - /dev/shm:/dev/shm
         networks:
             jitsi_meet:
         deploy:
