@@ -25,9 +25,7 @@ services:
             - TZ
             - DISPLAY=:0
             - JIBRI_ALSA_CARD_INDEX=0
+        depends_on:
+            - jicofo
         networks:
             meet.jitsi:
-networks:
-    meet.jitsi:
-        external: true
-        name: jitsi
