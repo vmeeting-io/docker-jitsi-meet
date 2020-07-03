@@ -36,9 +36,13 @@ services:
             options:
                 max-size: "200k"
                 max-file: "10"
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     web:
-        image: theun/web:latest
+        image: dpnm/web:latest
         env_file: .env
         volumes:
             - ~/.jitsi-meet-cfg/web:/config
@@ -109,7 +113,7 @@ services:
         networks:
             jitsi_meet:
         deploy:
-            replicas: 1
+            replicas: 4
 
     # Monitoring stack
     influxdb:
