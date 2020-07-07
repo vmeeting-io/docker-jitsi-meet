@@ -35,6 +35,7 @@ ENV REACT_APP_AUTH_API_BASE=${REACT_APP_AUTH_API_BASE}
 ENV REACT_APP_JWT_TOKEN=${REACT_APP_JWT_TOKEN}
 
 COPY jitsi-meet/ /web/jitsi-meet/
+RUN cp -f /web/jitsi-meet/interface_config.js /defaults
 RUN echo REACT_APP_AUTH_API_BASE=${REACT_APP_AUTH_API_BASE} > .env \
   && echo REACT_APP_AUTH_PAGE_BASE=${REACT_APP_AUTH_PAGE_BASE} >> .env \
   && echo REACT_APP_JWT_TOKEN=${REACT_APP_JWT_TOKEN} >> .env
