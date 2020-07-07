@@ -46,7 +46,8 @@ services:
             - REACT_APP_AUTH_API_BASE=${VMEETING_API_BASE}
             - REACT_APP_AUTH_PAGE_BASE=${VMEETING_FRONT_BASE}
             - REACT_APP_JWT_TOKEN=${JWT_APP_ID}
-            - RECORDING_DOWNLOAD_BASE=${RECORDING_DOWNLOAD_BASE}
+            - RECORDING_DOWNLOAD_BASE
+            - VMEETING_GRAFANA_BASE
         networks:
             meet.jitsi:
                 aliases:
