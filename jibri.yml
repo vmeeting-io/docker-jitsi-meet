@@ -38,5 +38,7 @@ services:
         restart: ${RESTART_POLICY}
         volumes:
             - ${CONFIG}/storage:/recordings:z
+        environment:
+            - RECORDING_RETETION_DAYS
         networks:
             meet.jitsi:
