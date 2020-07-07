@@ -58,6 +58,7 @@ RUN mv /usr/bin/google-chrome /usr/bin/google-chrome-bin
 RUN mv /usr/bin/ffmpeg /usr/bin/ffmpeg-bin
 COPY rootfs/ /
 
+RUN chmod 755 /wait-for-it.sh
 
 RUN \
 	chmod 755 /usr/bin/ffmpeg && \
@@ -71,6 +72,7 @@ RUN \
 	chmod 600 /home/jibri/.ssh/id_rsa.pub && \
 	chmod 644 /etc/ssh/ssh_config
 
-
+# override the base image s6-overlay entrypoint
+ENTRYPOINT []
 VOLUME /config
 

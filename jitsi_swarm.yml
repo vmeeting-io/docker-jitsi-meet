@@ -119,6 +119,7 @@ services:
     jibri:
         image: dpnm/jibri:latest
         env_file: .env
+        command: /wait-for-it.sh -t 0 prosody:5222 -- /init
         environment:
             - DISPLAY=:0
         volumes:
