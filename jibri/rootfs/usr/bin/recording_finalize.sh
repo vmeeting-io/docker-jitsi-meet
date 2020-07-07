@@ -92,6 +92,6 @@ curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" --data-urlencode "$MESSAGE" -
     --data-urlencode "$SOURCE" --data-urlencode "$ACTION" --data-urlencode "$SUBJECT"  "$ENDPOINT"
 
 #
-# finally remove the recorded files
+# finally remove the recorded folder
 #
-rm -r ${REC_DIR}
+rm -r ${UPLOAD_DIR}
