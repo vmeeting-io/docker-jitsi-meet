@@ -27,6 +27,7 @@ services:
             - AWS_ACCESS_KEY_ID
             - PUBLIC_URL
             - RECORDING_DOWNLOAD_BASE
+            - RECORDING_RETETION_DAYS
             - DISPLAY=:0
         depends_on:
             - jicofo
