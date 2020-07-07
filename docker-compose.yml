@@ -12,6 +12,7 @@ services:
             - ${CONFIG}/web:/config:Z
             - ${CONFIG}/web/letsencrypt:/etc/letsencrypt:Z
             - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
+            - ${CONFIG}/storage:/recordings:z
         environment:
             - ENABLE_AUTH
             - ENABLE_GUESTS
@@ -45,6 +46,7 @@ services:
             - REACT_APP_AUTH_API_BASE=${VMEETING_API_BASE}
             - REACT_APP_AUTH_PAGE_BASE=${VMEETING_FRONT_BASE}
             - REACT_APP_JWT_TOKEN=${JWT_APP_ID}
+            - RECORDING_DOWNLOAD_BASE=${RECORDING_DOWNLOAD_BASE}
         networks:
             meet.jitsi:
                 aliases:

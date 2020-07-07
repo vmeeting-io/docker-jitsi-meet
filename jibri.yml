@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
     jibri:
-        image: dpnm/jibri:latest
+        image: theun/jibri:latest
         restart: ${RESTART_POLICY}
         volumes:
             - ${CONFIG}/jibri:/config:Z
@@ -23,9 +23,20 @@ services:
             - JIBRI_STRIP_DOMAIN_JID
             - JIBRI_LOGS_DIR
             - TZ
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_ACCESS_KEY_ID
+            - PUBLIC_URL
+            - RECORDING_DOWNLOAD_BASE
             - DISPLAY=:0
-            - JIBRI_ALSA_CARD_INDEX=0
         depends_on:
             - jicofo
+        networks:
+            meet.jitsi:
+
+    storage:
+        image: theun/storage:latest
+        restart: ${RESTART_POLICY}
+        volumes:
+            - ${CONFIG}/storage:/recordings:z
         networks:
             meet.jitsi:

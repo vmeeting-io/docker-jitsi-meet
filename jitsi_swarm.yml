@@ -48,6 +48,7 @@ services:
             - ~/.jitsi-meet-cfg/web:/config
             - ~/.jitsi-meet-cfg/web/letsencrypt:/etc/letsencrypt
             - ~/.jitsi-meet-cfg/transcripts:/usr/share/jitsi-meet/transcripts
+            - ~/.jitsi-meet-cfg/storage:/recordings
         ports:
             - '80:80'
             - '443:443'
@@ -60,9 +61,21 @@ services:
                 constraints:
                     - "node.role==manager"
 
+    # storage must be in the same node with web
+    storage:
+        image: dpnm/storage:latest
+        volumes:
+            - ~/.jitsi-meet-cfg/storage:/recordings
+        networks:
+            jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
     # XMPP server
     prosody:
-        image: theun/prosody:latest
+        image: dpnm/prosody:latest
         env_file: .env
         networks:
             jitsi_meet:
@@ -71,7 +84,7 @@ services:
 
     # Focus component
     jicofo:
-        image: theun/jicofo:latest
+        image: dpnm/jicofo:latest
         env_file: .env
         networks:
             jitsi_meet:
@@ -133,7 +146,7 @@ services:
 
 networks:
     jitsi_meet:
-        # ipam:
-        #     driver: default
-        #     config:
-        #         - subnet: 172.28.0.0/16
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.28.0.0/16

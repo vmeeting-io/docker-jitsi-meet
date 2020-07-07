@@ -44,19 +44,33 @@ RUN \
 
 RUN \
         apt-dpkg-wrap apt-get update \
+        && apt-dpkg-wrap apt-get install -y openssh-server rsync \
+        && apt-cleanup
+
+RUN \
+        apt-dpkg-wrap apt-get update \
         && apt-dpkg-wrap apt-get install -y dbus dbus-x11 pulseaudio pulseaudio-utils rtkit \
         && apt-cleanup
 RUN adduser jibri rtkit
 
-RUN mkdir -p /home/jibri/.config/pulse
-COPY pulse/ /home/jibri/.config/pulse
-RUN chown jibri:jibri /home/jibri/.config -R
 
 RUN mv /usr/bin/google-chrome /usr/bin/google-chrome-bin
 RUN mv /usr/bin/ffmpeg /usr/bin/ffmpeg-bin
 COPY rootfs/ /
-RUN chmod 755 /usr/bin/ffmpeg
-RUN chmod 755 /usr/bin/google-chrome
+
+
+RUN \
+	chmod 755 /usr/bin/ffmpeg && \
+	chmod 755 /usr/bin/google-chrome && \
+	chmod 755 /usr/bin/recording_finalize.sh
+
+RUN chown jibri:jibri /home/jibri -R
+
+RUN \
+	chmod 600 /home/jibri/.ssh/id_rsa && \
+	chmod 600 /home/jibri/.ssh/id_rsa.pub && \
+	chmod 644 /etc/ssh/ssh_config
+
 
 VOLUME /config
 
