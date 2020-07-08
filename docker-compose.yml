@@ -148,7 +148,7 @@ services:
 
     # Video bridge
     jvb:
-        image: jitsi/jvb:latest
+        image: theun/jvb:latest
         restart: ${RESTART_POLICY}
         ports:
             - '${JVB_PORT}:${JVB_PORT}/udp'
