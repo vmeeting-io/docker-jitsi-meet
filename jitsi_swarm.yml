@@ -9,6 +9,10 @@ services:
             - '3000:3000'
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Auth API Backend
     vmapi:
@@ -19,12 +23,16 @@ services:
         command: /vmeeting-api/wait-for-it.sh -t 0 mongo:27017 -- nodemon -x "node app.js || (sleep 10; touch app.js)"
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     mongo:
         image: dpnm/mongo:latest
         env_file: .env
         volumes:
-            - ~/.jitsi-meet-cfg/mongo/db:/data/db
+            - ~/.jitsi-meet-cfg/mongo:/data/db
         # We use WiredTiger in all environments. In development environments we use small files
         # to conserve disk space, and disable the journal for a minor performance gain.
         # See https://docs.mongodb.com/v3.0/reference/program/mongod/#options for complete details.
@@ -36,6 +44,31 @@ services:
             options:
                 max-size: "200k"
                 max-file: "10"
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    # Monitoring stack
+    influxdb:
+        image: influxdb:1.8
+        networks:
+            jitsi_meet:
+        volumes:
+            - ~/.jitsi-meet-cfg/influxdb:/var/lib/influxdb
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    grafana:
+        image: dpnm/grafana:latest
+        env_file: .env
+        user: "0"
+        volumes:
+            -  ~/.jitsi-meet-cfg/grafana:/var/lib/grafana
+        networks:
+            jitsi_meet:
         deploy:
             placement:
                 constraints:
@@ -128,25 +161,6 @@ services:
             jitsi_meet:
         deploy:
             replicas: 4
-
-    # Monitoring stack
-    influxdb:
-        image: influxdb:1.8
-        networks:
-            jitsi_meet:
-
-    grafana:
-        image: dpnm/grafana:latest
-        env_file: .env
-        user: "0"
-        volumes:
-            -  ~/.jitsi-meet-cfg/grafana:/var/lib/grafana
-        networks:
-            jitsi_meet:
-        deploy:
-            placement:
-                constraints:
-                    - "node.role==manager"
 
 networks:
     jitsi_meet:
