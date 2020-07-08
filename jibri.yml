@@ -7,6 +7,7 @@ services:
         volumes:
             - ${CONFIG}/jibri:/config:Z
             - /dev/shm:/dev/shm
+        command: /wait-for-it.sh -t 0 prosody:5222 -- /init
         environment:
             - XMPP_AUTH_DOMAIN
             - XMPP_INTERNAL_MUC_DOMAIN
