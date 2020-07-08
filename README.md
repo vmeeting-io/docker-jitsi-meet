@@ -2,6 +2,7 @@
 - Create swarm cluster with 1 manager node. Worker nodes are for replicating jvb and jibri.
 - Pre-create pesistent storage folders
     ```shell
+    sudo rm -rf ~/.jitsi-meet-cfg
     mkdir -p ~/.jitsi-meet-cfg/{web/letsencrypt,transcripts,jibri,mongo,influxdb,storage,grafana}
     ```
 - Deploy
