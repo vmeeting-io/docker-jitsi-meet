@@ -110,6 +110,10 @@ services:
             jitsi_meet:
                 aliases:
                     - xmpp.meet.jitsi
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Focus component
     jicofo:
@@ -117,6 +121,10 @@ services:
         env_file: .env
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Video bridge
     jvb:
@@ -156,7 +164,7 @@ services:
         networks:
             jitsi_meet:
         deploy:
-            replicas: 4
+            replicas: 12
 
 networks:
     jitsi_meet:
