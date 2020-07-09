@@ -63,7 +63,7 @@ rsync -r $REC_DIR root@storage:/recordings
 
 FROM_EMAIL="smartlearn-info@postech.ac.kr"
 TO_EMAIL="${RECORDER_EMAIL}"
-EMAIL_SUBJECT="Download recorded file for Vmeeting ${MEETING_NAME}"
+EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}"
 EMAIL_MESSAGE="Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
@@ -75,7 +75,7 @@ NOTE: The recorded file(s) will be automatically DELETED from our servers after 
 
 
 This is out-going email only.
-Copyright@2019 Pohang University of Science and Technology. ALL RIGHTS RESERVED."
+Copyright@2020 Pohang University of Science and Technology. ALL RIGHTS RESERVED."
 
 DATE="$(date -R)"
 SIGNATURE="$(echo -n "$DATE" | openssl dgst -sha256 -hmac "${AWS_SECRET_ACCESS_KEY}" -binary | base64 -w 0)"
