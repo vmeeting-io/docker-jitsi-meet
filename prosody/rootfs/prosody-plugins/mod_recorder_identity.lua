@@ -6,7 +6,7 @@ module:hook("pre-iq/full", function(event)
     local stanza = event.stanza;
     if stanza.name == "iq" then
         local jibri = stanza:get_child('jibri', 'http://jitsi.org/protocol/jibri');
-        if jibri and jibri.attr.action == 'start' then
+        if jibri and jibri.attr.action == 'start' and jibri.attr.recording_mode == 'file' then
             local recorder_identity = event.origin.jitsi_meet_context_user;
             if recorder_identity then
                 log('info', "new recording session by: " .. recorder_identity.email);

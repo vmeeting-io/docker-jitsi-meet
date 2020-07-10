@@ -1,7 +1,9 @@
 #!/usr/bin/with-contenv bash
 
-# get host hostname
-HOSTNAME=$(cat  ${HOST_ETC}/hostname | awk '{print $1;}')
-sed -i "s/{{ HOST_NAME }}/${HOSTNAME}/g" /etc/telegraf/telegraf.conf
+if [[ $ENABLE_TELEGRAF -eq 1 || x$ENABLE_TELEGRAF == xtrue ]]; then
+    # get host hostname
+    HOSTNAME=$(cat  ${HOST_ETC}/hostname | awk '{print $1;}')
+    sed -i "s/{{ HOST_NAME }}/${HOSTNAME}/g" /etc/telegraf/telegraf.conf
 
-exec /bin/bash -c "/usr/bin/telegraf"
+    exec /bin/bash -c "/usr/bin/telegraf"
+fi

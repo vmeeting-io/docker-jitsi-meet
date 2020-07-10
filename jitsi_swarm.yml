@@ -5,26 +5,30 @@ services:
     vmfront:
         image: dpnm/vmfront:latest
         env_file: .env
-        ports:
-            - '3000:3000'
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Auth API Backend
     vmapi:
         image: dpnm/vmapi:latest
         env_file: .env
-        ports:
-            - '5000:5000'
         command: /vmeeting-api/wait-for-it.sh -t 0 mongo:27017 -- nodemon -x "node app.js || (sleep 10; touch app.js)"
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     mongo:
         image: dpnm/mongo:latest
         env_file: .env
         volumes:
-            - ~/.jitsi-meet-cfg/mongo/db:/data/db
+            - ~/.jitsi-meet-cfg/mongo:/data/db
         # We use WiredTiger in all environments. In development environments we use small files
         # to conserve disk space, and disable the journal for a minor performance gain.
         # See https://docs.mongodb.com/v3.0/reference/program/mongod/#options for complete details.
@@ -41,6 +45,31 @@ services:
                 constraints:
                     - "node.role==manager"
 
+    # Monitoring stack
+    influxdb:
+        image: influxdb:1.8
+        networks:
+            jitsi_meet:
+        volumes:
+            - ~/.jitsi-meet-cfg/influxdb:/var/lib/influxdb
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    grafana:
+        image: dpnm/grafana:latest
+        env_file: .env
+        user: "0"
+        volumes:
+            -  ~/.jitsi-meet-cfg/grafana:/var/lib/grafana
+        networks:
+            jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
     web:
         image: dpnm/web:latest
         env_file: .env
@@ -48,6 +77,7 @@ services:
             - ~/.jitsi-meet-cfg/web:/config
             - ~/.jitsi-meet-cfg/web/letsencrypt:/etc/letsencrypt
             - ~/.jitsi-meet-cfg/transcripts:/usr/share/jitsi-meet/transcripts
+            - ~/.jitsi-meet-cfg/storage:/recordings
         ports:
             - '80:80'
             - '443:443'
@@ -60,21 +90,41 @@ services:
                 constraints:
                     - "node.role==manager"
 
+    # storage must be in the same node with web
+    storage:
+        image: dpnm/storage:latest
+        volumes:
+            - ~/.jitsi-meet-cfg/storage:/recordings
+        networks:
+            jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
+
     # XMPP server
     prosody:
-        image: theun/prosody:latest
+        image: dpnm/prosody:latest
         env_file: .env
         networks:
             jitsi_meet:
                 aliases:
                     - xmpp.meet.jitsi
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Focus component
     jicofo:
-        image: theun/jicofo:latest
+        image: dpnm/jicofo:latest
         env_file: .env
         networks:
             jitsi_meet:
+        deploy:
+            placement:
+                constraints:
+                    - "node.role==manager"
 
     # Video bridge
     jvb:
@@ -106,6 +156,7 @@ services:
     jibri:
         image: dpnm/jibri:latest
         env_file: .env
+        command: /wait-for-it.sh -t 0 prosody:5222 -- /init
         environment:
             - DISPLAY=:0
         volumes:
@@ -113,27 +164,11 @@ services:
         networks:
             jitsi_meet:
         deploy:
-            replicas: 4
-
-    # Monitoring stack
-    influxdb:
-        image: influxdb:1.8
-        networks:
-            jitsi_meet:
-
-    grafana:
-        image: dpnm/grafana:latest
-        user: "1000"
-        ports:
-            - '3010:3000'
-        environment:
-            - GF_SECURITY_ADMIN_PASSWORD=admin
-        networks:
-            jitsi_meet:
+            replicas: 12
 
 networks:
     jitsi_meet:
-        # ipam:
-        #     driver: default
-        #     config:
-        #         - subnet: 172.28.0.0/16
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.28.0.0/16

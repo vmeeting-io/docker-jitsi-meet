@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+set -e
+shopt -s nullglob
+
+RECORDING_DIR=/recordings
+[ ! -d "$RECORDING_DIR" ] && echo "Directory ${RECORDING_DIR} DOES NOT exists." && exit 1
+
+if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
+    while true; do
+        cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
+        cd $RECORDING_DIR && find * -type d -empty -delete
+        # check every 12h
+        sleep 12h
+    done
+fi
