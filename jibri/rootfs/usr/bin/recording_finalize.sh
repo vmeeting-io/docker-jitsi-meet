@@ -61,7 +61,7 @@ rsync -r $REC_DIR root@storage:/recordings
 # send email about download link to the recorder user
 #
 
-FROM_EMAIL="smartlearn-info@postech.ac.kr"
+FROM_EMAIL="vmeeting-info@postech.ac.kr"
 TO_EMAIL="${RECORDER_EMAIL}"
 EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}"
 EMAIL_MESSAGE="Dear ${RECORDER_NAME},
