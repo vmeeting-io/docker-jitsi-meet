@@ -3,7 +3,7 @@ version: '3.8'
 services:
     # Auth Frontend
     vmfront:
-        image: dpnm/vmfront:latest
+        image: theun/vmfront:latest
         env_file: .env
         networks:
             jitsi_meet:
@@ -14,7 +14,7 @@ services:
 
     # Auth API Backend
     vmapi:
-        image: dpnm/vmapi:latest
+        image: theun/vmapi:latest
         env_file: .env
         command: /vmeeting-api/wait-for-it.sh -t 0 mongo:27017 -- nodemon -x "node app.js || (sleep 10; touch app.js)"
         networks:
@@ -25,7 +25,7 @@ services:
                     - "node.role==manager"
 
     mongo:
-        image: dpnm/mongo:latest
+        image: theun/mongo:latest
         env_file: .env
         volumes:
             - ~/.jitsi-meet-cfg/mongo:/data/db
@@ -58,7 +58,7 @@ services:
                     - "node.role==manager"
 
     grafana:
-        image: dpnm/grafana:latest
+        image: theun/grafana:latest
         env_file: .env
         user: "0"
         volumes:
@@ -71,7 +71,7 @@ services:
                     - "node.role==manager"
 
     web:
-        image: dpnm/web:latest
+        image: theun/web:latest
         env_file: .env
         volumes:
             - ~/.jitsi-meet-cfg/web:/config
@@ -92,7 +92,7 @@ services:
 
     # storage must be in the same node with web
     storage:
-        image: dpnm/storage:latest
+        image: theun/storage:latest
         volumes:
             - ~/.jitsi-meet-cfg/storage:/recordings
         networks:
@@ -104,7 +104,7 @@ services:
 
     # XMPP server
     prosody:
-        image: dpnm/prosody:latest
+        image: theun/prosody:latest
         env_file: .env
         networks:
             jitsi_meet:
@@ -117,7 +117,7 @@ services:
 
     # Focus component
     jicofo:
-        image: dpnm/jicofo:latest
+        image: theun/jicofo:latest
         env_file: .env
         networks:
             jitsi_meet:
@@ -128,7 +128,7 @@ services:
 
     # Video bridge
     jvb:
-        image: dpnm/jvb:latest
+        image: theun/jvb:latest
         env_file: .env
         ports:
             - target: 10000
@@ -154,7 +154,7 @@ services:
             mode: global
 
     jibri:
-        image: dpnm/jibri:latest
+        image: theun/jibri:latest
         env_file: .env
         command: /wait-for-it.sh -t 0 prosody:5222 -- /init
         environment:
