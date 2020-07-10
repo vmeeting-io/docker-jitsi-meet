@@ -10,7 +10,7 @@ services:
             meet.jitsi:
 
     grafana:
-        image: dpnm/grafana:latest
+        image: theun/grafana:latest
         restart: ${RESTART_POLICY}
         user: "0"
         volumes:

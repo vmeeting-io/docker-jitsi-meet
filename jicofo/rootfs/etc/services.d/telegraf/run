@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+if [[ $ENABLE_TELEGRAF -eq 1 || x$ENABLE_TELEGRAF == xtrue ]]; then
+    exec /bin/bash -c "/usr/bin/telegraf"
+fi

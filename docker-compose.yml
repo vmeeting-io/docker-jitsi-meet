@@ -141,6 +141,7 @@ services:
             - JIBRI_BREWERY_MUC
             - JIBRI_PENDING_TIMEOUT
             - TZ
+            - ENABLE_TELEGRAF
         depends_on:
             - prosody
         networks:
