@@ -17,6 +17,23 @@ if [[ "$JIBRI_XMPP_PASSWORD" == "$OLD_JIBRI_XMPP_PASSWORD" ]]; then
     exit 1
 fi
 
+# jibri recording_finalize
+
+if [[ -z $SMTP_SERVER ]]; then
+    echo 'FATAL ERROR: SMTP_SERVER must be set'
+    exit 1
+fi
+
+if [[ -z $NOREPLY_MAIL ]]; then
+    echo 'FATAL ERROR: NOREPLY_MAIL must be set'
+    exit 1
+fi
+
+sed -i \
+    -e 's#SMTP_SERVER=.*#SMTP_SERVER=${SMTP_SERVER}#' \
+    -e 's#MAIL_FROM=.*#MAIL_FROM=${NOREPLY_MAIL}#' \
+    ${JIBRI_FINALIZE_RECORDING_SCRIPT_PATH}
+
 # DISPLAY is necessary for start
 [ -z "${DISPLAY}" ] \
 && ( echo -e "\e[31mERROR: Please set DISPLAY variable.\e[39m"; kill 1; exit 1 )

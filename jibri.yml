@@ -29,6 +29,8 @@ services:
             - PUBLIC_URL
             - RECORDING_DOWNLOAD_BASE
             - RECORDING_RETETION_DAYS
+            - NOREPLY_MAIL
+            - SMTP_SERVER
             - DISPLAY=:0
         depends_on:
             - jicofo

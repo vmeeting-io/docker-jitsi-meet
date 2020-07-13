@@ -44,7 +44,7 @@ RUN \
 
 RUN \
         apt-dpkg-wrap apt-get update \
-        && apt-dpkg-wrap apt-get install -y openssh-server rsync \
+        && apt-dpkg-wrap apt-get install -y openssh-server rsync dos2unix \
         && apt-cleanup
 
 RUN \

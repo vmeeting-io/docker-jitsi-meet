@@ -2,6 +2,10 @@
 set -e
 shopt -s nullglob
 
+
+SMTP_SERVER=smtp.postech.ac.kr:25
+MAIL_FROM=noreply@vmeeting.postech.ac.kr
+
 #
 # the directory where the files and metadata exists
 #
@@ -37,7 +41,7 @@ MEETING_NAME="${URL##*/}"
 
 #
 # copy recorded folder to the central storage (only copy video and transcript)
-# and generate download link
+# generate download link and email content
 # We use a random name for security and not depend on jibri random folder name
 #
 
@@ -55,16 +59,13 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
 ${LINK}"
 done
 
-rsync -r $REC_DIR root@storage:/recordings
+# create email content
+EMAIL_MESSAGE="\
+From: <${MAIL_FROM}>
+To: <${RECORDER_EMAIL}>
+Subject: [Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}
 
-#
-# send email about download link to the recorder user
-#
-
-FROM_EMAIL="vmeeting-info@postech.ac.kr"
-TO_EMAIL="${RECORDER_EMAIL}"
-EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}"
-EMAIL_MESSAGE="Dear ${RECORDER_NAME},
+Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
 
@@ -77,19 +78,24 @@ NOTE: The recorded file(s) will be automatically DELETED from our servers after 
 This is out-going email only.
 Copyright@2020 Pohang University of Science and Technology. ALL RIGHTS RESERVED."
 
-DATE="$(date -R)"
-SIGNATURE="$(echo -n "$DATE" | openssl dgst -sha256 -hmac "${AWS_SECRET_ACCESS_KEY}" -binary | base64 -w 0)"
-AUTH_HEADER="X-Amzn-Authorization: AWS3-HTTPS AWSAccessKeyId=${AWS_ACCESS_KEY_ID}, Algorithm=HmacSHA256, Signature=$SIGNATURE"
-ENDPOINT="https://email.us-west-2.amazonaws.com/"
+echo "$EMAIL_MESSAGE" > ${REC_DIR}/email.txt
 
-ACTION="Action=SendEmail"
-SOURCE="Source=$FROM_EMAIL"
-DEST="Destination.ToAddresses.member.1=$TO_EMAIL"
-SUBJECT="Message.Subject.Data=$EMAIL_SUBJECT"
-MESSAGE="Message.Body.Text.Data=$EMAIL_MESSAGE"
+# RFC 5322 require CRLF line ending for email content
+unix2dos ${REC_DIR}/email.txt
 
-curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" --data-urlencode "$MESSAGE" --data-urlencode "$DEST" \
-    --data-urlencode "$SOURCE" --data-urlencode "$ACTION" --data-urlencode "$SUBJECT"  "$ENDPOINT"
+# finally sync everything to storage
+rsync -r $REC_DIR root@storage:/recordings
+
+#
+# send email about download link to the recorder user
+# email is sent via the storage container, which runs in manager node.
+# port 25 should be opened by the ISP for the manager node
+#
+
+ssh root@storage "curl --url \"$SMTP_SERVER\" \
+                --mail-from \"$MAIL_FROM\" \
+                --mail-rcpt \"$RECORDER_EMAIL\" \
+                --upload-file /recordings/$REC_FOLDER/email.txt"
 
 #
 # finally remove the recorded folder
