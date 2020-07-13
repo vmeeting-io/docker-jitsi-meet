@@ -94,13 +94,6 @@ if [[ ! -f /config/config.js ]]; then
         /config/config.js
     fi
 
-    if [[ $ENABLE_RECORDING -ne 1 || "$ENABLE_RECORDING" != "true" ]];
-        sed -i \
-            -e "s#'recording', ##" \
-            -e "s#'livestreaming', ##" \
-            /config/interface_config.js
-    fi
-
     if [[ $ENABLE_AUTH -eq 1 ]]; then
         if [[ $ENABLE_GUESTS -eq 1 ]]; then
             sed -i \
@@ -137,6 +130,13 @@ if [[ ! -f /config/interface_config.js ]]; then
     if [[ $ENABLE_TRANSCRIPTIONS -ne 1 || "$ENABLE_TRANSCRIPTIONS" != "true" ]]; then
         sed -i \
             -e "s#'closedcaptions', ##" \
+            /config/interface_config.js
+    fi
+
+    if [[ $ENABLE_RECORDING -ne 1 || "$ENABLE_RECORDING" != "true" ]]; then
+        sed -i \
+            -e "s#'recording', ##" \
+            -e "s#'livestreaming', ##" \
             /config/interface_config.js
     fi
 
