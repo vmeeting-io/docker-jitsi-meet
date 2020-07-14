@@ -2,3 +2,6 @@
 .env
 .env.bak
 docker-compose.override.yml
+id_rsa
+id_rsa.pub
+authorized_keys
