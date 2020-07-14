@@ -2,7 +2,7 @@ FORCE_REBUILD ?= 0
 JITSI_RELEASE ?= stable
 JITSI_BUILD ?= latest
 JITSI_REPO ?= theun
-JITSI_SERVICES ?= base base-java web prosody jicofo jvb jigasi etherpad jibri
+JITSI_SERVICES ?= base base-java web prosody jicofo jvb jigasi etherpad jibri storage grafana
 
 BUILD_ARGS := --build-arg JITSI_REPO=$(JITSI_REPO)
 ifeq ($(FORCE_REBUILD), 1)
@@ -25,6 +25,7 @@ push:
 	docker push $(JITSI_REPO)/$(JITSI_SERVICE):$(JITSI_BUILD)
 
 %-all:
+	@if [ ! -f jibri/rootfs/home/jibri/.ssh/id_rsa ]; then ./ssh_keygen_jibri.sh; fi
 	@$(foreach SERVICE, $(JITSI_SERVICES), $(MAKE) --no-print-directory JITSI_SERVICE=$(SERVICE) $(subst -all,;,$@))
 
 clean:

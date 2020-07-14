@@ -1,3 +1,16 @@
+# Jitsi swarm mode
+- Create swarm cluster with 1 manager node. Worker nodes are for replicating jvb and jibri.
+- Pre-create pesistent storage folders
+    ```shell
+    sudo rm -rf ~/.jitsi-meet-cfg
+    mkdir -p ~/.jitsi-meet-cfg/{web/letsencrypt,transcripts,jibri,mongo,influxdb,storage,grafana}
+    ```
+- Deploy
+    ```shell
+    docker stack deploy --compose-file jitsi_swarm.yml jitsi
+    ```
+- After deployment, goto `https://{{ HOMEPAGE }}/admin/stats` to have initital setup for grafana monitoring stack.
+
 # Jitsi Meet on Docker
 
 ![](resources/jitsi-docker.png)

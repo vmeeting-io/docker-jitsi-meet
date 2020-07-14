@@ -2,11 +2,12 @@ version: '3.8'
 
 services:
     jibri:
-        image: dpnm/jibri:latest
+        image: theun/jibri:latest
         restart: ${RESTART_POLICY}
         volumes:
             - ${CONFIG}/jibri:/config:Z
             - /dev/shm:/dev/shm
+        command: /wait-for-it.sh -t 0 prosody:5222 -- /init
         environment:
             - XMPP_AUTH_DOMAIN
             - XMPP_INTERNAL_MUC_DOMAIN
@@ -23,9 +24,25 @@ services:
             - JIBRI_STRIP_DOMAIN_JID
             - JIBRI_LOGS_DIR
             - TZ
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_ACCESS_KEY_ID
+            - PUBLIC_URL
+            - RECORDING_DOWNLOAD_BASE
+            - RECORDING_RETETION_DAYS
+            - NOREPLY_MAIL
+            - SMTP_SERVER
             - DISPLAY=:0
-            - JIBRI_ALSA_CARD_INDEX=0
         depends_on:
             - jicofo
+        networks:
+            meet.jitsi:
+
+    storage:
+        image: theun/storage:latest
+        restart: ${RESTART_POLICY}
+        volumes:
+            - ${CONFIG}/storage:/recordings:z
+        environment:
+            - RECORDING_RETETION_DAYS
         networks:
             meet.jitsi:
