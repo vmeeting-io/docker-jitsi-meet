@@ -69,7 +69,7 @@ Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
 
-The recorded file(s) for the Vmeeting "${MEETING_NAME}" is now avaiable for download at:
+The recorded file(s) for the Vmeeting "${MEETING_NAME}" is now available for downloading at:
 ${DOWNLOAD_LINKS}
 
 NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days.
