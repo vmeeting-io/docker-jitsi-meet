@@ -61,15 +61,15 @@ done
 
 # create email content
 EMAIL_MESSAGE="\
-From: "Vmeeting" <${MAIL_FROM}>
+From: Vmeeting <${MAIL_FROM}>
 To: <${RECORDER_EMAIL}>
-Subject: [Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}
+Subject: [Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\"
 
 Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
 
-The recorded file(s) for the Vmeeting "${MEETING_NAME}" is now available for downloading at:
+The recorded file(s) for the meeting named \"${MEETING_NAME}\" is now available for downloading at:
 ${DOWNLOAD_LINKS}
 
 NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days.
