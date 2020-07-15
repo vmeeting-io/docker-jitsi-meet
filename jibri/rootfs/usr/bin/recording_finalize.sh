@@ -61,7 +61,7 @@ done
 
 # create email content
 EMAIL_MESSAGE="\
-From: Vmeeting <${MAIL_FROM}>
+From: "Vmeeting" <${MAIL_FROM}>
 To: <${RECORDER_EMAIL}>
 Subject: [Vmeeting] Download recorded file for Vmeeting ${MEETING_NAME}
 
