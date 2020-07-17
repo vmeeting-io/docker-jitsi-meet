@@ -78,8 +78,8 @@ if [[ ! -f /config/config.js ]]; then
         /config/config.js
 
     sed -i \
-        -e "s#// startAudioMuted:.*#startAudioMuted: 1,#" \
-        -e "s#// startVideoMuted:.*#startVideoMuted: 1,#" \
+        -e "s#// startAudioMuted:.*#startAudioMuted: 20,#" \
+        -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
         /config/config.js
 
     sed -i \
