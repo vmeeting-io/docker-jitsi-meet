@@ -57,7 +57,7 @@ if [[ ! -f /config/nginx/nginx.conf ]]; then
 fi
 
 if [[ ! -f /config/nginx/meet.conf ]]; then
-    tpl /defaults/meet.conf > /config/nginx/meet.conf
+    tpl /defaults/meet.$NODE_ENV.conf > /config/nginx/meet.conf
 fi
 
 if [[ ! -f /config/nginx/ssl.conf ]]; then
