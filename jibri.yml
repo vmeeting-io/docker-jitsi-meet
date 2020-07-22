@@ -4,6 +4,9 @@ services:
     jibri:
         image: theun/jibri:latest
         restart: ${RESTART_POLICY}
+        build:
+            context: ./docker-jitsi-meet/jibri
+            dockerfile: Dockerfile
         volumes:
             - ${CONFIG}/jibri:/config:Z
             - /dev/shm:/dev/shm
@@ -40,6 +43,9 @@ services:
     storage:
         image: theun/storage:latest
         restart: ${RESTART_POLICY}
+        build:
+            context: ./docker-jitsi-meet/storage
+            dockerfile: Dockerfile
         volumes:
             - ${CONFIG}/storage:/recordings:z
         environment:

@@ -1,3 +1,16 @@
+ifdef VMEETING_API_BASE
+	BUILD_ARGS := $(BUILD_ARGS) --build-arg VMEETING_API_BASE=$(VMEETING_API_BASE)
+	override BUILD_ARGS := $(BUILD_ARGS) --build-arg VMEETING_API_BASE=$(VMEETING_API_BASE)
+endif
+ifdef VMEETING_FRONT_BASE
+ 	BUILD_ARGS := $(BUILD_ARGS) --build-arg VMEETING_FRONT_BASE=$(VMEETING_FRONT_BASE)
+ 	override BUILD_ARGS := $(BUILD_ARGS) --build-arg VMEETING_FRONT_BASE=$(VMEETING_FRONT_BASE)
+endif
+ifdef JWT_APP_ID
+	BUILD_ARGS := $(BUILD_ARGS) --build-arg JWT_APP_ID=$(JWT_APP_ID)
+	override BUILD_ARGS := $(BUILD_ARGS) --build-arg JWT_APP_ID=$(JWT_APP_ID)
+endif
+
 build:
 	docker build $(BUILD_ARGS) -t $(JITSI_REPO)/web .
 

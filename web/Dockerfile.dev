@@ -1,0 +1,12 @@
+FROM node:12
+
+RUN apt-get update && apt-get install -y vim curl make
+
+# `/app/node_modules/.bin`을 $PATH 에 추가
+ENV PATH /web/jitsi-meet/node_modules/.bin:$PATH
+
+WORKDIR /web/jitsi-meet
+COPY jitsi-meet/package*.json ./
+RUN npm install
+
+COPY jitsi-meet/ /web/jitsi-meet/
