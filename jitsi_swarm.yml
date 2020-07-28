@@ -95,6 +95,9 @@ services:
         image: theun/storage:latest
         volumes:
             - ~/.jitsi-meet-cfg/storage:/recordings
+            - type: volume
+              source: vmeeting
+              target: /vmeeting
         networks:
             jitsi_meet:
         deploy:
@@ -165,6 +168,13 @@ services:
             jitsi_meet:
         deploy:
             replicas: 12
+
+volumes:
+    vmeeting:
+        driver_opts:
+            type: "nfs"
+            o: "addr=${NFS_SERVER},nolock,soft,rw"
+            device: ":${NFS_SERVER_PATH}"
 
 networks:
     jitsi_meet:
