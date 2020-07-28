@@ -3,12 +3,20 @@ set -e
 shopt -s nullglob
 
 RECORDING_DIR=/recordings
+VMEETING_DIR=/vmeeting
+
 [ ! -d "$RECORDING_DIR" ] && echo "Directory ${RECORDING_DIR} DOES NOT exists." && exit 1
+[ ! -d "$VMEETING_DIR" ] && echo "Directory ${VMEETING_DIR} DOES NOT exists." && exit 1
 
 if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
     while true; do
+        # backup to nfs server
+        rsync -a $RECORDING_DIR $VMEETING_DIR
+
+        # remove old recordings
         cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
         cd $RECORDING_DIR && find * -type d -empty -delete
+
         # check every 12h
         sleep 12h
     done
