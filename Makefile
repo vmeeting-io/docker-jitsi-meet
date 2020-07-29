@@ -25,7 +25,6 @@ push:
 	docker push $(JITSI_REPO)/$(JITSI_SERVICE):$(JITSI_BUILD)
 
 %-all:
-	@if [ ! -f jibri/rootfs/home/jibri/.ssh/id_rsa ]; then ./ssh_keygen_jibri.sh; fi
 	@$(foreach SERVICE, $(JITSI_SERVICES), $(MAKE) --no-print-directory JITSI_SERVICE=$(SERVICE) $(subst -all,;,$@))
 
 clean:
