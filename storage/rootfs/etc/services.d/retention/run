@@ -10,8 +10,7 @@ VMEETING_DIR=/vmeeting
 
 if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
     while true; do
-        # backup to nfs server
-        rsync -a $RECORDING_DIR $VMEETING_DIR
+        # TODO: also delete old file in NAS?
 
         # remove old recordings
         cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;

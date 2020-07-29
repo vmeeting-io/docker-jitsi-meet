@@ -9,4 +9,3 @@ mkdir -p  /root/.ssh/
 echo $ID_RSA_PUB_BASE64 | openssl base64 -A -d | tee /root/.ssh/authorized_keys
 
 chmod 644 /root/.ssh/authorized_keys
-
