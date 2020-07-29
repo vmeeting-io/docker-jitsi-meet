@@ -11,6 +11,5 @@ RUN \
     mkdir -p /var/run/sshd
 
 COPY rootfs/ /
-RUN chmod 644 /root/.ssh/authorized_keys
 
 VOLUME /recordings

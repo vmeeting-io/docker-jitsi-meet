@@ -67,10 +67,7 @@ RUN \
 
 RUN chown jibri:jibri /home/jibri -R
 
-RUN \
-	chmod 600 /home/jibri/.ssh/id_rsa && \
-	chmod 600 /home/jibri/.ssh/id_rsa.pub && \
-	chmod 644 /etc/ssh/ssh_config
+RUN chmod 644 /etc/ssh/ssh_config
 
 # override the base image s6-overlay entrypoint
 ENTRYPOINT []

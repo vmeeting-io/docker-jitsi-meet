@@ -32,6 +32,8 @@ services:
             - RECORDING_RETETION_DAYS
             - NOREPLY_MAIL
             - SMTP_SERVER
+            - ID_RSA_BASE64
+            - ID_RSA_PUB_BASE64
             - DISPLAY=:0
         depends_on:
             - jicofo
@@ -51,6 +53,7 @@ services:
               target: /vmeeting
         environment:
             - RECORDING_RETETION_DAYS
+            - ID_RSA_PUB_BASE64
         networks:
             meet.jitsi:
 

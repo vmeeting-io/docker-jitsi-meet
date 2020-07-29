@@ -29,14 +29,36 @@ if [[ -z $NOREPLY_MAIL ]]; then
     exit 1
 fi
 
+# DISPLAY is necessary for start
+[ -z "${DISPLAY}" ] \
+&& ( echo -e "\e[31mERROR: Please set DISPLAY variable.\e[39m"; kill 1; exit 1 )
+
+# jibri ssh key
+if [[ -z $ID_RSA_BASE64 ]]; then
+    echo 'FATAL ERROR: ID_RSA_BASE64 must be set'
+    exit 1
+fi
+
+if [[ -z $ID_RSA_PUB_BASE64 ]]; then
+    echo 'FATAL ERROR: ID_RSA_PUB_BASE64 must be set'
+    exit 1
+fi
+
+mkdir -p /home/jibri/.ssh/
+echo $ID_RSA_BASE64 | openssl base64 -A -d | tee /home/jibri/.ssh/id_rsa
+echo $ID_RSA_PUB_BASE64 | openssl base64 -A -d | tee /home/jibri/.ssh/id_rsa.pub
+
+chown jibri:jibri /home/jibri -R
+chmod 600 /home/jibri/.ssh/id_rsa
+chmod 600 /home/jibri/.ssh/id_rsa.pub
+chmod 644 /etc/ssh/ssh_config
+
+# smtp mail
 sed -i \
     -e 's#SMTP_SERVER=.*#SMTP_SERVER=${SMTP_SERVER}#' \
     -e 's#MAIL_FROM=.*#MAIL_FROM=${NOREPLY_MAIL}#' \
     ${JIBRI_FINALIZE_RECORDING_SCRIPT_PATH}
 
-# DISPLAY is necessary for start
-[ -z "${DISPLAY}" ] \
-&& ( echo -e "\e[31mERROR: Please set DISPLAY variable.\e[39m"; kill 1; exit 1 )
 
 # INIT dbus for pulseaudio
 dbus-uuidgen > /var/lib/dbus/machine-id
