@@ -27,8 +27,6 @@ services:
             - JIBRI_STRIP_DOMAIN_JID
             - JIBRI_LOGS_DIR
             - TZ
-            - AWS_SECRET_ACCESS_KEY
-            - AWS_ACCESS_KEY_ID
             - PUBLIC_URL
             - RECORDING_DOWNLOAD_BASE
             - RECORDING_RETETION_DAYS
