@@ -93,6 +93,7 @@ services:
     # storage must be in the same node with web
     storage:
         image: theun/storage:latest
+        env_file: .env
         volumes:
             - ~/.jitsi-meet-cfg/storage:/recordings
             - type: volume
