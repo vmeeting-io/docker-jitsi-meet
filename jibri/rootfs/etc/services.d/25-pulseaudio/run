@@ -1,5 +1,0 @@
-#!/usr/bin/with-contenv bash
-HOME=/home/jibri
-
-DAEMON="/usr/bin/start-pulseaudio-x11"
-exec s6-setuidgid jibri /bin/bash -c "exec $DAEMON"
