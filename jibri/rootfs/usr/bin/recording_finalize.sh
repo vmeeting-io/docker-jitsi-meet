@@ -3,8 +3,8 @@ set -e
 shopt -s nullglob
 
 
-SMTP_SERVER=smtp.postech.ac.kr:25
-MAIL_FROM=noreply@vmeeting.postech.ac.kr
+SMTP_SERVER=meet.jitsi:25
+MAIL_FROM=noreply@meet.jitsi
 
 #
 # the directory where the files and metadata exists
