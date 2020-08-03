@@ -3,15 +3,11 @@ set -e
 shopt -s nullglob
 
 RECORDING_DIR=/recordings
-VMEETING_DIR=/vmeeting
 
 [ ! -d "$RECORDING_DIR" ] && echo "Directory ${RECORDING_DIR} DOES NOT exists." && exit 1
-[ ! -d "$VMEETING_DIR" ] && echo "Directory ${VMEETING_DIR} DOES NOT exists." && exit 1
 
 if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
     while true; do
-        # TODO: also delete old file in NAS?
-
         # remove old recordings
         cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
         cd $RECORDING_DIR && find * -type d -empty -delete

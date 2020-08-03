@@ -48,18 +48,8 @@ services:
             dockerfile: Dockerfile
         volumes:
             - ${CONFIG}/storage:/recordings:z
-            - type: volume
-              source: vmeeting
-              target: /vmeeting
         environment:
             - RECORDING_RETETION_DAYS
             - ID_RSA_PUB_BASE64
         networks:
             meet.jitsi:
-
-volumes:
-    vmeeting:
-        driver_opts:
-            type: "nfs"
-            o: "addr=${NFS_SERVER},nolock,soft,rw"
-            device: ":${NFS_SERVER_PATH}"

@@ -98,10 +98,6 @@ ssh root@storage "curl --url \"$SMTP_SERVER\" \
                 --upload-file /recordings/$REC_FOLDER/email.txt"
 
 #
-# finally remove the recorded folder. Also backup the video to NAS
+# finally remove the recorded folder
 #
-set +e
-# TODO: copy directly from jibri? currently, the finalize script run as jibri user,
-# and it has permission denined error accessing vmeeting NAS. It seems to require root access
-ssh root@storage "cp -r /recordings/${REC_FOLDER} /vmeeting/recordings/"
 rm -r ${UPLOAD_DIR}
