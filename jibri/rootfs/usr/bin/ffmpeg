@@ -2,7 +2,7 @@
 
 ARGS=$@
 ARGS=$(echo $ARGS | sed 's/-f alsa/-f pulse/')
-ARGS=$(echo $ARGS | sed 's/-i plug:cloop/-i default/')
-ARGS=$(echo $ARGS | sed 's/-i plug:bsnoop/-i default/')
+ARGS=$(echo $ARGS | sed 's/plug:cloop/default/')
+ARGS=$(echo $ARGS | sed 's/plug:bsnoop/default/')
 
 exec /usr/bin/ffmpeg-bin $ARGS
