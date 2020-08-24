@@ -4,7 +4,7 @@ services:
     # Etherpad: real-time collaborative document editing
     etherpad:
         image: jitsi/etherpad:stable-4857
-        restart: ${RESTART_POLICY}
+        restart: ${RESTART_POLICY}z
         networks:
             meet.jitsi:
                 aliases:
