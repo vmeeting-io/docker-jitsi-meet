@@ -266,6 +266,9 @@ var config = {
     // UI
     //
 
+    // Enable etherpad
+    // etherpad_base: 'https://vmeeting.postech.ac.kr/etherpad/p/',
+
     // Require users to always specify a display name.
     // requireDisplayName: true,
 
