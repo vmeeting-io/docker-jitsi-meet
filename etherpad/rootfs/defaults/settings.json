@@ -162,7 +162,7 @@
   "editOnly" : false,
 
   "ep_draw": {
-    "host": "vmeeting.postech.ac.kr"
+    "host": "devmeet.postech.ac.kr"
   },
 
   /*
