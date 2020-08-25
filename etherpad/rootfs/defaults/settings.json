@@ -161,8 +161,8 @@
    */
   "editOnly" : false,
 
-  "ep_draw":{
-    "host": "wbo_host.tld"
+  "ep_draw": {
+    "host": "vmeeting.postech.ac.kr"
   },
 
   /*
