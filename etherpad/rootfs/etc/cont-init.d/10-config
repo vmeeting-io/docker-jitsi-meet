@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/with-contenv bash
 
 if [[ ! -f /config/settings.json ]]; then
     tpl /defaults/settings.json > /config/settings.json
