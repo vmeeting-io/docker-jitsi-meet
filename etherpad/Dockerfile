@@ -1,4 +1,5 @@
 FROM etherpad/etherpad:1.8.4
+USER root
 
 ADD https://github.com/subchen/frep/releases/download/v1.3.5/frep-1.3.5-linux-amd64 /usr/bin/frep
 
