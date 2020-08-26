@@ -161,6 +161,10 @@
    */
   "editOnly" : false,
 
+  "ep_draw": {
+    "host": "vmeeting.io"
+  },
+
   /*
    * If set to true, those users who have a valid session will automatically be
    * granted access to password protected pads.
