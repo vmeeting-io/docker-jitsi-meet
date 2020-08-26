@@ -1,5 +1,6 @@
 #!/bin/bash
-
 ARGS=$@
 
-exec /usr/bin/google-chrome-bin --no-sandbox ARGS=$@
+ARGS=$(echo $ARGS | sed 's/--kiosk/--kiosk --no-sandbox/')
+
+exec /usr/bin/google-chrome-bin $ARGS
