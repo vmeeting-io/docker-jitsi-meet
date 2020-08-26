@@ -16,5 +16,5 @@ RUN \
 	rm -f /tmp/*.tar.gz && \
   chmod +x /usr/bin/frep
 
-ENTRYPOINT [ "/init" ]
+ENTRYPOINT []
 EXPOSE 9001
