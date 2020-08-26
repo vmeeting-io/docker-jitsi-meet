@@ -162,7 +162,7 @@
   "editOnly" : false,
 
   "ep_draw": {
-    "host": "vmeeting.io"
+    "host": "{{ .Env.XMPP_DOMAIN }}"
   },
 
   /*

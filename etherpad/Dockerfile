@@ -1,9 +1,12 @@
 FROM etherpad/etherpad:1.8.4
 
+ADD https://github.com/subchen/frep/releases/download/v1.3.5/frep-1.3.5-linux-amd64 /usr/bin/frep
+
 ARG ETHERPAD_PLUGINS="ep_whiteboard"
 
 RUN for PLUGIN_NAME in ${ETHERPAD_PLUGINS}; do npm install "${PLUGIN_NAME}" || exit 1; done
+RUN chmod +x /usr/bin/frep
 
-ADD ./rootfs/defaults/settings.json /opt/etherpad-lite/settings.json
+COPY rootfs/ /
 
 EXPOSE 9001

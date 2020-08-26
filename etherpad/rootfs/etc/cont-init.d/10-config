@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv bash
+
+if [[ ! -f /config/settings.json ]]; then
+    tpl /defaults/settings.json > /config/settings.json
+    cp /config/settings.json /opt/etherpad-lite/settings.json
+fi
