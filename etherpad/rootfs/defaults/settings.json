@@ -162,7 +162,7 @@
   "editOnly" : false,
 
   "ep_draw": {
-    "host": "{{ .Env.XMPP_DOMAIN }}"
+    "host": "{{ .Env.LETSENCRYPT_DOMAIN }}"
   },
 
   /*
