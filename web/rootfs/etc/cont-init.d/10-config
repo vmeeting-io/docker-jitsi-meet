@@ -116,7 +116,7 @@ if [[ ! -f /config/config.js ]]; then
     if [[ -z "$(grep -om1 'etherpad_base:' /config/config.js)" ]]; then
         if [[ ! -z "${ETHERPAD_PUBLIC_URL}" ]]; then
             sed -i \
-                -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}/p/'," \
+                -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
                 /config/config.js
         elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
             sed -i \
