@@ -2,9 +2,10 @@
 set -e
 shopt -s nullglob
 
-
-SMTP_SERVER=meet.jitsi:25
-MAIL_FROM=noreply@meet.jitsi
+if [[ -z $NOREPLY_MAIL ]]; then
+    echo 'FATAL ERROR: NOREPLY_MAIL must be set'
+    exit 1
+fi
 
 #
 # the directory where the files and metadata exists
@@ -61,10 +62,6 @@ done
 
 # create email content
 EMAIL_MESSAGE="\
-From: Vmeeting <${MAIL_FROM}>
-To: <${RECORDER_EMAIL}>
-Subject: [Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\"
-
 Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
@@ -78,24 +75,66 @@ NOTE: The recorded file(s) will be automatically DELETED from our servers after 
 This is out-going email only.
 Copyright@2020 Pohang University of Science and Technology. ALL RIGHTS RESERVED."
 
-echo "$EMAIL_MESSAGE" > ${REC_DIR}/email.txt
+if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
+    if [[ -z $AWS_ACCESS_KEY_ID ]]; then
+        echo 'FATAL ERROR: AWS_ACCESS_KEY_ID must be set'
+        exit 1
+    fi
+    if [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
+        echo 'FATAL ERROR: AWS_SECRET_ACCESS_KEY must be set'
+        exit 1
+    fi
 
-# RFC 5322 require CRLF line ending for email content
-unix2dos ${REC_DIR}/email.txt
+    # sync everything to storage
+    rsync -r $REC_DIR root@storage:/recordings
 
-# finally sync everything to storage
-rsync -r $REC_DIR root@storage:/recordings
+    DATE="$(date -R)"
+    SIGNATURE="$(echo -n "$DATE" | openssl dgst -sha256 -hmac "${AWS_SECRET_ACCESS_KEY}" -binary | base64 -w 0)"
+    AUTH_HEADER="X-Amzn-Authorization: AWS3-HTTPS AWSAccessKeyId=${AWS_ACCESS_KEY_ID}, Algorithm=HmacSHA256, Signature=$SIGNATURE"
+    EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
+    ENDPOINT="https://email.us-west-2.amazonaws.com/"
 
-#
-# send email about download link to the recorder user
-# email is sent via the storage container, which runs in manager node.
-# port 25 should be opened by the ISP for the manager node
-#
+    ACTION="Action=SendEmail"
+    SOURCE="Source=${NOREPLY_MAIL}"
+    DEST="Destination.ToAddresses.member.1=${RECORDER_EMAIL}"
+    SUBJECT="Message.Subject.Data=${EMAIL_SUBJECT}"
+    MESSAGE="Message.Body.Text.Data=${EMAIL_MESSAGE}"
 
-ssh root@storage "curl --url \"$SMTP_SERVER\" \
-                --mail-from \"$MAIL_FROM\" \
-                --mail-rcpt \"$RECORDER_EMAIL\" \
-                --upload-file /recordings/$REC_FOLDER/email.txt"
+    curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" --data-urlencode "$MESSAGE" --data-urlencode "$DEST" \
+        --data-urlencode "$SOURCE" --data-urlencode "$ACTION" --data-urlencode "$SUBJECT"  "$ENDPOINT"
+
+else
+    # send using postech smtp server
+    if [[ -z $SMTP_SERVER ]]; then
+        echo 'FATAL ERROR: SMTP_SERVER must be set'
+        exit 1
+    fi
+    # FIXME: NOT indent the string is needed here.
+    EMAIL_HEADER="\
+From: Vmeeting <${NOREPLY_MAIL}>
+To: <${RECORDER_EMAIL}>
+Subject: [Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\"
+"
+    echo "$EMAIL_HEADER" > ${REC_DIR}/email.txt
+    echo "$EMAIL_MESSAGE" >> ${REC_DIR}/email.txt
+
+    # RFC 5322 require CRLF line ending for email content
+    unix2dos ${REC_DIR}/email.txt
+
+    # finally sync everything to storage
+    rsync -r $REC_DIR root@storage:/recordings
+
+    #
+    # send email about download link to the recorder user
+    # email is sent via the storage container, which runs in manager node.
+    # port 25 should be opened by the ISP for the manager node
+    #
+
+    ssh root@storage "curl --url \"$SMTP_SERVER\" \
+                    --mail-from \"$NOREPLY_MAIL\" \
+                    --mail-rcpt \"$RECORDER_EMAIL\" \
+                    --upload-file /recordings/$REC_FOLDER/email.txt"
+fi
 
 #
 # finally remove the recorded folder
