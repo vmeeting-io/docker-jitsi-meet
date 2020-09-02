@@ -41,13 +41,6 @@ chmod 600 /home/jibri/.ssh/id_rsa
 chmod 600 /home/jibri/.ssh/id_rsa.pub
 chmod 644 /etc/ssh/ssh_config
 
-# smtp mail
-sed -i \
-    -e 's#SMTP_SERVER=.*#SMTP_SERVER=${SMTP_SERVER}#' \
-    -e 's#MAIL_FROM=.*#MAIL_FROM=${NOREPLY_MAIL}#' \
-    ${JIBRI_FINALIZE_RECORDING_SCRIPT_PATH}
-
-
 # INIT dbus for pulseaudio
 dbus-uuidgen > /var/lib/dbus/machine-id
 mkdir -p /var/run/dbus
