@@ -37,8 +37,11 @@ fi
 RECORDER_EMAIL=$(cat $METADATA_JSON | jq -r ".recorder_identity.email")
 RECORDER_NAME=$(cat $METADATA_JSON | jq -r ".recorder_identity.name")
 URL=$(cat $METADATA_JSON | jq -r ".meeting_url")
+# decode percent (%) encoded url so that non-ascii meeting name is decoded correctly
+URL=$(input=${URL//+/ }; printf "${URL//%/\\x}")
 [[ "$URL" == "null" ]] && URL=""
 MEETING_NAME="${URL##*/}"
+FDATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 #
 # copy recorded folder to the central storage (only copy video and transcript)
@@ -52,9 +55,15 @@ REC_DIR=${UPLOAD_DIR}/${REC_FOLDER}
 mkdir -p ${REC_DIR}
 
 for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
+    # Non ascii file name is not working correctly. either here or in url
+    # detection in email. E.g., if meeting name start with english word and then
+    # korean word, then gmail link detection will drop the korean part.
+    # To prevent this and similar error, change file name to ascii char only
     file_name=$(basename "$f")
-    mv $f ${REC_DIR}/
-    LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${file_name}"
+    file_extension=${file_name##*.}
+    new_file_name="recorded_${FDATE}.${file_extension}"
+    mv $f ${REC_DIR}/${new_file_name}
+    LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${new_file_name}"
     # one line for each link
     DOWNLOAD_LINKS="${DOWNLOAD_LINK}
 ${LINK}"
