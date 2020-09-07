@@ -41,9 +41,11 @@ RUN \
     && apt-cleanup \
     && rm -rf /etc/prosody
 
+ENV JITSI_MEET_PROSODY_VERSION=1.0.4289-1
+
 RUN \
     apt-dpkg-wrap apt-get update \
-    && apt-dpkg-wrap apt-get -d install -y jitsi-meet-prosody \
+    && apt-dpkg-wrap apt-get -d install -y jitsi-meet-prosody=${JITSI_MEET_PROSODY_VERSION} \
     && dpkg -x /var/cache/apt/archives/jitsi-meet-prosody*.deb /tmp/pkg \
     && mv /tmp/pkg/usr/share/jitsi-meet/prosody-plugins /prosody-plugins \
     && apt-cleanup \

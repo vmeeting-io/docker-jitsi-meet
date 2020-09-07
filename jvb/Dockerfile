@@ -1,9 +1,11 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
+ENV VIDEOBRIDGE_VERSION=2.1-273-g072dd44b-1
+
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y jitsi-videobridge2 jq curl iproute2 && \
+	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 && \
 	apt-cleanup
 
 # Telegrapf

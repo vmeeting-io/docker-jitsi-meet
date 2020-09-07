@@ -1,9 +1,11 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
+ENV JICOFO_VERSION=1.0-612-1
+
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y jicofo && \
+	apt-dpkg-wrap apt-get install -y jicofo=${JICOFO_VERSION} && \
 	apt-cleanup
 
 # Telegrapf
