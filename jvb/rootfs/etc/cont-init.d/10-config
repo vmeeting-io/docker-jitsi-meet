@@ -11,6 +11,12 @@ if [[ "$JVB_AUTH_PASSWORD" == "$OLD_JVB_AUTH_PASSWORD" ]]; then
     exit 1
 fi
 
+if [[ ! -z $JVB_MAX_MEMORY ]]; then
+    sed -i \
+        -e "s/# VIDEOBRIDGE_MAX_MEMORY.*/VIDEOBRIDGE_MAX_MEMORY=${JVB_MAX_MEMORY}/g" \
+        /usr/share/jitsi-videobridge/lib/videobridge.rc
+fi
+
 if [[ ! -f /config/sip-communicator.properties ]]; then
     tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
 fi
