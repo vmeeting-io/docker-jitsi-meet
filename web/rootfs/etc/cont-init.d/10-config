@@ -152,6 +152,6 @@ if [[ ! -f /config/interface_config.js ]]; then
 
 fi
 
-if [[ ! -f /config/passni-config.js ]]; then
-    cp /defaults/passni-config.js /config/passni-config.js
+if [[ ! -f /config/passni-config.json ]]; then
+    cp /defaults/passni-config.json /config/passni-config.json
 fi
