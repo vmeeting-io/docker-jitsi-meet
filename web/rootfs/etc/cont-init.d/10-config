@@ -90,6 +90,17 @@ if [[ ! -f /config/config.js ]]; then
         -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
         /config/config.js
 
+    if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
+        if [[ -z "$PUBLIC_URL" ]]; then
+            echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
+            exit 1
+        fi
+
+        sed -i \
+          -e "s#// websocket:.*#websocket: '${PUBLIC_URL/http/ws}/xmpp-websocket',#" \
+        /config/config.js
+    fi
+
     if [[ $ENABLE_RECORDING -eq 1 || x$ENABLE_RECORDING == xtrue ]]; then
         sed -i \
             -e "/\/\/ Recording.*/a hiddenDomain: '$XMPP_RECORDER_DOMAIN'," \

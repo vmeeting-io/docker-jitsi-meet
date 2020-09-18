@@ -14,8 +14,17 @@ http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 {{ $JWT_TOKEN_AUTH_MODULE := .Env.JWT_TOKEN_AUTH_MODULE | default "token_verification" }}
 {{ $ENABLE_LOBBY := .Env.ENABLE_LOBBY | default "0" | toBool }}
 
+{{ $ENABLE_XMPP_WEBSOCKET := .Env.ENABLE_XMPP_WEBSOCKET | default "0" | toBool }}
+
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_ISSUERS }}
 asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSUERS) }}" }
+{{ end }}
+
+{{ if $ENABLE_XMPP_WEBSOCKET }}
+-- Deprecated in 0.12
+-- https://github.com/bjc/prosody/commit/26542811eafd9c708a130272d7b7de77b92712de
+cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}" };
+consider_bash_secure = true;
 {{ end }}
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
@@ -41,7 +50,15 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     authentication = "internal_hashed"
   {{ end }}
 {{ else }}
-    authentication = "anonymous"
+  -- https://github.com/jitsi/docker-jitsi-meet/pull/502#issuecomment-619146339
+  {{ if $ENABLE_XMPP_WEBSOCKET }}
+  authentication = "token"
+  {{ else }}
+  authentication = "anonymous"
+  {{ end }}
+  app_id = ""
+  app_secret = ""
+  allow_empty_token = true
 {{ end }}
     ssl = {
         key = "/config/certs/{{ .Env.XMPP_DOMAIN }}.key";
@@ -49,6 +66,10 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     }
     modules_enabled = {
         "bosh";
+        {{ if $ENABLE_XMPP_WEBSOCKET }}
+        "websocket";
+        "smacks"; -- XEP-0198: Stream Management
+        {{ end }}
         "pubsub";
         "ping";
         "speakerstats";
@@ -77,7 +98,16 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
 
 {{ if and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool) }}
 VirtualHost "{{ .Env.XMPP_GUEST_DOMAIN }}"
+-- https://github.com/jitsi/docker-jitsi-meet/pull/502#issuecomment-619146339
+    {{ if $ENABLE_XMPP_WEBSOCKET }}
+    authentication = "token"
+    {{ else }}
     authentication = "anonymous"
+    {{ end }}
+    app_id = ""
+    app_secret = ""
+    allow_empty_token = true
+
     c2s_require_encryption = false
 {{ end }}
 
