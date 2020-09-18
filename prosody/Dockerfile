@@ -51,11 +51,11 @@ RUN \
     && apt-cleanup \
     && rm -rf /tmp/pkg /var/cache/apt
 
+COPY rootfs/ /
+
 RUN patch -d /usr/lib/prosody/modules/muc -p0 < /prosody-plugins/muc_owner_allow_kick.patch
 RUN patch -d /usr/lib/prosody/modules/ -p2 < /prosody-plugins/mod_websocket.patch
 RUN patch -d /usr/lib/prosody/modules/ -p0 < /prosody-plugins/mod_websocket_smacks.patch
-
-COPY rootfs/ /
 
 COPY --from=builder /usr/local/lib/lua /usr/local/lib/lua
 COPY --from=builder /usr/local/share/lua /usr/local/share/lua
