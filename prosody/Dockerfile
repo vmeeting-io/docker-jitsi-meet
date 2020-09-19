@@ -54,7 +54,7 @@ RUN \
 COPY rootfs/ /
 
 RUN patch -d /usr/lib/prosody/modules/muc -p0 < /prosody-plugins/muc_owner_allow_kick.patch
-RUN patch -d /usr/lib/prosody/modules/ -p2 < /prosody-plugins/mod_websocket.patch
+RUN patch -d /usr/lib/prosody/modules/ -p2 < /prosody-plugins/mod_websocket_session_event.patch
 RUN patch -d /usr/lib/prosody/modules/ -p0 < /prosody-plugins/mod_websocket_smacks.patch
 
 COPY --from=builder /usr/local/lib/lua /usr/local/lib/lua

@@ -98,7 +98,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
 
 {{ if and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool) }}
 VirtualHost "{{ .Env.XMPP_GUEST_DOMAIN }}"
--- https://github.com/jitsi/docker-jitsi-meet/pull/502#issuecomment-619146339
+    -- https://github.com/jitsi/docker-jitsi-meet/pull/502#issuecomment-619146339
     {{ if $ENABLE_XMPP_WEBSOCKET }}
     authentication = "token"
     {{ else }}
