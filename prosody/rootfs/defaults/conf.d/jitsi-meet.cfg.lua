@@ -88,6 +88,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     {{ if $ENABLE_LOBBY }}
     main_muc = "{{ .Env.XMPP_MUC_DOMAIN }}"
     lobby_muc = "lobby.{{ .Env.XMPP_DOMAIN }}"
+    muc_lobby_whitelist = { "recorder.{{ .Env.XMPP_DOMAIN }}" }
     {{ end }}
 
     speakerstats_component = "speakerstats.{{ .Env.XMPP_DOMAIN }}"
