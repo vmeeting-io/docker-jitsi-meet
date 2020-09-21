@@ -14,12 +14,12 @@ providers:
     # <bool> disable dashboard deletion
     disableDeletion: false
     # <bool> enable dashboard editing
-    editable: false
+    editable: true
     # <int> how often Grafana will scan for changed dashboards
     # we set it to large because we do not need update from json file
     updateIntervalSeconds: 100000
     # <bool> allow updating provisioned dashboards from the UI
-    allowUiUpdates: false
+    allowUiUpdates: true
     options:
       # <string, required> path to dashboard files on disk. Required when using the 'file' type
       path: /etc/grafana/provisioning/jitsi

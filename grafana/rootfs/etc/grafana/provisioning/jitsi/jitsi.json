@@ -49,7 +49,7 @@
         "y": 0
       },
       "id": 2,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -133,7 +133,7 @@
         "y": 0
       },
       "id": 5,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -217,7 +217,7 @@
         "y": 0
       },
       "id": 3,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -299,7 +299,7 @@
         "y": 0
       },
       "id": 12,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -708,7 +708,7 @@
       },
       "id": 14,
       "interval": "",
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -812,7 +812,7 @@
       },
       "id": 39,
       "interval": "",
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -918,7 +918,7 @@
       },
       "id": 40,
       "interval": "",
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1026,7 +1026,7 @@
       },
       "lines": true,
       "linewidth": 1,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -1203,7 +1203,7 @@
       },
       "lines": true,
       "linewidth": 1,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -1382,7 +1382,7 @@
       },
       "lines": true,
       "linewidth": 1,
-      "maxDataPoints": 50,
+      "maxDataPoints": 200,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -1580,7 +1580,7 @@
       },
       "seriesOverrides": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "transform": "negative-Y"
         }
       ],
@@ -1589,7 +1589,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "groupBy": [
             {
               "params": [
@@ -1626,7 +1626,7 @@
           ]
         },
         {
-          "alias": "bit_rate_upload",
+          "alias": "servers to clients",
           "groupBy": [
             {
               "params": [
@@ -1761,7 +1761,7 @@
       },
       "seriesOverrides": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "transform": "negative-Y"
         }
       ],
@@ -1770,7 +1770,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "groupBy": [
             {
               "params": [
@@ -1807,7 +1807,7 @@
           ]
         },
         {
-          "alias": "bit_rate_upload",
+          "alias": "servers to clients",
           "groupBy": [
             {
               "params": [
@@ -1942,7 +1942,7 @@
       },
       "seriesOverrides": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "transform": "negative-Y"
         }
       ],
@@ -1951,7 +1951,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "bit_rate_download",
+          "alias": "clients to servers",
           "groupBy": [
             {
               "params": [
@@ -1988,7 +1988,7 @@
           ]
         },
         {
-          "alias": "bit_rate_upload",
+          "alias": "servers to clients",
           "groupBy": [
             {
               "params": [
