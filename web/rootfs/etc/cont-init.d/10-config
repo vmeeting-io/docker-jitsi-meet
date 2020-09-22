@@ -154,10 +154,10 @@ if [[ ! -f /config/interface_config.js ]]; then
             /config/interface_config.js
     fi
 
-    if [[ $ENABLE_RECORDING -ne 1 || "$ENABLE_RECORDING" != "true" ]]; then
+    if [[ $ENABLE_RECORDING -ne 1 && "$ENABLE_RECORDING" != "true" ]]; then
         sed -i \
-            -e "s#'recording', ##" \
-            -e "s#'livestreaming', ##" \
+            -e "s#'recording',##" \
+            -e "s#'livestreaming',##" \
             /config/interface_config.js
     fi
 
