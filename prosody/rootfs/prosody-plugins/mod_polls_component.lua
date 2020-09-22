@@ -2,16 +2,13 @@ local get_room_from_jid = module:require "util".get_room_from_jid;
 local st = require "util.stanza";
 local json = require "util.json";
 
+module:log("info", "Loading module polls");
+
 local muc_component_host = module:get_option_string("muc_component");
 if muc_component_host ~= nil then
     log("info", "Starting module %s", tostring(muc_component_host));
 end
 
-local muc_module = module:context("conference.jitsi.example.com");
-if muc_module == nil then
-    log("error", "No such muc found");
-    return;
-end
 
 function on_message(event)
     log("debug", "Recieved Message %s", tostring(event.stanza));
@@ -49,10 +46,10 @@ function on_message(event)
     end
 end
 
-function on_occupant_joined(event)
+function occupant_joined(event)
     local room = event.room;
     local occupant = event.occupant;
-    
+
     if room.poll then
         log("info", "Informed occupant %s about poll %s", tostring(occupant.jid), room.poll);
 
@@ -71,7 +68,7 @@ function on_occupant_joined(event)
     end
 end
 
-function on_room_created(event)
+function room_created(event)
     log("info", "room created");
 
     local room = event.room;
@@ -79,5 +76,23 @@ function on_room_created(event)
 end
 
 module:hook("message/host", on_message);
-muc_module:hook("muc-room-created", on_room_created, -1);
-muc_module:hook("muc-occupant-joined", on_occupant_joined, -1);
+
+-- executed on every host added internally in prosody, including components
+function process_host(host)
+    if host == muc_component_host then -- the conference muc component
+        module:log("info","Hook to muc events on %s", host);
+
+        local muc_module = module:context(host);
+        muc_module:hook("muc-room-created", room_created, -1);
+        muc_module:hook("muc-occupant-joined", occupant_joined, -1);
+    end
+end
+
+if prosody.hosts[muc_component_host] == nil then
+    module:log("info","No muc component found, will listen for it: %s", muc_component_host)
+
+    -- when a host or component is added
+    prosody.events.add_handler("host-activated", process_host);
+else
+    process_host(muc_component_host);
+end
