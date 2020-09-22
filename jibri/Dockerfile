@@ -6,11 +6,19 @@ FROM ${JITSI_REPO}/base-java
 ARG CHROME_RELEASE=78.0.3904.97
 ARG CHROMEDRIVER_MAJOR_RELEASE=78
 
-ENV JIBRI_VERSION=8.0-34-gd133175-1
+# ENV JIBRI_VERSION=8.0-34-gd133175-1
+
+# RUN \
+# 	apt-dpkg-wrap apt-get update \
+# 	&& apt-dpkg-wrap apt-get install -y jibri=${JIBRI_VERSION} libgl1-mesa-dri \
+# 	&& apt-cleanup#
 
 RUN \
 	apt-dpkg-wrap apt-get update \
-	&& apt-dpkg-wrap apt-get install -y jibri=${JIBRI_VERSION} libgl1-mesa-dri \
+	&& apt-dpkg-wrap apt-get install -y wget libgl1-mesa-dri \
+	&& wget https://download.jitsi.org/unstable/jibri_8.0-58-g7e3714b-1_all.deb -q -O jibri.deb \
+	&& apt-dpkg-wrap apt-get install -y ./jibri.deb \
+	&& rm jibri.deb \
 	&& apt-cleanup
 
 
