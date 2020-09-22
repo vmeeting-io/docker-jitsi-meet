@@ -1580,7 +1580,7 @@
       },
       "seriesOverrides": [
         {
-          "alias": "clients to servers",
+          "alias": "server incoming",
           "transform": "negative-Y"
         }
       ],
@@ -1589,7 +1589,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "clients to servers",
+          "alias": "server incoming",
           "groupBy": [
             {
               "params": [
@@ -1626,7 +1626,7 @@
           ]
         },
         {
-          "alias": "servers to clients",
+          "alias": "server outgoing",
           "groupBy": [
             {
               "params": [
@@ -1807,7 +1807,7 @@
           ]
         },
         {
-          "alias": "servers to clients",
+          "alias": "server outgoing",
           "groupBy": [
             {
               "params": [
@@ -1988,7 +1988,7 @@
           ]
         },
         {
-          "alias": "servers to clients",
+          "alias": "server outgoing",
           "groupBy": [
             {
               "params": [
