@@ -24,7 +24,7 @@ asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSU
 -- Deprecated in 0.12
 -- https://github.com/bjc/prosody/commit/26542811eafd9c708a130272d7b7de77b92712de
 cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}" };
-consider_bash_secure = true;
+consider_bosh_secure = true;
 {{ end }}
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
