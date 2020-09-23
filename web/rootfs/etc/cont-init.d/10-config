@@ -90,6 +90,10 @@ if [[ ! -f /config/config.js ]]; then
         -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
         /config/config.js
 
+    sed -i \
+        -e "s#// opusMaxAverageBitrate:.*#opusMaxAverageBitrate: 64000,#" \
+        /config/config.js
+
     if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
         if [[ -z "$PUBLIC_URL" ]]; then
             echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
