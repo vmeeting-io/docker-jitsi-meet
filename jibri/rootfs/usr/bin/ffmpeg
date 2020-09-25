@@ -7,4 +7,8 @@ ARGS=$(echo $ARGS | sed 's/plug:bsnoop/default/')
 
 ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-crf 22/')
 
+# https://trac.ffmpeg.org/wiki/Limiting%20the%20output%20bitrate
+ARGS=$(echo $ARGS | sed 's/-maxrate [^ ]*/-maxrate 4000k/')
+ARGS=$(echo $ARGS | sed 's/-bufsize [^ ]*/-bufsize 4000k/')
+
 exec /usr/bin/ffmpeg-bin $ARGS
