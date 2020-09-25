@@ -21,6 +21,11 @@ RUN \
 	&& rm jibri.deb \
 	&& apt-cleanup
 
+RUN \
+	apt-dpkg-wrap apt-get update \
+	&& apt-dpkg-wrap apt-get install -y fonts-noto fonts-noto-cjk \
+	&& apt-cleanup
+
 
 RUN \
 	[ "${CHROME_RELEASE}" = "latest" ] \
