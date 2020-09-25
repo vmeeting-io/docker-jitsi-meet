@@ -5,4 +5,6 @@ ARGS=$(echo $ARGS | sed 's/-f alsa/-f pulse/')
 ARGS=$(echo $ARGS | sed 's/plug:cloop/default/')
 ARGS=$(echo $ARGS | sed 's/plug:bsnoop/default/')
 
+ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-crf 22/')
+
 exec /usr/bin/ffmpeg-bin $ARGS
