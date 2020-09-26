@@ -25,4 +25,26 @@ if [[ ! -f /config/logging.properties ]]; then
     cp /defaults/logging.properties /config
 fi
 
+CONFIG="/etc/jitsi/videobridge/config"
+HOCON_CONFIG="/config/jvb.conf"
+if ! grep -q "\-Dconfig.file" "$CONFIG"; then
+    sed -i 's|JAVA_SYS_PROPS="|JAVA_SYS_PROPS="-Dconfig.file='"$HOCON_CONFIG"' |g' $CONFIG
+fi
+
+if [ ! -f $HOCON_CONFIG ]; then
+    echo "Generating an empty hocon config"
+    echo "videobridge {
+    http-servers {
+        public {
+            port = 9090
+        }
+    }
+    websockets {
+        enabled = true
+        domain = \"$LETSENCRYPT_DOMAIN:443\"
+        tls = true
+    }
+}" >> $HOCON_CONFIG
+fi
+
 chown -R jvb:jitsi /config
