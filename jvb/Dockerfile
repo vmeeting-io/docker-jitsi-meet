@@ -31,7 +31,7 @@ RUN \
     dpkg -i telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
-EXPOSE 8125/udp 8092/udp 8094
+EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
 
