@@ -21,6 +21,12 @@ if [[ ! -f /config/sip-communicator.properties ]]; then
     tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
 fi
 
+LOCAL_ADDRESS=$(ip route | grep '172.28.0.0/16' | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+sed -i \
+        -e "s/org.jitsi.videobridge.rest.COLIBRI_WS_SERVER_ID=.*/org.jitsi.videobridge.rest.COLIBRI_WS_SERVER_ID=${LOCAL_ADDRESS}/" \
+        /config/sip-communicator.properties
+
+
 if [[ ! -f /config/logging.properties ]]; then
     cp /defaults/logging.properties /config
 fi
