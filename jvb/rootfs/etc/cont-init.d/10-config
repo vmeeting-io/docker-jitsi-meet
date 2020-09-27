@@ -41,7 +41,7 @@ if [ ! -f $HOCON_CONFIG ]; then
     }
     websockets {
         enabled = true
-        domain = \"$LETSENCRYPT_DOMAIN:443\"
+        domain = \"$XMPP_DOMAIN:443\"
         tls = true
     }
 }" >> $HOCON_CONFIG
