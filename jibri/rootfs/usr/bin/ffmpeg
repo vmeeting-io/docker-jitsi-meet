@@ -1,14 +1,20 @@
-#!/bin/bash
-
 ARGS=$@
+
+if $(echo $ARGS | grep -q 'rtmp://'); then
+    IS_STREAMING=true
+else
+    IS_STREAMING=false
+fi
+
 ARGS=$(echo $ARGS | sed 's/-f alsa/-f pulse/')
 ARGS=$(echo $ARGS | sed 's/plug:cloop/default/')
 ARGS=$(echo $ARGS | sed 's/plug:bsnoop/default/')
 
-ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-crf 22/')
-
-# https://trac.ffmpeg.org/wiki/Limiting%20the%20output%20bitrate
-ARGS=$(echo $ARGS | sed 's/-maxrate [^ ]*/-maxrate 4000k/')
-ARGS=$(echo $ARGS | sed 's/-bufsize [^ ]*/-bufsize 4000k/')
+if $IS_STREAMING; then
+    ARGS=$(echo $ARGS | sed 's/-crf [^ ]*//')
+    ARGS=$(echo $ARGS | sed 's/-tune zerolatency//')
+else
+    ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-crf 22/')
+fi
 
 exec /usr/bin/ffmpeg-bin $ARGS
