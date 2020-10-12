@@ -17,7 +17,7 @@
   "gnetId": 11969,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1602487393527,
+  "iteration": 1602488005314,
   "links": [],
   "panels": [
     {
@@ -675,6 +675,28 @@
       "type": "stat"
     },
     {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 40,
+      "panels": [],
+      "repeat": "jitsi_host",
+      "scopedVars": {
+        "jitsi_host": {
+          "selected": false,
+          "text": "vmeeting3",
+          "value": "vmeeting3"
+        }
+      },
+      "title": "$jitsi_host",
+      "type": "row"
+    },
+    {
       "datasource": "InfluxDB",
       "description": "",
       "fieldConfig": {
@@ -701,10 +723,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 24,
+        "h": 7,
+        "w": 3,
         "x": 0,
-        "y": 4
+        "y": 5
       },
       "id": 14,
       "interval": "",
@@ -716,14 +738,14 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
           "fields": "",
           "values": false
         }
       },
       "pluginVersion": "7.0.3",
-      "repeat": "jitsi_host",
+      "repeat": null,
       "repeatDirection": "h",
       "scopedVars": {
         "jitsi_host": {
@@ -775,7 +797,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "CPU: ${jitsi_host}",
+      "title": "CPU",
       "type": "stat"
     },
     {
@@ -794,18 +816,18 @@
       "fillGradient": 4,
       "gridPos": {
         "h": 7,
-        "w": 24,
-        "x": 0,
-        "y": 8
+        "w": 5,
+        "x": 3,
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 10,
       "legend": {
         "alignAsTable": true,
-        "avg": true,
+        "avg": false,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
         "sort": null,
         "sortDesc": null,
@@ -824,7 +846,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeat": "jitsi_host",
+      "repeat": null,
       "scopedVars": {
         "jitsi_host": {
           "selected": false,
@@ -851,7 +873,7 @@
           "orderByTime": "ASC",
           "policy": "default",
           "query": "SELECT last(\"total\") FROM \"mem\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter GROUP BY time($interval)",
-          "rawQuery": true,
+          "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -918,7 +940,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Memory: $jitsi_host",
+      "title": "Memory",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -970,10 +992,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 15
+        "h": 7,
+        "w": 6,
+        "x": 8,
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 7,
@@ -983,10 +1005,10 @@
         "avg": true,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
-        "sort": "current",
-        "sortDesc": true,
+        "sort": null,
+        "sortDesc": null,
         "total": false,
         "values": true
       },
@@ -1000,7 +1022,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeat": "jitsi_host",
+      "repeat": null,
       "scopedVars": {
         "jitsi_host": {
           "selected": false,
@@ -1019,7 +1041,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "server incoming",
+          "alias": "server_incoming",
           "groupBy": [
             {
               "params": [
@@ -1056,7 +1078,7 @@
           ]
         },
         {
-          "alias": "server outgoing",
+          "alias": "server_outgoing",
           "groupBy": [
             {
               "params": [
@@ -1097,7 +1119,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Bitrate: $jitsi_host",
+      "title": "Bitrate",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1150,9 +1172,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 24,
-        "x": 0,
-        "y": 23
+        "w": 5,
+        "x": 14,
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 18,
@@ -1162,8 +1184,10 @@
         "avg": true,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
+        "sort": null,
+        "sortDesc": null,
         "total": false,
         "values": true
       },
@@ -1177,7 +1201,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeat": "jitsi_host",
+      "repeat": null,
       "scopedVars": {
         "jitsi_host": {
           "selected": false,
@@ -1187,7 +1211,7 @@
       },
       "seriesOverrides": [
         {
-          "alias": "loss_rate_download",
+          "alias": "server incoming",
           "transform": "negative-Y"
         }
       ],
@@ -1196,7 +1220,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "loss_rate_download",
+          "alias": "server_incoming",
           "groupBy": [
             {
               "params": [
@@ -1233,7 +1257,7 @@
           ]
         },
         {
-          "alias": "loss_rate_upload",
+          "alias": "server_outgoing",
           "groupBy": [
             {
               "params": [
@@ -1274,7 +1298,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Loss Rate: $jitsi_host",
+      "title": "Loss Rate",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1326,10 +1350,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
-        "w": 24,
-        "x": 0,
-        "y": 30
+        "h": 7,
+        "w": 5,
+        "x": 19,
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 9,
@@ -1354,7 +1378,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeat": "jitsi_host",
+      "repeat": null,
       "scopedVars": {
         "jitsi_host": {
           "selected": false,
@@ -1411,7 +1435,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Participants: $jitsi_host",
+      "title": "Participants",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1501,5 +1525,5 @@
   "timezone": "",
   "title": "Vmeeting",
   "uid": "45f414d318b340ed9211",
-  "version": 4
+  "version": 9
 }
