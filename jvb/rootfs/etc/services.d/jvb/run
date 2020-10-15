@@ -2,9 +2,13 @@
 
 JAVA_SYS_PROPS="-Dnet.java.sip.communicator.SC_HOME_DIR_LOCATION=/ -Dnet.java.sip.communicator.SC_HOME_DIR_NAME=config -Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jvb.conf"
 
-if [[ ! -z "$DOCKER_HOST_ADDRESS" ]]; then
-    LOCAL_ADDRESS=$(ip route get "$DOCKER_HOST_ADDRESS" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
-    JAVA_SYS_PROPS="$JAVA_SYS_PROPS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_LOCAL_ADDRESS=$LOCAL_ADDRESS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$DOCKER_HOST_ADDRESS -Dorg.ice4j.ice.harvest.BLOCKED_INTERFACES=bridge"
+HOST_PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+
+if [[ ! -z "$HOST_PUBLIC_IP" ]]; then
+    LOCAL_ADDRESS=$(ip route get "$HOST_PUBLIC_IP" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+    JAVA_SYS_PROPS="$JAVA_SYS_PROPS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_LOCAL_ADDRESS=$LOCAL_ADDRESS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$HOST_PUBLIC_IP -Dorg.ice4j.ice.harvest.BLOCKED_INTERFACES=bridge"
+else
+    echo "ERROR: can not detect HOST_PUBLIC_IP!"
 fi
 
 DAEMON=/usr/share/jitsi-videobridge/jvb.sh
