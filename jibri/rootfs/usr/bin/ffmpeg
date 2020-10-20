@@ -11,8 +11,9 @@ ARGS=$(echo $ARGS | sed 's/plug:cloop/default/')
 ARGS=$(echo $ARGS | sed 's/plug:bsnoop/default/')
 
 if $IS_STREAMING; then
-    ARGS=$(echo $ARGS | sed 's/-crf [^ ]*//')
+    ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-b:v 2500k/')
     ARGS=$(echo $ARGS | sed 's/-tune zerolatency//')
+
 else
     ARGS=$(echo $ARGS | sed 's/-crf [^ ]*/-crf 22/')
 fi
