@@ -52,9 +52,7 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
 fi
 
 # copy config files
-if [[ ! -f /config/nginx/nginx.conf ]]; then
-    cp /defaults/nginx.conf /config/nginx/nginx.conf
-fi
+tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
 if [[ ! -f /config/nginx/whiteboard.conf ]]; then
     tpl /defaults/whiteboard.conf > /config/nginx/whiteboard.conf
@@ -72,79 +70,11 @@ if [[ ! -f /config/nginx/site-confs/default ]]; then
     tpl /defaults/default > /config/nginx/site-confs/default
 fi
 
-if [[ ! -f /config/config.js ]]; then
-    cp /defaults/config.js /config/config.js
-    sed -i \
-        -e "s#jitsi-meet.example.com#$XMPP_DOMAIN#g" \
-        -e "s#bosh:.*#bosh: '/http-bind',#" \
-        -e "s#muc:.*#muc: '${XMPP_MUC_DOMAIN}',#" \
-        -e "s#// focusUserJid:.*#focusUserJid: '${JICOFO_AUTH_USER}@${XMPP_AUTH_DOMAIN}',#" \
-        /config/config.js
-
-    sed -i \
-        -e "s#// startAudioMuted:.*#startAudioMuted: 20,#" \
-        -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
-        /config/config.js
-
-    sed -i \
-        -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
-        /config/config.js
-
-    sed -i \
-        -e "s#// opusMaxAverageBitrate:.*#opusMaxAverageBitrate: 64000,#" \
-        /config/config.js
-
-    if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
-        if [[ -z "$PUBLIC_URL" ]]; then
-            echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
-            exit 1
-        fi
-
-        sed -i \
-          -e "s#// websocket:.*#websocket: '${PUBLIC_URL/http/ws}/xmpp-websocket',#" \
-        /config/config.js
-    fi
-
-    if [[ $ENABLE_RECORDING -eq 1 || x$ENABLE_RECORDING == xtrue ]]; then
-        sed -i \
-            -e "/\/\/ Recording.*/a hiddenDomain: '$XMPP_RECORDER_DOMAIN'," \
-            -e "s#// fileRecordingsEnabled:.*#fileRecordingsEnabled: true,#" \
-            -e "s#// liveStreamingEnabled:.*#liveStreamingEnabled: true,#" \
-        /config/config.js
-    fi
-
-    if [[ $ENABLE_AUTH -eq 1 ]]; then
-        if [[ $ENABLE_GUESTS -eq 1 ]]; then
-            sed -i \
-                -e "s#// anonymousdomain:.*#anonymousdomain: '${XMPP_GUEST_DOMAIN}',#" \
-                /config/config.js
-            sed -i \
-                -e "s#enableUserRolesBasedOnToken:.*#enableUserRolesBasedOnToken: true,#" \
-                /config/config.js
-        fi
-
-        sed -i \
-            -e "s#// authdomain:.*#authdomain: '${XMPP_DOMAIN}',#" \
-            /config/config.js
-    fi
-
-    if [[ -z "$(grep -om1 'etherpad_base:' /config/config.js)" ]]; then
-        if [[ ! -z "${ETHERPAD_PUBLIC_URL}" ]]; then
-            sed -i \
-                -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
-                /config/config.js
-        elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
-            sed -i \
-                -e "/enableWelcomePage/a\    etherpad_base: '${PUBLIC_URL}/etherpad/p/'," \
-                /config/config.js
-        fi
-    fi
-
-    if [[ $ENABLE_TRANSCRIPTIONS -eq 1 || "$ENABLE_TRANSCRIPTIONS" == "true" ]]; then
-        sed -i \
-             -e "s#// transcribingEnabled:.*#transcribingEnabled: true,#" \
-             /config/config.js
-    fi
+cp /defaults/config.js /config/config.js
+tpl /defaults/system-config.js >> /config/config.js
+tpl /defaults/settings-config.js >> /config/config.js
+if [[ -f /config/custom-config.js ]]; then
+    cat /config/custom-config.js >> /config/config.js
 fi
 
 if [[ ! -f /config/interface_config.js ]]; then
@@ -157,14 +87,6 @@ if [[ ! -f /config/interface_config.js ]]; then
             -e "s#'closedcaptions', ##" \
             /config/interface_config.js
     fi
-
-    if [[ $ENABLE_RECORDING -ne 1 && "$ENABLE_RECORDING" != "true" ]]; then
-        sed -i \
-            -e "s#'recording',##" \
-            -e "s#'livestreaming',##" \
-            /config/interface_config.js
-    fi
-
 fi
 
 if [[ ! -f /config/passni-config.json ]]; then

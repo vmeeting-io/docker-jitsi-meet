@@ -1,5 +1,7 @@
 #!/usr/bin/with-contenv bash
 
+export LOCAL_ADDRESS=$(ip addr show dev "$(ip route|awk '/^default/ { print $5 }')" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
 if [[ -z $JVB_AUTH_PASSWORD ]]; then
     echo 'FATAL ERROR: JVB auth password must be set'
     exit 1
@@ -11,14 +13,9 @@ if [[ "$JVB_AUTH_PASSWORD" == "$OLD_JVB_AUTH_PASSWORD" ]]; then
     exit 1
 fi
 
-if [[ ! -z $JVB_MAX_MEMORY ]]; then
-    sed -i \
-        -e "s/# VIDEOBRIDGE_MAX_MEMORY.*/VIDEOBRIDGE_MAX_MEMORY=${JVB_MAX_MEMORY}/g" \
-        /usr/share/jitsi-videobridge/lib/videobridge.rc
-fi
-
-if [[ ! -f /config/sip-communicator.properties ]]; then
-    tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
+tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
+if [[ -f /config/custom-sip-communicator.properties ]]; then
+    cat /config/custom-sip-communicator.properties >> /config/sip-communicator.properties
 fi
 
 LOCAL_ADDRESS=$(ip route | grep '172.28.0.0/16' | sed -n 's/.*src \([0-9.]\+\).*/\1/p')

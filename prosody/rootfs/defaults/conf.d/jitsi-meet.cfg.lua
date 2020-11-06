@@ -7,6 +7,7 @@ plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
 http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 
 {{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "0" | toBool }}
+{{ $ENABLE_GUEST_DOMAIN := and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool)}}
 {{ $AUTH_TYPE := .Env.AUTH_TYPE | default "internal" }}
 {{ $JWT_ASAP_KEYSERVER := .Env.JWT_ASAP_KEYSERVER | default "" }}
 {{ $JWT_ALLOW_EMPTY := .Env.JWT_ALLOW_EMPTY | default "0" | toBool }}
@@ -74,7 +75,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
         "ping";
         "speakerstats";
         "conference_duration";
-        {{ if $ENABLE_LOBBY }}
+        {{ if and $ENABLE_LOBBY (not $ENABLE_GUEST_DOMAIN) }}
         "muc_lobby_rooms";
         {{ end }}
         {{ if .Env.XMPP_MODULES }}
@@ -85,10 +86,12 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
         {{end}}
     }
 
-    {{ if $ENABLE_LOBBY }}
+    {{ if and $ENABLE_LOBBY (not $ENABLE_GUEST_DOMAIN) }}
     main_muc = "{{ .Env.XMPP_MUC_DOMAIN }}"
     lobby_muc = "lobby.{{ .Env.XMPP_DOMAIN }}"
-    muc_lobby_whitelist = { "recorder.{{ .Env.XMPP_DOMAIN }}" }
+    {{ if .Env.XMPP_RECORDER_DOMAIN }}
+    muc_lobby_whitelist = { "{{ .Env.XMPP_RECORDER_DOMAIN }}" }
+    {{ end }}
     {{ end }}
 
     speakerstats_component = "speakerstats.{{ .Env.XMPP_DOMAIN }}"
@@ -98,7 +101,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     c2s_require_encryption = false
     bosh_max_inactivity = 120
 
-{{ if and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool) }}
+{{ if $ENABLE_GUEST_DOMAIN }}
 VirtualHost "{{ .Env.XMPP_GUEST_DOMAIN }}"
     -- https://github.com/jitsi/docker-jitsi-meet/pull/502#issuecomment-619146339
     {{ if $ENABLE_XMPP_WEBSOCKET }}
@@ -111,6 +114,19 @@ VirtualHost "{{ .Env.XMPP_GUEST_DOMAIN }}"
     allow_empty_token = true
 
     c2s_require_encryption = false
+
+    {{ if $ENABLE_LOBBY }}
+    modules_enabled = {
+        "muc_lobby_rooms";
+    }
+
+    main_muc = "{{ .Env.XMPP_MUC_DOMAIN }}"
+    lobby_muc = "lobby.{{ .Env.XMPP_DOMAIN }}"
+    {{ if .Env.XMPP_RECORDER_DOMAIN }}
+    muc_lobby_whitelist = { "{{ .Env.XMPP_RECORDER_DOMAIN }}" }
+    {{ end }}
+    {{ end }}
+
 {{ end }}
 
 VirtualHost "{{ .Env.XMPP_AUTH_DOMAIN }}"

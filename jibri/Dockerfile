@@ -6,12 +6,7 @@ FROM ${JITSI_REPO}/base-java
 ARG CHROME_RELEASE=78.0.3904.97
 ARG CHROMEDRIVER_MAJOR_RELEASE=78
 
-# ENV JIBRI_VERSION=8.0-34-gd133175-1
-
-# RUN \
-# 	apt-dpkg-wrap apt-get update \
-# 	&& apt-dpkg-wrap apt-get install -y jibri=${JIBRI_VERSION} libgl1-mesa-dri \
-# 	&& apt-cleanup#
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN \
 	apt-dpkg-wrap apt-get update \
@@ -38,9 +33,9 @@ RUN \
 
 RUN \
         [ "${CHROME_RELEASE}" != "latest" ] \
-        && curl -4so /tmp/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb \
+        && curl -4so "/tmp/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb" "http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb" \
 	&& apt-dpkg-wrap apt-get update \
-        && apt-dpkg-wrap apt-get install -y /tmp/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb \
+        && apt-dpkg-wrap apt-get install -y "/tmp/google-chrome-stable_${CHROME_RELEASE}-1_amd64.deb" \
 	&& apt-cleanup \
 	|| true
 
@@ -48,7 +43,7 @@ RUN \
 	[ "${CHROMEDRIVER_MAJOR_RELEASE}" = "latest" ] \
 	&& CHROMEDRIVER_RELEASE="$(curl -4Ls https://chromedriver.storage.googleapis.com/LATEST_RELEASE)" \
 	|| CHROMEDRIVER_RELEASE="$(curl -4Ls https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROMEDRIVER_MAJOR_RELEASE})" \
-	&& curl -4Ls https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_RELEASE}/chromedriver_linux64.zip \
+	&& curl -4Ls "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_RELEASE}/chromedriver_linux64.zip" \
 	| zcat >> /usr/bin/chromedriver \
 	&& chmod +x /usr/bin/chromedriver \
 	&& chromedriver --version
