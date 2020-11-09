@@ -26,7 +26,7 @@ ADD https://prosody.im/files/prosody-debian-packages.key /tmp/prosody.key
 RUN \
     apt-key add /tmp/prosody.key \
     && rm -f /tmp/prosody.key \
-    && echo "deb http://packages.prosody.im/debian buster main" > /etc/apt/sources.list.d/prosody.list \
+    && echo "deb http://packages.prosody.im/debian stretch main" > /etc/apt/sources.list.d/prosody.list \
     && apt-dpkg-wrap apt-get update \
     && apt-dpkg-wrap apt-get install -y \
       prosody \
@@ -35,6 +35,7 @@ RUN \
       libsasl2-modules-ldap \
       lua-basexx \
       patch \
+    && apt-dpkg-wrap apt-get install -t stretch-backports -y \
       lua-ldap \
       lua-sec \
     && apt-cleanup \
@@ -53,6 +54,8 @@ RUN \
 COPY rootfs/ /
 
 RUN patch -d /usr/lib/prosody/modules/muc -p0 < /prosody-plugins/muc_owner_allow_kick.patch
+RUN patch -d /usr/lib/prosody/modules/ -p2 < /prosody-plugins/mod_websocket_session_event.patch
+RUN patch -d /usr/lib/prosody/modules/ -p0 < /prosody-plugins/mod_websocket_smacks.patch
 
 COPY --from=builder /usr/local/lib/lua /usr/local/lib/lua
 COPY --from=builder /usr/local/share/lua /usr/local/share/lua
