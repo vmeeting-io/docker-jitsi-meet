@@ -1,3 +1,3 @@
 [submodule "web/jitsi-meet"]
 	path = web/jitsi-meet
-	url = git@github.com:vmeeting-io/jitsi-meet.git
+	url = https://github.com/vmeeting-io/jitsi-meet
