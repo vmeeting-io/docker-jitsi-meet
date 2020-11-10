@@ -16,6 +16,6 @@ RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
 	certbot-auto --noninteractive --install-only
 
-EXPOSE 80 443 8080
+EXPOSE 8443 8080
 
 VOLUME ["/config", "/etc/letsencrypt"]

@@ -1,0 +1,14 @@
+{
+	"product" : "Pass-Ni SSO v4.0.005",
+	"application" : "Pass-Ni SSO API for NODE v4.0.005",
+	"server_id" : "postech-server",
+	"server_version" : "4.0.005",
+	"server_domain" : "sso.postech.ac.kr",
+	"server_port" : "443",
+	"server_context_root" : "/sso",
+	"server_ssl_yn" : "Y",
+	"server_api_url" : "/api",
+	"agent_id" : "postech-vmeeting-web",
+	"agent_secky" : "4321A17C9B0BF7C0CA43239D0ADB4DD6",
+	"agent_encoding" : "utf-8"
+}
