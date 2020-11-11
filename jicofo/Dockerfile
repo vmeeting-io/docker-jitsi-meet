@@ -1,7 +1,7 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
-ENV JICOFO_VERSION=1.0-612-1
+ENV JICOFO_VERSION=1.0-644-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \

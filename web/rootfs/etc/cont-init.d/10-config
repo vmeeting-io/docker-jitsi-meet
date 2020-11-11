@@ -52,9 +52,7 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
 fi
 
 # copy config files
-if [[ ! -f /config/nginx/nginx.conf ]]; then
-    cp /defaults/nginx.conf /config/nginx/nginx.conf
-fi
+tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
 if [[ ! -f /config/nginx/whiteboard.conf ]]; then
     tpl /defaults/whiteboard.conf > /config/nginx/whiteboard.conf

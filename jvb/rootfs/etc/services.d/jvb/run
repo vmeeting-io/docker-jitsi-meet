@@ -13,7 +13,6 @@ fi
 
 JAVA_SYS_PROPS="-Dnet.java.sip.communicator.SC_HOME_DIR_LOCATION=/ -Dnet.java.sip.communicator.SC_HOME_DIR_NAME=config -Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jvb.conf"
 
-
 if [[ ! -z "$HOST_IP" ]]; then
     LOCAL_ADDRESS=$(ip route get "$HOST_IP" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
     JAVA_SYS_PROPS="$JAVA_SYS_PROPS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_LOCAL_ADDRESS=$LOCAL_ADDRESS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$HOST_IP -Dorg.ice4j.ice.harvest.BLOCKED_INTERFACES=bridge"
@@ -22,9 +21,5 @@ else
 fi
 
 DAEMON=/usr/share/jitsi-videobridge/jvb.sh
-DEFAULT_DAEMON_OPTS="none"
 
-DAEMON_OPTS=${JVB_ENABLE_APIS:=$DEFAULT_DAEMON_OPTS}
-
-exec s6-setuidgid jvb /bin/bash -c "JAVA_SYS_PROPS=\"$JAVA_SYS_PROPS\" exec $DAEMON --apis=${DAEMON_OPTS}"
-
+exec s6-setuidgid jvb /bin/bash -c "JAVA_SYS_PROPS=\"$JAVA_SYS_PROPS\" exec $DAEMON --apis=${JVB_ENABLE_APIS:="none"}"

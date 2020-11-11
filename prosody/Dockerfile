@@ -40,7 +40,7 @@ RUN \
     && apt-cleanup \
     && rm -rf /etc/prosody
 
-ENV JITSI_MEET_PROSODY_VERSION=1.0.4289-1
+ENV JITSI_MEET_PROSODY_VERSION=1.0.4466-1
 
 RUN \
     apt-dpkg-wrap apt-get update \

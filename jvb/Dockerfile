@@ -1,7 +1,7 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-273-g072dd44b-1
+ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
