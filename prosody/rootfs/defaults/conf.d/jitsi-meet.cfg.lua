@@ -24,7 +24,7 @@ asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSU
 {{ if $ENABLE_XMPP_WEBSOCKET }}
 -- Deprecated in 0.12
 -- https://github.com/bjc/prosody/commit/26542811eafd9c708a130272d7b7de77b92712de
-cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}:{{ .Env.HTTPS_PORT }}" };
+cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}", "{{ .Env.PUBLIC_URL }}:{{ .Env.HTTPS_PORT }}" };
 consider_bosh_secure = true;
 {{ end }}
 
