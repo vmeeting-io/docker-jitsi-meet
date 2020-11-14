@@ -36,18 +36,10 @@ COPY jitsi-meet/ /web/jitsi-meet/
 RUN cp -f /web/jitsi-meet/interface_config.js /defaults
 RUN cp -f /web/jitsi-meet/config.js /defaults
 
+RUN make all
+
 RUN chmod 755 /wait-for-it.sh
 
-ARG VMEETING_FRONT_BASE
-ARG VMEETING_API_BASE
-ARG JWT_APP_ID
-ENV VMEETING_FRONT_BASE=${VMEETING_FRONT_BASE}
-ENV VMEETING_API_BASE=${VMEETING_API_BASE}
-ENV JWT_APP_ID=${JWT_APP_ID}
-
-RUN echo VMEETING_FRONT_BASE=${VMEETING_FRONT_BASE} > .env \
-  && echo VMEETING_API_BASE=${VMEETING_API_BASE} >> .env \
-  && echo JWT_APP_ID=${JWT_APP_ID} >> .env
 
 ENTRYPOINT []
 

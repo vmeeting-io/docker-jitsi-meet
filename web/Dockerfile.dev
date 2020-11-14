@@ -10,3 +10,5 @@ COPY jitsi-meet/package*.json ./
 RUN npm install
 
 COPY jitsi-meet/ /web/jitsi-meet/
+
+RUN make dev
