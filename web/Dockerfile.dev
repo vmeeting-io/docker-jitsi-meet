@@ -5,10 +5,20 @@ RUN apt-get update && apt-get install -y vim curl make
 # `/app/node_modules/.bin`을 $PATH 에 추가
 ENV PATH /web/jitsi-meet/node_modules/.bin:$PATH
 
-WORKDIR /web/jitsi-meet
-COPY jitsi-meet/package*.json ./
-RUN npm install
+COPY lib-jitsi-meet/ /web/lib-jitsi-meet/
+RUN cd /web/lib-jitsi-meet/ && npm install
 
 COPY jitsi-meet/ /web/jitsi-meet/
+RUN cd /web/jitsi-meet/ && npm install && make dev
 
-RUN make dev
+WORKDIR /web
+
+RUN echo "#!/bin/bash \n\
+        cd /web/lib-jitsi-meet \n\
+        webpack -p \n\
+        rm /web/jitsi-meet/libs/lib-jitsi-meet.min.js \n\
+        rm /web/jitsi-meet/libs/lib-jitsi-meet.min.map \n\
+        cp lib-jitsi-meet.min.js /web/jitsi-meet/libs/ \n\
+        cp lib-jitsi-meet.min.map /web/jitsi-meet/libs/" \
+        > /web/update_lib_jitsi.sh
+RUN chmod a+x /web/update_lib_jitsi.sh
