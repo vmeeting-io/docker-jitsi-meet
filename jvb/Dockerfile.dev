@@ -1,0 +1,42 @@
+ARG JITSI_REPO=theun
+FROM ${JITSI_REPO}/base-intellij
+
+# Telegrapf
+RUN apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y --no-install-recommends dirmngr wget iputils-ping snmp procps lm-sensors && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -ex && \
+    for key in \
+        05CE15085FC09D18E99EFB22684A14CF2582E0C5 ; \
+    do \
+        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" || \
+        gpg --keyserver pgp.mit.edu --recv-keys "$key" || \
+        gpg --keyserver keyserver.pgp.com --recv-keys "$key" ; \
+    done
+
+ENV TELEGRAF_VERSION 1.14.4
+ENV ARCH='amd64'
+RUN \
+    wget --no-verbose https://dl.influxdata.com/telegraf/releases/telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb.asc && \
+    wget --no-verbose https://dl.influxdata.com/telegraf/releases/telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
+    gpg --batch --verify telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb.asc telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
+    dpkg -i telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
+    rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
+
+# jvb
+ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
+
+RUN \
+	mkdir -p /usr/share/man/man1 && \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils openjdk-8-jdk-headless vim git && \
+	apt-cleanup
+
+# in dev mode, we run jvb manually, so we modify original jvb service to generate run script and then go to sleep
+RUN sed -i 's#\(exec java .*\)#echo "\1" > /run_jvb.sh#g' /usr/share/jitsi-videobridge/jvb.sh && \
+    echo  "sleep 1000000" >> /usr/share/jitsi-videobridge/jvb.sh
+
+COPY rootfs/ /
+
+VOLUME /config
