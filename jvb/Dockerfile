@@ -1,4 +1,26 @@
 ARG JITSI_REPO=theun
+
+FROM ${JITSI_REPO}/base as builder
+RUN \
+    mkdir -p /usr/share/man/man1 && \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y openjdk-8-jdk-headless wget && \
+	apt-cleanup
+
+RUN \
+    cd /opt/ && \
+    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
+    mv apache-maven-3.5.4 maven
+ENV M2_HOME=/opt/maven
+ENV PATH=${M2_HOME}/bin:${PATH}
+
+COPY jitsi-videobridge /jitsi-videobridge
+
+RUN cd /jitsi-videobridge/jvb && \
+    mvn clean verify package
+
+
 FROM ${JITSI_REPO}/base-java
 
 ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
@@ -34,5 +56,7 @@ RUN \
 EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
+
+COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
 
 VOLUME /config
