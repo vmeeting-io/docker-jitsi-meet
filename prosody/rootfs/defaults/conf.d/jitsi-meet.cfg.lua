@@ -165,11 +165,21 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
         {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") }}
         "{{ $JWT_TOKEN_AUTH_MODULE }}";
         {{ end }}
+        {{ if .Env.MAX_PARTICIPANTS_LIMIT }}
+        "muc_max_occupants";
+        {{ end }}
     }
     muc_room_cache_size = 1000
     muc_room_locking = false
     muc_room_default_public_jids = true
-
+    {{ if .Env.MAX_PARTICIPANTS_LIMIT }}
+    muc_max_occupants = {{ .Env.MAX_PARTICIPANTS_LIMIT }}
+    {{ if .Env.XMPP_RECORDER_DOMAIN }}
+    muc_lobby_whitelist = { "{{ .Env.XMPP_RECORDER_DOMAIN }}" }
+    {{ else }}
+    muc_lobby_whitelist = { }
+    {{ end }}
+    {{ end }}
 Component "focus.{{ .Env.XMPP_DOMAIN }}"
     component_secret = "{{ .Env.JICOFO_COMPONENT_SECRET }}"
 
