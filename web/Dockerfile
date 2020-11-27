@@ -36,8 +36,6 @@ COPY jitsi-meet/ /web/jitsi-meet/
 RUN cp -f /web/jitsi-meet/interface_config.js /defaults
 RUN cp -f /web/jitsi-meet/config.js /defaults
 
-RUN make all
-
 RUN chmod 755 /wait-for-it.sh
 
 
