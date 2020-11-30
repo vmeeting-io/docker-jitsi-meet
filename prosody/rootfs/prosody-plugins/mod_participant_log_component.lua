@@ -3,7 +3,7 @@ local socket = require "socket";
 local json = require "util.json";
 local ext_events = module:require "ext_events";
 local it = require "util.iterators";
-local jid = require "jtil.jid";
+local jid = require "util.jid";
 local jid_resource = require "util.jid".resource;
 local is_healthcheck_room = module:require "util".is_healthcheck_room;
 local http = require "net.http";
@@ -39,6 +39,7 @@ function occupant_joined(event)
 
         local body = {};
         body.room = node;
+        body.meetingId = room._data.meetingId;
         body.stats = {};
 
         room.participant[nick] = {
@@ -54,11 +55,11 @@ function occupant_joined(event)
             local stat = {};
         
             stat.joinTime = os.time(v.joinTime);
-            stat.leaveTime = os.time(v.leaveTime);
-            stat.name = v.name);
+            stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
+            stat.name = v.name;
             stat.email = v.email;
-            stat.id = id;
-            stat.jid = jid;
+            stat.id = v.id;
+            stat.jid = v.jid;
             body.stats[k] = stat;
         end
 
@@ -91,6 +92,7 @@ function occupant_leaving(event)
 
         local body = {};
         body.room = node;
+        body.meetingId = room._data.meetingId;
         body.stats = {};
 
         room.participant[nick] = {
@@ -106,11 +108,11 @@ function occupant_leaving(event)
             local stat = {};
         
             stat.joinTime = os.time(v.joinTime);
-            stat.leaveTime = os.time(v.leaveTime);
-            stat.name = v.name);
+            stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
+            stat.name = v.name;
             stat.email = v.email;
-            stat.id = id;
-            stat.jid = jid;
+            stat.id = v.id;
+            stat.jid = v.jid;
             body.stats[k] = stat;
         end
 
@@ -127,6 +129,10 @@ end
 function room_created(event)
     local room = event.room;
     room.participant = {};
+
+    for k, v in pairs(room._affiliations) do
+        log("info", "%s is %s", k, v);
+    end
 end
 
 function room_destroyed(event)
@@ -142,17 +148,18 @@ function room_destroyed(event)
 
     local body = {};
     body.room = node;
+    body.meetingId = room._data.meetingId;
     body.stats = {};
 
     for k, v in pairs(room.participant) do
         local stat = {};
     
         stat.joinTime = os.time(v.joinTime);
-        stat.leaveTime = os.time(v.leaveTime);
-        stat.name = v.name);
+        stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
+        stat.name = v.name;
         stat.email = v.email;
-        stat.id = id;
-        stat.jid = jid;
+        stat.id = v.id;
+        stat.jid = v.jid;
         body.stats[k] = stat;
     end
 
