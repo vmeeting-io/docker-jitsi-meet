@@ -21,6 +21,10 @@ if [[ ! -f /config/sip-communicator.properties ]]; then
     tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
 fi
 
+if [[ ! -f /config/jicofo.conf ]]; then
+    tpl /defaults/jicofo.conf > /config/jicofo.conf
+fi
+
 if [[ ! -f /config/logging.properties ]]; then
     cp /defaults/logging.properties /config
 fi
