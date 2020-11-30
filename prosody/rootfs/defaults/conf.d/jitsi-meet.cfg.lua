@@ -97,6 +97,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     speakerstats_component = "speakerstats.{{ .Env.XMPP_DOMAIN }}"
     conference_duration_component = "conferenceduration.{{ .Env.XMPP_DOMAIN }}"
     participant_log_component = "participantlog.{{ .Env.XMPP_DOMAIN }}"
+    conference_db_component = "conferencedb.{{ .Env.XMPP_DOMAIN }}"
 
     c2s_require_encryption = false
     bosh_max_inactivity = 120
@@ -190,6 +191,9 @@ Component "conferenceduration.{{ .Env.XMPP_DOMAIN }}" "conference_duration_compo
     muc_component = "{{ .Env.XMPP_MUC_DOMAIN }}"
 
 Component "participantlog.{{ .Env.XMPP_DOMAIN }}" "participant_log_component"
+    muc_component = "{{ .Env.XMPP_MUC_DOMAIN }}"
+
+Component "conferencedb.{{ .Env.XMPP_DOMAIN }}" "conference_db_component"
     muc_component = "{{ .Env.XMPP_MUC_DOMAIN }}"
 
 {{ if $ENABLE_LOBBY }}
