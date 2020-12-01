@@ -68,7 +68,7 @@ function occupant_joined(event)
         -- https://prosody.im/doc/developers/net/http
         http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
-            print(resp_body, response_code, response);
+            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
         end);
     end
 end
@@ -121,7 +121,7 @@ function occupant_leaving(event)
         -- https://prosody.im/doc/developers/net/http
         http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
-            print(resp_body, response_code, response);
+            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
         end);
     end
 end
@@ -168,7 +168,7 @@ function room_destroyed(event)
     -- https://prosody.im/doc/developers/net/http
     http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
     function(resp_body, response_code, response)
-        print(resp_body, response_code, response);
+        log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
     end);
 end
 

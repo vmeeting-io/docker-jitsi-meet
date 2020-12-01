@@ -22,7 +22,6 @@ end
 
 log("info", "Starting conference db module for %s", muc_component_host);
 
-
 function room_created(event)
     local room = event.room;
 
@@ -45,7 +44,7 @@ function room_destroyed(event)
 
     http.request(url, { body=reqbody_string, method="POST" },
         function(resp_body, response_code, response)
-                print(resp_body, response_code, response);
+            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
         end);
 end
 
