@@ -1,9 +1,10 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
-ENV JICOFO_VERSION=1.0-644-1
+ENV JICOFO_VERSION=1.0-660-1
 
 RUN \
+    echo "deb https://download.jitsi.org unstable/" > /etc/apt/sources.list.d/jitsi.list && \
 	apt-dpkg-wrap apt-get update && \
 	apt-dpkg-wrap apt-get install -y jicofo=${JICOFO_VERSION} && \
 	apt-cleanup
