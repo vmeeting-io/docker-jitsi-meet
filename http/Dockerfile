@@ -14,7 +14,7 @@ RUN \
 
 RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
-	certbot-auto --noninteractive --install-only
+	certbot-auto --no-self-upgrade --noninteractive --install-only
 
 EXPOSE 80 443 8080
 
