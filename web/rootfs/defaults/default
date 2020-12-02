@@ -1,7 +1,8 @@
 server {
 	listen 80 default_server;
+{{ if .Env.ENABLE_IPv6 }}
 	listen [::]:80 default_server;
-
+{{ end }}
 	{{ if .Env.ENABLE_HTTP_REDIRECT | default "0" | toBool }}
 	return 301 https://$host$request_uri;
 	{{ else }}
@@ -12,7 +13,9 @@ server {
 {{ if not (.Env.DISABLE_HTTPS | default "0" | toBool) }}
 server {
 	listen 443 ssl http2;
+{{ if .Env.ENABLE_IPv6 }}
 	listen [::]:443 ssl http2;
+{{ end }}
 
 	include /config/nginx/ssl.conf;
 	include /config/nginx/meet.conf;
