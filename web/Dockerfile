@@ -1,7 +1,7 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base
 
-ADD https://dl.eff.org/certbot-auto /usr/local/bin/
+ADD https://raw.githubusercontent.com/certbot/certbot/v1.9.0/certbot-auto /usr/local/bin/
 
 COPY rootfs/ /
 
