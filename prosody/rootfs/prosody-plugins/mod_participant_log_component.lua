@@ -43,16 +43,13 @@ function occupant_joined(event)
         body_json.type = 'participant_log';
         body_json.log = users_json;
 
-        for k, v in pairs(room._occupants) do
-            local stanza = st.message({
-                from = module.host;
-                to = v.jid;
+        room:broadcast_message(
+            st.message({
+                type = 'groupchat',
+                from = module.host
             })
             :tag("json-message", {xmlns='http://jitsi.org/jitmeet'})
-            :text(json.encode(body_json)):up();
-
-            room:route_stanza(stanza);
-        end
+            :text(json.encode(body_json)):up());
     end
 end
 
@@ -81,16 +78,13 @@ function occupant_leaving(event)
         body_json.type = 'participant_log';
         body_json.log = users_json;
 
-        for k, v in pairs(room._occupants) do
-            local stanza = st.message({
-                from = module.host;
-                to = v.jid;
+        room:broadcast_message(
+            st.message({
+                type = 'groupchat',
+                from = module.host
             })
             :tag("json-message", {xmlns='http://jitsi.org/jitmeet'})
-            :text(json.encode(body_json)):up();
-
-            room:route_stanza(stanza);
-        end
+            :text(json.encode(body_json)):up());
     end
 end
 
