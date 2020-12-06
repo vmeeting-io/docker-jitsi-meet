@@ -1238,7 +1238,7 @@
             [
               {
                 "params": [
-                  "loss_rate_download"
+                  "incoming_loss"
                 ],
                 "type": "field"
               },
@@ -1275,7 +1275,7 @@
             [
               {
                 "params": [
-                  "loss_rate_upload"
+                  "outgoing_loss"
                 ],
                 "type": "field"
               },
