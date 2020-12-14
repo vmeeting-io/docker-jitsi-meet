@@ -1,7 +1,7 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base
 
-ADD https://dl.eff.org/certbot-auto /usr/local/bin/
+ADD https://raw.githubusercontent.com/certbot/certbot/v1.9.0/certbot-auto /usr/local/bin/
 
 COPY rootfs/ /
 
@@ -23,7 +23,7 @@ RUN \
 
 RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
-	certbot-auto --noninteractive --install-only
+	certbot-auto --no-self-upgrade --noninteractive --install-only
 
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs git

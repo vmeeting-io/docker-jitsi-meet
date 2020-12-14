@@ -118,11 +118,21 @@ function occupant_leaving(event)
 
         local encoded_body = json.encode(body);
 
+<<<<<<< HEAD
         -- https://prosody.im/doc/developers/net/http
         http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
             log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
         end);
+=======
+        room:broadcast_message(
+            st.message({
+                type = 'groupchat',
+                from = module.host
+            })
+            :tag("json-message", {xmlns='http://jitsi.org/jitmeet'})
+            :text(json.encode(body_json)):up());
+>>>>>>> origin/master
     end
 end
 
