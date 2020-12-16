@@ -119,9 +119,9 @@ function occupant_leaving(event)
         local encoded_body = json.encode(body);
 
         -- https://prosody.im/doc/developers/net/http
-        http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
+        http.request(url, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
-            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
+            log("info", "HTTP PATCH Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
         end);
     end
 end
@@ -129,10 +129,6 @@ end
 function room_created(event)
     local room = event.room;
     room.participant = {};
-
-    for k, v in pairs(room._affiliations) do
-        log("info", "%s is %s", k, v);
-    end
 end
 
 function room_destroyed(event)
@@ -144,7 +140,7 @@ function room_destroyed(event)
 
     local node, host, resource = jid.split(room.jid);
 
-    local url = "http://vmapi:5000/plog/room-destoryed";
+    local url = "http://vmapi:5000/plog/room-destroyed";
 
     local body = {};
     body.room = node;
@@ -166,9 +162,9 @@ function room_destroyed(event)
     local encoded_body = json.encode(body);
 
     -- https://prosody.im/doc/developers/net/http
-    http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
+    http.request(url, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
     function(resp_body, response_code, response)
-        log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
+        log("info", "HTTP PATCH Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
     end);
 end
 
