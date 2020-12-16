@@ -140,7 +140,16 @@ function room_destroyed(event)
 
     local node, host, resource = jid.split(room.jid);
 
-    local url = "http://vmapi:5000/plog/room-destroyed";
+    local url1 = "http://vmapi:5000/conference/set-end-time";
+    local reqbody = { name = node };
+    local reqbody_string = http.formencode(reqbody);
+
+    http.request(url1, { body=reqbody_string, method="POST" },
+        function(resp_body, response_code, response)
+            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
+        end);
+
+    local url2 = "http://vmapi:5000/plog/room-destroyed";
 
     local body = {};
     body.room = node;
@@ -162,7 +171,7 @@ function room_destroyed(event)
     local encoded_body = json.encode(body);
 
     -- https://prosody.im/doc/developers/net/http
-    http.request(url, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
+    http.request(url2, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
     function(resp_body, response_code, response)
         log("info", "HTTP PATCH Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
     end);
