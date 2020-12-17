@@ -1,6 +1,18 @@
 #!/usr/bin/with-contenv bash
+set -x
 
-export LOCAL_ADDRESS=$(ip route | grep '172.28.0.0/16' | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+if [[ $JVB_USE_PRIVATE_NET -eq 1 || x$JVB_USE_PRIVATE_NET == xtrue ]]; then
+    if [ ! -f "$HOST_ETC/hostip" ]; then
+        echo "can not find hostip file in host /etc. Exit ..."
+        exit 1
+    fi
+    export PUBLIC_ADDRESS=$(cat $HOST_ETC/hostip | head -n 1 |  sed 's/ //g')
+else
+    export PUBLIC_ADDRESS=$(dig +short myip.opendns.com @resolver1.opendns.com)
+fi
+
+export LOCAL_ADDRESS=$(ip route get "$PUBLIC_ADDRESS" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+export SWARM_ADDRESS=$(ip route | grep "${JITSI_MEET_SUBNET}" | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 
 if [[ -z $JVB_AUTH_PASSWORD ]]; then
     echo 'FATAL ERROR: JVB auth password must be set'

@@ -1,24 +1,7 @@
 #!/usr/bin/with-contenv bash
 set -x
 
-if [[ $JVB_USE_PRIVATE_NET -eq 1 || x$JVB_USE_PRIVATE_NET == xtrue ]]; then
-    if [ ! -f "$HOST_ETC/hostip" ]; then
-        echo "can not find hostip file in host /etc. Exit ..."
-        exit 1
-    fi
-    HOST_IP=$(cat $HOST_ETC/hostip | head -n 1 |  sed 's/ //g')
-else
-    HOST_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-fi
-
 JAVA_SYS_PROPS="-Dnet.java.sip.communicator.SC_HOME_DIR_LOCATION=/ -Dnet.java.sip.communicator.SC_HOME_DIR_NAME=config -Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jvb.conf"
-
-if [[ ! -z "$HOST_IP" ]]; then
-    LOCAL_ADDRESS=$(ip route get "$HOST_IP" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
-    JAVA_SYS_PROPS="$JAVA_SYS_PROPS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_LOCAL_ADDRESS=$LOCAL_ADDRESS -Dorg.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$HOST_IP -Dorg.ice4j.ice.harvest.BLOCKED_INTERFACES=bridge"
-else
-    echo "ERROR: can not detect HOST_IP!"
-fi
 
 DAEMON=/usr/share/jitsi-videobridge/jvb.sh
 
