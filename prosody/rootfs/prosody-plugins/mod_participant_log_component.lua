@@ -8,6 +8,8 @@ local jid_resource = require "util.jid".resource;
 local is_healthcheck_room = module:require "util".is_healthcheck_room;
 local http = require "net.http";
 
+local log_level = "info";
+
 -- we use async to detect Prosody 0.10 and earlier
 local have_async = pcall(require, "util.async");
 if not have_async then
@@ -26,109 +28,87 @@ log("info", "Starting participant logger for %s", muc_component_host);
 function occupant_joined(event)
     local room = event.room;
     local occupant = event.occupant;
-
+    local node, host, resource = jid.split(room.jid);
     local nick = jid_resource(occupant.nick);
 
-    local participant_count = it.count(room:each_occupant());
-
-
-    if room.participant then
-        local node, host, resource = jid.split(room.jid);
-
-        local url = "http://vmapi:5000/plog/participant-join";
-
-        local body = {};
-        body.room = node;
-        body.meetingId = room._data.meetingId;
-        body.stats = {};
-
-        room.participant[nick] = {
+    if room._id then
+        local body = {
+            conference = room._id,
             joinTime = os.date("*t"),
             leaveTime = nil,
             name = occupant.sessions[occupant.jid]:get_child_text('nick', 'http://jabber.org/protocol/nick'),
             email = occupant.sessions[occupant.jid]:get_child_text('email'),
-            id = occupant.sessions[occupant.jid]:get_child_text('id'),
+            nick = nick,
             jid = occupant.jid
         };
-
-        for k, v in pairs(room.participant) do
-            local stat = {};
-        
-            stat.joinTime = os.time(v.joinTime);
-            stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
-            stat.name = v.name;
-            stat.email = v.email;
-            stat.id = v.id;
-            stat.jid = v.jid;
-            body.stats[k] = stat;
-        end
 
         local encoded_body = json.encode(body);
 
         -- https://prosody.im/doc/developers/net/http
-        http.request(url, { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
+        http.request("http://vmapi:5000/plog/", { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
-            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
+            local body = json.decode(resp_body);
+            room.participants[occupant.jid] = body._id;
+            log(log_level, "plog created", room._id, body._id, response_code);
         end);
+
+        log("info", "occupant_joined:", room._id, body.nick);
     end
 end
 
 function occupant_leaving(event)
     local room = event.room;
+    local occupant = event.occupant;
 
     if is_healthcheck_room(room.jid) then
-            return;
+        return;
     end
 
-    local occupant = event.occupant;
-    local nick = jid_resource(occupant.nick);
-
-    local logForOccupant = room.participant[nick];
-
-    if logForOccupant then
+    if room._id and room.participants[occupant.jid] then
         local node, host, resource = jid.split(room.jid);
-
-        local url = "http://vmapi:5000/plog/participant-leave";
-
-        local body = {};
-        body.room = node;
-        body.meetingId = room._data.meetingId;
-        body.stats = {};
-
-        room.participant[nick] = {
-            joinTime = room.participant[nick].joinTime,
-            leaveTime = os.date("*t"),
-            name = room.participant[nick].name,
-            email = room.participant[nick].email,
-            id = room.participant[nick].id,
-            jid = room.participant[nick].jid
-        };
-
-        for k, v in pairs(room.participant) do
-            local stat = {};
-        
-            stat.joinTime = os.time(v.joinTime);
-            stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
-            stat.name = v.name;
-            stat.email = v.email;
-            stat.id = v.id;
-            stat.jid = v.jid;
-            body.stats[k] = stat;
-        end
-
-        local encoded_body = json.encode(body);
+        local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
 
         -- https://prosody.im/doc/developers/net/http
-        http.request(url, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
+        http.request(url, { method="DELETE" },
         function(resp_body, response_code, response)
-            log("info", "HTTP PATCH Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
+            log(log_level, "plod updated", room._id, room.participants[occupant.jid], response_code);
         end);
+
+        log("info", "occupant_leaving:", room._id, room.participants[occupant.jid]);
+    end
+end
+
+function dump(o)
+    if type(o) == 'table' then
+        local s = '{ '
+        for k,v in pairs(o) do
+            if type(k) ~= 'number' then k = '"'..k..'"' end
+            s = s .. '['..k..'] = ' .. dump(v) .. ','
+        end
+        return s .. '} '
+    else
+        return tostring(o)
     end
 end
 
 function room_created(event)
     local room = event.room;
     room.participant = {};
+
+    local node, host, resource = jid.split(room.jid);
+    local url1 = "http://vmapi:5000/conference";
+    local reqbody = { name = node, meetingId = room._data.meetingId };
+
+    http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
+        function(resp_body, response_code, response)
+            local body = json.decode(resp_body);
+            room.mail_owner = body.mail_owner;
+            room._id = body._id;
+            room.participants = {};
+            log(log_level, node, "room created", room._id);
+        end);
+
+    log("info", "room_created: %s, %s", node, room._data.meetingId);
 end
 
 function room_destroyed(event)
@@ -138,55 +118,16 @@ function room_destroyed(event)
         return;
     end
 
-    local node, host, resource = jid.split(room.jid);
+    if room._id then
+        local node, host, resource = jid.split(room.jid);
 
-    local url1 = "http://vmapi:5000/conference/set-end-time";
-    local reqbody = { name = node };
-    local reqbody_string = http.formencode(reqbody);
+        local url1 = "http://vmapi:5000/conference/" .. room._id;
+        http.request(url1, { method="DELETE" },
+            function(resp_body, response_code, response)
+                log(log_level, node, "room destroyed", room._id, response_code);
+            end);
 
-    http.request(url1, { body=reqbody_string, method="POST" },
-        function(resp_body, response_code, response)
-            log("info", "HTTP POST Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
-        end);
-
-    local url2 = "http://vmapi:5000/plog/room-destroyed";
-
-    local body = {};
-    body.room = node;
-    body.meetingId = room._data.meetingId;
-    body.stats = {};
-
-    for k, v in pairs(room.participant) do
-        local stat = {};
-    
-        stat.joinTime = os.time(v.joinTime);
-        stat.leaveTime = v.leaveTime and os.time(v.leaveTime) or nil;
-        stat.name = v.name;
-        stat.email = v.email;
-        stat.id = v.id;
-        stat.jid = v.jid;
-        body.stats[k] = stat;
-    end
-
-    local encoded_body = json.encode(body);
-
-    -- https://prosody.im/doc/developers/net/http
-    http.request(url2, { body=encoded_body, method="PATCH", headers = { ["Content-Type"] = "application/json" } },
-    function(resp_body, response_code, response)
-        log("info", "HTTP PATCH Request to room %s with meetingId %s received code %s", node, room._data.meetingId, response_code);
-    end);
-end
-
--- executed on every host added internally in prosody, including components
-function process_host(host)
-    if host == muc_component_host then -- the conference muc component
-        module:log("info", "Hook to muc events on %s", host);
-
-       local muc_module = module:context(host)
-       muc_module:hook("muc-room-created", room_created, -1);
-       muc_module:hook("muc-room-destroyed", room_destroyed, -1);
-       muc_module:hook("muc-occupant-joined", occupant_joined, -1);
-       muc_module:hook("muc-occupant-pre-leave", occupant_leaving, -1);
+        log("info", "room_destoryed: %s, %s", node, room._data.meetingId);
     end
 end
 

@@ -168,6 +168,7 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
         {{ if .Env.MAX_PARTICIPANTS_LIMIT }}
         "muc_max_occupants";
         {{ end }}
+        "participant_log"
     }
     muc_room_cache_size = 1000
     muc_room_locking = false
@@ -180,6 +181,7 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
     muc_lobby_whitelist = { }
     {{ end }}
     {{ end }}
+
 Component "focus.{{ .Env.XMPP_DOMAIN }}"
     component_secret = "{{ .Env.JICOFO_COMPONENT_SECRET }}"
 
