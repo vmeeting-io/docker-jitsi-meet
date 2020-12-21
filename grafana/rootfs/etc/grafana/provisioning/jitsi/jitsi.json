@@ -1404,7 +1404,7 @@
           "measurement": "jitsi_stats",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT \"octo_endpoints\" FROM \"jitsi_stats\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter",
+          "query": "SELECT \"participants\" FROM \"jitsi_stats\" WHERE (\"host\" =~ /^$jitsi_host$/) AND $timeFilter",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1412,7 +1412,7 @@
             [
               {
                 "params": [
-                  "octo_endpoints"
+                  "participants"
                 ],
                 "type": "field"
               },
