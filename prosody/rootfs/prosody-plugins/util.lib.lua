@@ -18,14 +18,20 @@ local escaped_muc_domain_prefix = muc_domain_prefix:gsub("%p", "%%%1");
 local target_subdomain_pattern
     = "^"..escaped_muc_domain_prefix..".([^%.]+)%."..escaped_muc_domain_base;
 
+-- Utility function to split room JID to include room name and subdomain
+local function room_jid_split_subdomain(room_jid)
+    local node, host, resource = jid.split(room_jid);
+    local target_subdomain = host and host:match(target_subdomain_pattern);
+    return node, host, resource, target_subdomain
+end
+
 --- Utility function to check and convert a room JID from
 -- virtual room1@muc.foo.example.com to real [foo]room1@muc.example.com
 -- @param room_jid the room jid to match and rewrite if needed
 -- @return returns room jid [foo]room1@muc.example.com when it has subdomain
 -- otherwise room1@muc.example.com(the room_jid value untouched)
 local function room_jid_match_rewrite(room_jid)
-    local node, host, resource = jid.split(room_jid);
-    local target_subdomain = host and host:match(target_subdomain_pattern);
+    local node, host, resource, target_subdomain = room_jid_split_subdomain(room_jid);
     if not target_subdomain then
         module:log("debug", "No need to rewrite out 'to' %s", room_jid);
         return room_jid;
@@ -191,5 +197,6 @@ return {
     get_room_from_jid = get_room_from_jid;
     async_handler_wrapper = async_handler_wrapper;
     room_jid_match_rewrite = room_jid_match_rewrite;
+    room_jid_split_subdomain = room_jid_split_subdomain;
     update_presence_identity = update_presence_identity;
 };

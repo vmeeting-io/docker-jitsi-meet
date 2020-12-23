@@ -81,6 +81,15 @@ if [[ ! -f $PROSODY_CFG ]]; then
         fi
         prosodyctl --config $PROSODY_CFG register $JIGASI_XMPP_USER $XMPP_AUTH_DOMAIN $JIGASI_XMPP_PASSWORD
     fi
+
+    if [[ ! -z $VMAPI_AUTH_USER ]] && [[ ! -z $VMAPI_AUTH_PASSWORD ]]; then
+        OLD_VMAPI_AUTH_PASSWORD=passw0rd
+        if [[ "$VMAPI_AUTH_PASSWORD" == "$OLD_VMAPI_AUTH_PASSWORD" ]]; then
+            echo 'FATAL ERROR: Jigasi auth password must be changed, check the README'
+            exit 1
+        fi
+        prosodyctl --config $PROSODY_CFG register $VMAPI_AUTH_USER $XMPP_AUTH_DOMAIN $VMAPI_AUTH_PASSWORD
+    fi
 fi
 
 mkdir -p /config/certs
