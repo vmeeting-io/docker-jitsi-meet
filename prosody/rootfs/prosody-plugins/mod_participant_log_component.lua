@@ -101,7 +101,7 @@ function room_created(event)
 
     http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
         function(resp_body, response_code, response)
-            local body = json.decode(resp_body);
+            local body = json.decode(resp_body).docs[0];
             room.mail_owner = body.mail_owner;
             room._id = body._id;
             room.participants = {};
