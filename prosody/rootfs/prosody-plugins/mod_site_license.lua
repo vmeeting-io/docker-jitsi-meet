@@ -10,7 +10,7 @@ local st = require "util.stanza";
 local MAX_OCCUPANTS = 50;
 local sites = {};
 local licenses = {};
-local whitelist = module:get_option_set("muc_access_whitelist");
+local whitelist = module:get_option_set("muc_access_whitelist", {});
 local room_jid_split_subdomain = module:require "util".room_jid_split_subdomain;
 
 local log_level = "info";
@@ -199,6 +199,7 @@ end
 -- end);
 
 module:hook("muc-room-destroyed", function(event)
+    local room = event.room;
     log("info", "room destroyed: %s", event.room.jid);
     return return_site_license(room);
 end);

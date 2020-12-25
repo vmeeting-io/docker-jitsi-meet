@@ -4,6 +4,7 @@ local json = require "util.json";
 local ext_events = module:require "ext_events";
 local it = require "util.iterators";
 local jid = require "util.jid";
+local room_jid_split_subdomain = module:require "util".room_jid_split_subdomain;
 local jid_resource = require "util.jid".resource;
 local is_healthcheck_room = module:require "util".is_healthcheck_room;
 local http = require "net.http";
@@ -65,7 +66,7 @@ function occupant_leaving(event)
     end
 
     if room._id and room.participants[occupant.jid] then
-        local node, host, resource = jid.split(room.jid);
+        local node, host, resource = jid_split(room.jid);
         local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
 
         -- https://prosody.im/doc/developers/net/http
@@ -96,8 +97,13 @@ function room_created(event)
     room.participant = {};
 
     local node, host, resource = jid.split(room.jid);
-    local url1 = "http://vmapi:5000/conferences";
-    local reqbody = { name = node, meetingId = room._data.meetingId };
+    local site_id, name = node:match("^%[([^%]]+)%](.+)$");
+    local url1 = "http://vmapi:5000/"
+    if site_id then
+        url1 = url1 .. "sites/" .. site_id .. "/";
+    end
+    url1 = url1 .. "conferences";
+    local reqbody = { name = name, meetingId = room._data.meetingId };
 
     http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
         function(resp_body, response_code, response)
@@ -112,7 +118,7 @@ function room_created(event)
             end
         end);
 
-    log("info", "room_created: %s, %s", node, room._data.meetingId);
+    log("info", "room_created: %s, %s, %s, %s, %s", node, host, resource, site_id, room._data.meetingId);
 end
 
 function room_destroyed(event)
@@ -124,8 +130,13 @@ function room_destroyed(event)
 
     if room._id then
         local node, host, resource = jid.split(room.jid);
+        local site_id, name = node:match("^%[([^%]]+)%](.+)$");
+        local url1 = "http://vmapi:5000/"
+        if site_id then
+            url1 = url1 .. "sites/" .. site_id .. "/";
+        end
+        url1 = url1 .. "conferences/" .. room._id;
 
-        local url1 = "http://vmapi:5000/conferences/" .. room._id;
         http.request(url1, { method="DELETE" },
             function(resp_body, response_code, response)
                 log(log_level, node, "room destroyed", room._id, response_code);
