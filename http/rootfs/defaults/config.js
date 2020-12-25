@@ -286,11 +286,6 @@ var config = {
     // Default language for the user interface.
     // defaultLanguage: 'en',
 
-    // If true all users without a token will be considered guests and all users
-    // with token will be considered non-guests. Only guests will be allowed to
-    // edit their profile.
-    enableUserRolesBasedOnToken: false,
-
     // Whether or not some features are checked based on token.
     // enableFeaturesBasedOnToken: false,
 

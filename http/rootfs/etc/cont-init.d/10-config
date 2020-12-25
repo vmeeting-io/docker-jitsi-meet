@@ -102,9 +102,6 @@ if [[ ! -f /config/config.js ]]; then
             sed -i \
                 -e "s#// anonymousdomain:.*#anonymousdomain: '${XMPP_GUEST_DOMAIN}',#" \
                 /config/config.js
-            sed -i \
-                -e "s#enableUserRolesBasedOnToken:.*#enableUserRolesBasedOnToken: true,#" \
-                /config/config.js
         fi
 
         sed -i \
