@@ -1,7 +1,6 @@
 admins = {
     "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}",
-    "{{ .Env.JVB_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}",
-    "{{ .Env.VMAPI_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
+    "{{ .Env.JVB_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
 }
 
 plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
