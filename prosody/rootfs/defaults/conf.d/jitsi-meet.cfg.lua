@@ -34,6 +34,7 @@ asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AU
 
 -- domain mapper options, must at least have domain base set to use the mapper
 muc_mapper_domain_base = "{{ .Env.XMPP_DOMAIN }}";
+muc_mapper_domain_prefix = "{{ first (splitList "." .Env.XMPP_MUC_DOMAIN) }}";
 
 VirtualHost "{{ .Env.XMPP_DOMAIN }}"
 {{ if $ENABLE_AUTH }}

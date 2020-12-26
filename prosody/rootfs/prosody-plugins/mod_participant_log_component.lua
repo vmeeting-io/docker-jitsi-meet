@@ -4,7 +4,6 @@ local json = require "util.json";
 local ext_events = module:require "ext_events";
 local it = require "util.iterators";
 local jid = require "util.jid";
-local room_jid_split_subdomain = module:require "util".room_jid_split_subdomain;
 local jid_resource = require "util.jid".resource;
 local is_healthcheck_room = module:require "util".is_healthcheck_room;
 local http = require "net.http";
@@ -66,7 +65,7 @@ function occupant_leaving(event)
     end
 
     if room._id and room.participants[occupant.jid] then
-        local node, host, resource = jid_split(room.jid);
+        local node, host, resource = jid.split(room.jid);
         local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
 
         -- https://prosody.im/doc/developers/net/http
