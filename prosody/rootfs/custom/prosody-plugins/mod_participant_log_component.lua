@@ -102,7 +102,7 @@ function room_created(event)
         url1 = url1 .. "sites/" .. site_id .. "/";
     end
     url1 = url1 .. "conferences";
-    local reqbody = { name = name, meetingId = room._data.meetingId };
+    local reqbody = { name = name, meeting_id = room._data.meetingId };
 
     http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
         function(resp_body, response_code, response)

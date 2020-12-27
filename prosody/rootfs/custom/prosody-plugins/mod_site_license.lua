@@ -5,12 +5,18 @@ local it = require "util.iterators";
 local split_jid = require "util.jid".split;
 local json = require "util.json";
 local st = require "util.stanza";
+
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
+local get_room_from_jid = module:require "util".get_room_from_jid;
+local room_jid_match_rewrite = module:require "util".room_jid_match_rewrite;
 
 local MAX_OCCUPANTS = 50;
 local MAX_DURATIONS = -1;
 local conferences = {};
 local whitelist = module:get_option_set("muc_access_whitelist", {});
+local muc_domain_prefix = module:get_option_string("muc_mapper_domain_prefix", "conference");
+local muc_domain_base = module:get_option_string("muc_mapper_domain_base", module.host);
+local muc_domain = module:get_option_string("muc_mapper_domain", muc_domain_prefix.."."..muc_domain_base);
 
 local log_level = "info";
 
@@ -23,29 +29,29 @@ local function check_for_max_occupants(session, room, stanza)
     -- check max occupants
     local user_jid = stanza.attr.from;
 	local user, domain, res = split_jid(user_jid);
+	local roomData = room._data;
 
     --no user object means no way to check for max occupants
 	if user == nil or is_admin(user_jid) then
-		log("debug", "nil or admin user not required to check max occupants: %s", user_jid);
-		return
+		log(log_level, "nil or admin user not required to check max occupants: %s", user_jid);
+		return;
     end
 
 	-- If we're a whitelisted user joining the room, don't bother checking the max
 	-- occupants.
-    module:log("debug", "user = %s, domain = %s, res = %s", user, domain, res);
+    log(log_level, "user = %s, domain = %s, res = %s", user, domain, roomData.max_occupants or MAX_OCCUPANTS);
 	if whitelist and whitelist:contains(domain) or whitelist:contains(user..'@'..domain) then
 		return;
 	end
 
 	if room and not room._jid_nick[user_jid] then
         local count = count_keys(room._occupants);
-        local meetingId = room._data.meetingId;
-		local slots = conferences[meetingId] and conferences[meetingId].max_occupants or MAX_OCCUPANTS;
+		local slots = roomData and roomData.max_occupants or MAX_OCCUPANTS;
 
 		-- If there is no whitelist, just check the count.
 		if not whitelist and count > slots then
-			module:log("info", "Attempt to enter a maxed out MUC");
-			origin.send(st.error_reply(stanza, "cancel", "service-unavailable"));
+			log("info", "Attempt to enter a maxed out MUC");
+			session.send(st.error_reply(stanza, "cancel", "service-unavailable"));
 			return true;
 		end
 
@@ -61,8 +67,8 @@ local function check_for_max_occupants(session, room, stanza)
 
 		-- If the room is full (<0 slots left), error out.
 		if slots < 0 then
-			module:log("info", "Attempt to enter a maxed out MUC");
-			origin.send(st.error_reply(stanza, "cancel", "service-unavailable"));
+			log("info", "Attempt to enter a maxed out MUC");
+			session.send(st.error_reply(stanza, "cancel", "service-unavailable"));
 			return true;
 		end
     end
@@ -70,7 +76,7 @@ end
 
 module:hook("muc-occupant-pre-join", function(event)
 	local origin, room, stanza = event.origin, event.room, event.stanza;
-	log("debug", "pre join: %s %s", tostring(room), tostring(stanza));
+	log(log_level, "pre join: %s %s", tostring(room), tostring(stanza));
 	return check_for_max_occupants(origin, room, stanza);
 end);
 
@@ -80,33 +86,44 @@ end);
 function handle_conference_event(event)
     local body = json.decode(event.request.body);
 
-    log("debug", "%s: Update Conference Event Received: %s", event.request.method, tostring(body));
+    log(log_level, "%s: Update Conference Event Received: %s", event.request.method, tostring(body));
 
-    local meetingId = body["meetingId"];
-
-    if not meetingId then
+	local roomName = body["room_name"];
+    if not roomName then
+		log(log_level, "Not Found, %s", roomName);
         return { status_code = 400 };
     end
 
-    if body["delete_yn"] then
-        conferences[meetingId] = nil;
+	local roomAddress = roomName.."@"..muc_domain;
+	local room_jid = room_jid_match_rewrite(roomAddress);
+	local room = get_room_from_jid(room_jid);
+	if not room or not room._data then
+		log(log_level, "Not Found %s %s", roomAddress, room_jid);
+		return { status_code = 400 };
+	end
+
+	if body["delete_yn"] then
+		log(log_level, "Conference Removed: %s", room._data.meetingId);
+		room._data.max_occupants = 0;
+		room._data.max_durations = 0;
     else
-        conferences[meetingId] = {
-            max_occupants = body["max_occupants"] or MAX_OCCUPANTS,
-            max_durations = body["max_durations"] or MAX_DURATIONS,
-        };
+		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;
+		room._data.max_durations = body["max_durations"] or MAX_DURATIONS;
+		log(log_level, "Conference Updated: %s %s %s", room._data.meetingId, room._data.max_occupants, room._data.max_durations);
     end
 
     return { status_code = 200; };
 end
 
-module:depends("http");
-module:provides("http", {
-    default_path = "/";
-    name = "conferences";
-    route = {
-        ["POST /conferences/events"] = function (event) return async_handler_wrapper(event,handle_conference_event) end;
-    };
-});
+function module.load()
+	module:depends("http");
+	module:provides("http", {
+		default_path = "/";
+		name = "conferences";
+		route = {
+			["POST /conferences/events"] = function (event) return async_handler_wrapper(event,handle_conference_event) end;
+		};
+	});
+end
 
 -- module:hook_global('config-reloaded', load_config);
