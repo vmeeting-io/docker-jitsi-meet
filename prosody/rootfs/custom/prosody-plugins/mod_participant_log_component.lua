@@ -23,7 +23,8 @@ if muc_component_host == nil then
     return;
 end
 
-log("info", "Starting participant logger for %s", muc_component_host);
+local default_tenant = module:get_option_string("default_tenant");
+log("info", "Starting participant logger for %s", muc_component_host, default_tenant);
 
 function occupant_joined(event)
     local room = event.room;
@@ -101,7 +102,7 @@ function room_created(event)
  
     if not site_id then
         name = node;
-        site_id = 'trial';
+        site_id = default_tenant;
     end
     url1 = url1 .. "sites/" .. site_id .. "/";
     url1 = url1 .. "conferences";

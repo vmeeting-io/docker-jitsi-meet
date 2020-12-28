@@ -28,6 +28,8 @@ cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}", "{{ .Env.PUBLIC_URL }}:{{ .E
 consider_bosh_secure = true;
 {{ end }}
 
+default_tenant = "{{ .Env.DEFAULT_TENANT_ID }}"
+
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
 asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AUDIENCES) }}" }
 {{ end }}
