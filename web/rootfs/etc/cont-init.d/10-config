@@ -73,7 +73,7 @@ fi
 if [[ ! -f /config/config.js ]]; then
     cp /defaults/config.js /config/config.js
     sed -i \
-        -e "s/muc.jitsi-meet.example.com/conference.<\!--# echo var=\"subdomain\" default=\"\" -->jitsi-meet.example.com/g" \
+        -e "s/muc.jitsi-meet.example.com/muc.<\!--# echo var=\"subdomain\" default=\"\" -->jitsi-meet.example.com/g" \
         /config/config.js
 
     sed -i \

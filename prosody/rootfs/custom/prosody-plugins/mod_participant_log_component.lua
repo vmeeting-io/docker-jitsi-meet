@@ -98,9 +98,12 @@ function room_created(event)
     local node, host, resource = jid.split(room.jid);
     local site_id, name = node:match("^%[([^%]]+)%](.+)$");
     local url1 = "http://vmapi:5000/"
-    if site_id then
-        url1 = url1 .. "sites/" .. site_id .. "/";
+ 
+    if not site_id then
+        name = node;
+        site_id = 'trial';
     end
+    url1 = url1 .. "sites/" .. site_id .. "/";
     url1 = url1 .. "conferences";
     local reqbody = { name = name, meeting_id = room._data.meetingId };
 
