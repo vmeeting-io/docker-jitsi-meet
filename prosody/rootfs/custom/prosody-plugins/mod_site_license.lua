@@ -48,6 +48,11 @@ local function check_for_max_occupants(session, room, stanza)
         local count = count_keys(room._occupants);
 		local slots = roomData and roomData.max_occupants or MAX_OCCUPANTS;
 
+		if slots < 0 then
+			log(log_level, "It is not required to check max occupants: %s", slots);
+			return;
+		end
+
 		-- If there is no whitelist, just check the count.
 		if not whitelist and count > slots then
 			log("info", "Attempt to enter a maxed out MUC");
