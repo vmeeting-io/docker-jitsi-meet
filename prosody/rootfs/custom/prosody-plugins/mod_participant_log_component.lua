@@ -24,7 +24,7 @@ if muc_component_host == nil then
 end
 
 local default_tenant = module:get_option_string("default_tenant");
-local vmeeting_api_token = module:get_option_string("vmeeting_api_token") or "";
+local vmeeting_api_token = module:get_option_string("vmeeting_api_token", "");
 
 log("info", "Starting participant logger for %s", muc_component_host, default_tenant);
 

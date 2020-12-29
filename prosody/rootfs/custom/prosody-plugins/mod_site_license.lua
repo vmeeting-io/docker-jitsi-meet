@@ -17,6 +17,7 @@ local whitelist = module:get_option_set("muc_access_whitelist", {});
 local muc_domain_prefix = module:get_option_string("muc_mapper_domain_prefix", "conference");
 local muc_domain_base = module:get_option_string("muc_mapper_domain_base", module.host);
 local muc_domain = module:get_option_string("muc_mapper_domain", muc_domain_prefix.."."..muc_domain_base);
+local vmeeting_api_token = module:get_option_string("vmeeting_api_token", "");
 
 local log_level = "info";
 
