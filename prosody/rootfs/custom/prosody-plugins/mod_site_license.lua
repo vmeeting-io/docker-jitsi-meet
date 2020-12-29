@@ -85,10 +85,24 @@ module:hook("muc-occupant-pre-join", function(event)
 	return check_for_max_occupants(origin, room, stanza);
 end);
 
+local function get_authorization_token(request)
+	local authorization = request.headers.authorization;
+	if authorization then
+		local token = authorization:match("Bearer ([^ ]+)");
+		return token;
+	end
+end
+
 --- Handles request for updating conference info
 -- @param event the http event, holds the request query
 -- @return GET response, containing a json with response details
 function handle_conference_event(event)
+	local token = get_authorization_token(event.request);
+	if not token or token ~= vmeeting_api_token then
+		log("info", "Forbidden: Authorization token is needed.");
+		return { status_code = 403 };
+	end
+
     local body = json.decode(event.request.body);
 
     log(log_level, "%s: Update Conference Event Received: %s", event.request.method, tostring(body));

@@ -29,6 +29,7 @@ consider_bosh_secure = true;
 {{ end }}
 
 default_tenant = "{{ .Env.DEFAULT_TENANT_ID }}"
+vmeeting_api_token = "{{ .Env.VMEETING_API_TOKEN }}""
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
 asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AUDIENCES) }}" }

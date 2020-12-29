@@ -24,6 +24,8 @@ if muc_component_host == nil then
 end
 
 local default_tenant = module:get_option_string("default_tenant");
+local vmeeting_api_token = module:get_option_string("vmeeting_api_token") or "";
+
 log("info", "Starting participant logger for %s", muc_component_host, default_tenant);
 
 function occupant_joined(event)
@@ -46,7 +48,14 @@ function occupant_joined(event)
         local encoded_body = json.encode(body);
 
         -- https://prosody.im/doc/developers/net/http
-        http.request("http://vmapi:5000/plog/", { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
+        http.request("http://vmapi:5000/plog/", {
+            body = encoded_body,
+            method = "POST",
+            headers = {
+                ["Content-Type"] = "application/json",
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
         function(resp_body, response_code, response)
             local body = json.decode(resp_body);
             room.participants[occupant.jid] = body._id;
@@ -70,7 +79,12 @@ function occupant_leaving(event)
         local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
 
         -- https://prosody.im/doc/developers/net/http
-        http.request(url, { method="DELETE" },
+        http.request(url, {
+            method = "DELETE",
+            headers = {
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
         function(resp_body, response_code, response)
             log(log_level, "plod updated", room._id, room.participants[occupant.jid], response_code);
         end);
@@ -108,7 +122,13 @@ function room_created(event)
     url1 = url1 .. "conferences";
     local reqbody = { name = name, meeting_id = room._data.meetingId };
 
-    http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
+    http.request(url1, {
+        body = http.formencode(reqbody),
+        method = "PATCH",
+        headers = {
+            Authorization = "Bearer " .. vmeeting_api_token
+        }
+    },
         function(resp_body, response_code, response)
             if response_code == 201 then
                 local body = json.decode(resp_body);
@@ -140,7 +160,12 @@ function room_destroyed(event)
         end
         url1 = url1 .. "conferences/" .. room._id;
 
-        http.request(url1, { method="DELETE" },
+        http.request(url1, {
+            method = "DELETE",
+            headers = {
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
             function(resp_body, response_code, response)
                 log(log_level, node, "room destroyed", room._id, response_code);
             end);
