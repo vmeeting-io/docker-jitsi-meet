@@ -57,9 +57,13 @@ function occupant_joined(event)
             }
         },
         function(resp_body, response_code, response)
-            local body = json.decode(resp_body);
-            room.participants[occupant.jid] = body._id;
-            log(log_level, "plog created", room._id, body._id, response_code);
+            if response_code == 201 then
+                local body = json.decode(resp_body);
+                room.participants[occupant.jid] = body._id;
+                log(log_level, "plog created", room._id, body._id, response_code);
+            else
+                log(log_level, "plog create is failed", tostring(response));
+            end
         end);
 
         log("info", "occupant_joined:", room._id, body.nick);

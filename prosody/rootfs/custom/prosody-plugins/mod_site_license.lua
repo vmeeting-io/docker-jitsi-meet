@@ -5,6 +5,7 @@ local it = require "util.iterators";
 local split_jid = require "util.jid".split;
 local json = require "util.json";
 local st = require "util.stanza";
+local timer = require "util.timer"
 
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
 local get_room_from_jid = module:require "util".get_room_from_jid;
@@ -80,6 +81,72 @@ local function check_for_max_occupants(session, room, stanza)
     end
 end
 
+local function destroy_meeting(now, id, room)
+	if is_healthcheck_room(room.jid) then
+		return;
+	end
+
+	for _, p in room:each_occupant() do
+		if not is_admin(p.jid) then
+			room:set_affiliation(true, p.jid, "outcast");
+			log(log_level, "kick the occupant, %s", p.jid);
+		end
+	end
+
+	log(log_level, "conference terminated: %s", room.jid);
+end
+
+local function start_time_restrict_task(room)
+	if is_healthcheck_room(room.jid) or not room._data then
+		log(log_level, "skip time restriction");
+		return;
+	end
+
+	if room._data.task_id then
+		timer.stop(room._data.task_id);
+		room._data.task_id = nil;
+		log(log_level, "%s task is stopped", room._data.task_id);
+	end
+
+	if not room._data.tstart then
+		room._data.tstart = os.time();
+		log(log_level, "conference started at %s: %s", os.date());
+	end
+
+	if not room._data.max_durations or room._data.max_durations <= 0 then
+		log(log_level, "It has unlimited duration: %s", room._data.max_durations);
+		return;
+	end
+
+	local time_elapsed = os.difftime(os.time(), room._data.tstart);
+	local time_remained = room._data.max_durations - time_elapsed;
+	if time_remained <= 0 then
+		log(log_level, "No time is remained: %s", time_remained);
+		destroy_meeting(os.time(), room._data.task_id, room);
+		return;
+	end
+
+	room._data.task_id = timer.add_task(time_remained, destroy_meeting, room);
+	log(log_level, "It will terminate after %s seconds", time_remained);
+end
+
+module:hook("muc-room-created", function(event)
+	local room = event.room;
+
+	if is_healthcheck_room(room.jid) or not room._data then
+		log(log_level, "skip restriction");
+		return;
+	end
+
+	local max_durations = room._data.max_durations;
+	if not max_durations or max_durations < 0 then
+		log(log_level, "skip restriction: %s", max_durations);
+		return;
+	end
+
+	start_time_restrict_task(room);
+end);
+
 module:hook("muc-occupant-pre-join", function(event)
 	local origin, room, stanza = event.origin, event.room, event.stanza;
 	log(log_level, "pre join: %s %s", tostring(room), tostring(stanza));
@@ -122,13 +189,21 @@ function handle_conference_event(event)
 		return { status_code = 400 };
 	end
 
+	local max_durations;
+	if body["max_durations"] ~= json.null then
+		max_durations = body["max_durations"];
+	else
+		max_durations = -1;
+	end
 	if body["delete_yn"] then
 		log(log_level, "Conference Removed: %s", room._data.meetingId);
 		room._data.max_occupants = 0;
 		room._data.max_durations = 0;
+		start_time_restrict_task(room);
     else
 		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;
-		room._data.max_durations = body["max_durations"] or MAX_DURATIONS;
+		room._data.max_durations = max_durations;
+		start_time_restrict_task(room);
 		log(log_level, "Conference Updated: %s %s %s", room._data.meetingId, room._data.max_occupants, room._data.max_durations);
     end
 
