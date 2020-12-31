@@ -47,9 +47,13 @@ function occupant_joined(event)
         -- https://prosody.im/doc/developers/net/http
         http.request("http://vmapi:5000/plog/", { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
         function(resp_body, response_code, response)
-            local body = json.decode(resp_body);
-            room.participants[occupant.jid] = body._id;
-            log(log_level, "plog created", room._id, body._id, response_code);
+            if response_code == 201 then
+                local body = json.decode(resp_body);
+                room.participants[occupant.jid] = body._id;
+                log(log_level, "plog created", room._id, body._id, response_code);
+            else
+                log(log_level, "plog create is failed", tostring(response));
+            end
         end);
 
         log("info", "occupant_joined:", room._id, body.nick);
@@ -101,11 +105,15 @@ function room_created(event)
 
     http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
         function(resp_body, response_code, response)
-            local body = json.decode(resp_body).docs[0];
-            room.mail_owner = body.mail_owner;
-            room._id = body._id;
-            room.participants = {};
-            log(log_level, node, "room created", room._id);
+            if response_code == 201 then
+                local body = json.decode(resp_body).docs[0];
+                room.mail_owner = body.mail_owner;
+                room._id = body._id;
+                room.participants = {};
+                log(log_level, node, "room created", room._id);
+            else
+                log(log_level, node, "PATCH failed!", tostring(response));
+            end
         end);
 
     log("info", "room_created: %s, %s", node, room._data.meetingId);
