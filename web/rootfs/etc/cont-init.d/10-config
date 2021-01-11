@@ -73,9 +73,12 @@ fi
 if [[ ! -f /config/config.js ]]; then
     cp /defaults/config.js /config/config.js
     sed -i \
+        -e "s/muc.jitsi-meet.example.com/muc.<\!--# echo var=\"subdomain\" default=\"\" -->jitsi-meet.example.com/g" \
+        /config/config.js
+
+    sed -i \
         -e "s#jitsi-meet.example.com#$XMPP_DOMAIN#g" \
         -e "s#bosh:.*#bosh: '/http-bind',#" \
-        -e "s#muc:.*#muc: '${XMPP_MUC_DOMAIN}',#" \
         -e "s#// focusUserJid:.*#focusUserJid: '${JICOFO_AUTH_USER}@${XMPP_AUTH_DOMAIN}',#" \
         /config/config.js
 
@@ -115,9 +118,6 @@ if [[ ! -f /config/config.js ]]; then
         if [[ $ENABLE_GUESTS -eq 1 ]]; then
             sed -i \
                 -e "s#// anonymousdomain:.*#anonymousdomain: '${XMPP_GUEST_DOMAIN}',#" \
-                /config/config.js
-            sed -i \
-                -e "s#enableUserRolesBasedOnToken:.*#enableUserRolesBasedOnToken: true,#" \
                 /config/config.js
         fi
 

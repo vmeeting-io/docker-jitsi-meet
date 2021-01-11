@@ -3,7 +3,7 @@ admins = {
     "{{ .Env.JVB_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
 }
 
-plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
+plugin_paths = { "/prosody-plugins-custom", "/prosody-plugins/" }
 http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 
 {{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "0" | toBool }}
@@ -28,9 +28,16 @@ cross_domain_websocket = { "{{ .Env.PUBLIC_URL }}", "{{ .Env.PUBLIC_URL }}:{{ .E
 consider_bosh_secure = true;
 {{ end }}
 
+default_tenant = "{{ .Env.DEFAULT_SITE_ID }}";
+vmeeting_api_token = "{{ .Env.VMEETING_API_TOKEN }}";
+
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
 asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AUDIENCES) }}" }
 {{ end }}
+
+-- domain mapper options, must at least have domain base set to use the mapper
+muc_mapper_domain_base = "{{ .Env.XMPP_DOMAIN }}";
+muc_mapper_domain_prefix = "{{ first (splitList "." .Env.XMPP_MUC_DOMAIN) }}";
 
 VirtualHost "{{ .Env.XMPP_DOMAIN }}"
 {{ if $ENABLE_AUTH }}
@@ -84,6 +91,7 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
         {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "ldap") }}
         "auth_cyrus";
         {{end}}
+        "site_license";
     }
 
     {{ if $ENABLE_LOBBY }}
@@ -159,27 +167,23 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
     storage = "memory"
     modules_enabled = {
         "muc_meeting_id";
+        "muc_domain_mapper";
         {{ if .Env.XMPP_MUC_MODULES }}
         "{{ join "\";\n\"" (splitList "," .Env.XMPP_MUC_MODULES) }}";
         {{ end }}
         {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") }}
         "{{ $JWT_TOKEN_AUTH_MODULE }}";
         {{ end }}
-        {{ if .Env.MAX_PARTICIPANTS_LIMIT }}
-        "muc_max_occupants";
-        {{ end }}
-        "participant_log"
+        "participant_log";
+        "site_license";
     }
     muc_room_cache_size = 1000
     muc_room_locking = false
     muc_room_default_public_jids = true
-    {{ if .Env.MAX_PARTICIPANTS_LIMIT }}
-    muc_max_occupants = {{ .Env.MAX_PARTICIPANTS_LIMIT }}
     {{ if .Env.XMPP_RECORDER_DOMAIN }}
     muc_lobby_whitelist = { "{{ .Env.XMPP_RECORDER_DOMAIN }}" }
     {{ else }}
     muc_lobby_whitelist = { }
-    {{ end }}
     {{ end }}
 
 Component "focus.{{ .Env.XMPP_DOMAIN }}"

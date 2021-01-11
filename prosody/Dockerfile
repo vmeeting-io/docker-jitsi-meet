@@ -37,6 +37,7 @@ RUN \
       patch \
       lua-ldap \
       lua-sec \
+      vim inotify-tools \
     && apt-cleanup \
     && rm -rf /etc/prosody
 

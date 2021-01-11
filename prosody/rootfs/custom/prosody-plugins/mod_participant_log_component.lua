@@ -23,7 +23,10 @@ if muc_component_host == nil then
     return;
 end
 
-log("info", "Starting participant logger for %s", muc_component_host);
+local default_tenant = module:get_option_string("default_tenant");
+local vmeeting_api_token = module:get_option_string("vmeeting_api_token", "");
+
+log("info", "Starting participant logger for %s", muc_component_host, default_tenant);
 
 function occupant_joined(event)
     local room = event.room;
@@ -45,7 +48,14 @@ function occupant_joined(event)
         local encoded_body = json.encode(body);
 
         -- https://prosody.im/doc/developers/net/http
-        http.request("http://vmapi:5000/plog/", { body=encoded_body, method="POST", headers = { ["Content-Type"] = "application/json" } },
+        http.request("http://vmapi:5000/plog/", {
+            body = encoded_body,
+            method = "POST",
+            headers = {
+                ["Content-Type"] = "application/json",
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
         function(resp_body, response_code, response)
             if response_code == 201 then
                 local body = json.decode(resp_body);
@@ -73,7 +83,12 @@ function occupant_leaving(event)
         local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
 
         -- https://prosody.im/doc/developers/net/http
-        http.request(url, { method="DELETE" },
+        http.request(url, {
+            method = "DELETE",
+            headers = {
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
         function(resp_body, response_code, response)
             log(log_level, "plod updated", room._id, room.participants[occupant.jid], response_code);
         end);
@@ -100,13 +115,27 @@ function room_created(event)
     room.participant = {};
 
     local node, host, resource = jid.split(room.jid);
-    local url1 = "http://vmapi:5000/conference";
-    local reqbody = { name = node, meetingId = room._data.meetingId };
+    local site_id, name = node:match("^%[([^%]]+)%](.+)$");
+    local url1 = "http://vmapi:5000/"
+ 
+    if not site_id then
+        name = node;
+        site_id = default_tenant;
+    end
+    url1 = url1 .. "sites/" .. site_id .. "/";
+    url1 = url1 .. "conferences";
+    local reqbody = { name = name, meeting_id = room._data.meetingId };
 
-    http.request(url1, { body=http.formencode(reqbody), method="PATCH" },
+    http.request(url1, {
+        body = http.formencode(reqbody),
+        method = "PATCH",
+        headers = {
+            Authorization = "Bearer " .. vmeeting_api_token
+        }
+    },
         function(resp_body, response_code, response)
             if response_code == 201 then
-                local body = json.decode(resp_body).docs[0];
+                local body = json.decode(resp_body);
                 room.mail_owner = body.mail_owner;
                 room._id = body._id;
                 room.participants = {};
@@ -116,7 +145,7 @@ function room_created(event)
             end
         end);
 
-    log("info", "room_created: %s, %s", node, room._data.meetingId);
+    log("info", "room_created: %s, %s, %s, %s, %s", node, host, resource, site_id, room._data.meetingId);
 end
 
 function room_destroyed(event)
@@ -128,9 +157,19 @@ function room_destroyed(event)
 
     if room._id then
         local node, host, resource = jid.split(room.jid);
+        local site_id, name = node:match("^%[([^%]]+)%](.+)$");
+        local url1 = "http://vmapi:5000/"
+        if site_id then
+            url1 = url1 .. "sites/" .. site_id .. "/";
+        end
+        url1 = url1 .. "conferences/" .. room._id;
 
-        local url1 = "http://vmapi:5000/conference/" .. room._id;
-        http.request(url1, { method="DELETE" },
+        http.request(url1, {
+            method = "DELETE",
+            headers = {
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
             function(resp_body, response_code, response)
                 log(log_level, node, "room destroyed", room._id, response_code);
             end);
