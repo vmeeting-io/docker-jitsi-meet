@@ -88,10 +88,6 @@ if [[ ! -f /config/config.js ]]; then
         /config/config.js
 
     sed -i \
-        -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
-        /config/config.js
-
-    sed -i \
         -e "s#// opusMaxAverageBitrate:.*#opusMaxAverageBitrate: 64000,#" \
         /config/config.js
 

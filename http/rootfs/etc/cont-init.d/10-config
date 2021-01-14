@@ -85,10 +85,6 @@ if [[ ! -f /config/config.js ]]; then
         -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
         /config/config.js
 
-    sed -i \
-        -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
-        /config/config.js
-
     if [[ $ENABLE_RECORDING -eq 1 || x$ENABLE_RECORDING == xtrue ]]; then
         sed -i \
             -e "/\/\/ Recording.*/a hiddenDomain: '$XMPP_RECORDER_DOMAIN'," \
