@@ -1,9 +1,9 @@
-[submodule "web/jitsi-meet"]
-	path = web/jitsi-meet
-	url = https://github.com/vmeeting-io/jitsi-meet
 [submodule "web/lib-jitsi-meet"]
 	path = web/lib-jitsi-meet
-	url = https://github.com/vmeeting-io/lib-jitsi-meet
+	url = git@github.com:vmeeting-io/lib-jitsi-meet.git
 [submodule "jvb/jitsi-videobridge"]
 	path = jvb/jitsi-videobridge
-	url = https://github.com/vmeeting-io/jitsi-videobridge
+	url = git@github.com:vmeeting-io/jitsi-videobridge.git
+[submodule "web/jitsi-meet"]
+	path = web/jitsi-meet
+	url = git@github.com:vmeeting-io/jitsi-meet.git

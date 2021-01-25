@@ -191,7 +191,7 @@ function occupant_leaving(event)
     if is_healthcheck_room(room.jid) then
         return;
     end
- 
+
     if not room.speakerStats then
         return;
     end
