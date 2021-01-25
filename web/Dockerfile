@@ -35,7 +35,7 @@ RUN npm install
 COPY jitsi-meet/ /web/jitsi-meet/
 RUN cp -f /web/jitsi-meet/interface_config.js /defaults
 RUN cp -f /web/jitsi-meet/config.js /defaults
-
+RUN cp -f /defaults/crontab /etc
 RUN chmod 755 /wait-for-it.sh
 
 
