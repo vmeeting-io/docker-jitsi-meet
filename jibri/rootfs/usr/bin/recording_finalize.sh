@@ -52,6 +52,8 @@ FDATE=$(date '+%Y-%m-%d-%H-%M-%S')
 DOWNLOAD_LINKS=""
 REC_FOLDER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 REC_DIR=${UPLOAD_DIR}/${REC_FOLDER}
+REC_FILE_PATH=""
+REC_FILE_NAME=""
 mkdir -p ${REC_DIR}
 
 for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
@@ -63,11 +65,52 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
     file_extension=${file_name##*.}
     new_file_name="recorded_${FDATE}.${file_extension}"
     mv $f ${REC_DIR}/${new_file_name}
+    REC_FILE_NAME=${REC_DIR}/${new_file_name}
     LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${new_file_name}"
     # one line for each link
-    DOWNLOAD_LINKS="${DOWNLOAD_LINK}
+    DOWNLOAD_LINKS="${DOWNLOAD_LINKS}
 ${LINK}"
 done
+
+if [[ "$USE_AMAZON_S3" -ne "" ]]; then
+    if [[ -z $S3_ACCESS_KEY_ID ]]; then
+        echo 'FATAL ERROR: S3_ACCESS_KEY_ID must be set'
+        exit 1
+    fi
+    if [[ -z $S3_SECRET_ACCESS_KEY ]]; then
+        echo 'FATAL ERROR: S3_SECRET_ACCESS_KEY must be set'
+        exit 1
+    fi
+    if [[ -z $S3_BUCKET ]]; then
+        echo 'FATAL ERROR: S3_BUCKET must be set'
+        exit 1
+    fi
+    if [[ -z $S3_UPLOAD_NOTIFY_URL ]]; then
+        echo 'FATAL ERROR: S3_UPLOAD_NOTIFY_URL must be set'
+        exit 1
+    fi
+
+    date=`date +%Y%m%d`
+    dateFormatted=`date -R`
+
+    relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${REC_FILE_NAME}"
+    contentType="application/octet-stream"
+    stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
+    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${S3_SECRET_ACCESS_KEY} -binary | base64`
+
+    curl -X PUT -T "${REC_FILE_NAME}" \
+        -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
+        -H "Date: ${dateFormatted}" \
+        -H "Content-Type: ${contentType}" \
+        -H "Authorization: AWS ${S3_ACCESS_KEY_ID}:${signature}" \
+        http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${REC_FILE_NAME}
+
+    curl -X POST \
+        -H "Content-Type: application/json" \
+        -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
+        ${S3_UPLOAD_NOTIFY_URL}
+
+else
 
 # create email content
 EMAIL_MESSAGE="\
@@ -143,6 +186,8 @@ Subject: [Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\"
                     --mail-from \"$NOREPLY_MAIL\" \
                     --mail-rcpt \"$RECORDER_EMAIL\" \
                     --upload-file /recordings/$REC_FOLDER/email.txt"
+fi
+
 fi
 
 #
