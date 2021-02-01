@@ -171,7 +171,7 @@ function room_destroyed(event)
             }
         },
             function(resp_body, response_code, response)
-                log(log_level, node, "room destroyed", room._id, response_code);
+                -- log(log_level, node, "room destroyed", room._id, response_code);
             end);
 
         log("info", "room_destoryed: %s, %s", node, room._data.meetingId);
