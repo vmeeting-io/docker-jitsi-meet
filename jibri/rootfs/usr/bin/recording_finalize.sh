@@ -93,7 +93,10 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
     date=`date +%Y%m%d`
     dateFormatted=`date -R`
 
-    relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${REC_FILE_NAME}"
+    S3_FILE_PATH=`echo $REC_FILE_NAME | cut -d'/' -f5-`
+    echo 'S3_FILE_PATH=' $S3_FILE_PATH
+
+    relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${S3_FILE_PATH}"
     contentType="application/octet-stream"
     stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
     signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${S3_SECRET_ACCESS_KEY} -binary | base64`
@@ -103,7 +106,7 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
         -H "Date: ${dateFormatted}" \
         -H "Content-Type: ${contentType}" \
         -H "Authorization: AWS ${S3_ACCESS_KEY_ID}:${signature}" \
-        http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${REC_FILE_NAME}
+        http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${S3_FILE_PATH}
 
     curl -X POST \
         -H "Content-Type: application/json" \
