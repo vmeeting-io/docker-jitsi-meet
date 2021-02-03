@@ -139,7 +139,7 @@ function room_created(event)
                 room.mail_owner = body.mail_owner;
                 room._id = body._id;
                 room.participants = {};
-                -- log(log_level, node, "room created", room._id);
+                log(log_level, "room created: %s, %s", node, room._id);
             else
                 log(log_level, "PATCH failed!", room.jid);
             end

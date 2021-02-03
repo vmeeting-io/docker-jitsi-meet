@@ -174,14 +174,16 @@ function handle_conference_event(event)
 
     local body = json.decode(event.request.body);
 
-    log(log_level, "%s: Update Conference Event Received: %s", event.request.method, tostring(body));
+    log(log_level, "%s: Update Conference Event Received: %s", event.request.method, body["room_name"]);
 
-	local roomName = encodeURI(body["room_name"]);
+	local roomName = body["room_name"];
     if not roomName then
 		log(log_level, "Not Found, %s", roomName);
         return { status_code = 400 };
     end
 
+	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
+	roomName = "["..site_id.."]"..encodeURI(name)
 	local roomAddress = roomName.."@"..muc_domain;
 	local room_jid = room_jid_match_rewrite(roomAddress);
 	local room = get_room_from_jid(room_jid);
