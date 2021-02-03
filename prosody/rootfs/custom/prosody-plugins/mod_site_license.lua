@@ -10,6 +10,7 @@ local timer = require "util.timer"
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
 local get_room_from_jid = module:require "util".get_room_from_jid;
 local room_jid_match_rewrite = module:require "util".room_jid_match_rewrite;
+local encodeURI = module:require "util".encodeURI;
 
 local MAX_OCCUPANTS = 50;
 local MAX_DURATIONS = -1;
@@ -175,7 +176,7 @@ function handle_conference_event(event)
 
     log(log_level, "%s: Update Conference Event Received: %s", event.request.method, tostring(body));
 
-	local roomName = body["room_name"];
+	local roomName = encodeURI(body["room_name"]);
     if not roomName then
 		log(log_level, "Not Found, %s", roomName);
         return { status_code = 400 };
