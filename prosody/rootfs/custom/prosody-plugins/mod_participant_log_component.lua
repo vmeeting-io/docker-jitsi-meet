@@ -155,13 +155,13 @@ function room_destroyed(event)
         return;
     end
 
+    local node, host, resource = jid.split(room.jid);
+    local site_id, name = node:match("^%[([^%]]+)%](.+)$");
+    local url1 = "http://vmapi:5000/"
+    if site_id then
+        url1 = url1 .. "sites/" .. site_id .. "/";
+    end
     if room._id then
-        local node, host, resource = jid.split(room.jid);
-        local site_id, name = node:match("^%[([^%]]+)%](.+)$");
-        local url1 = "http://vmapi:5000/"
-        if site_id then
-            url1 = url1 .. "sites/" .. site_id .. "/";
-        end
         url1 = url1 .. "conferences/" .. room._id;
 
         http.request(url1, {
@@ -170,11 +170,25 @@ function room_destroyed(event)
                 Authorization = "Bearer " .. vmeeting_api_token
             }
         },
-            function(resp_body, response_code, response)
-                -- log(log_level, node, "room destroyed", room._id, response_code);
-            end);
+        function(resp_body, response_code, response)
+            log(log_level, "room destroyed: %s, %s", node, room._id);
+        end);
 
-        log("info", "room_destoryed: %s, %s", node, room._data.meetingId);
+        log("info", "room_destroyed: %s, %s", node, room._data.meetingId);
+    else
+        -- url1 = url1 .. "conferences/";
+
+        -- http.request(url1, {
+        --     method = "DELETE",
+        --     headers = {
+        --         Authorization = "Bearer " .. vmeeting_api_token
+        --     }
+        -- },
+        -- function(resp_body, response_code, response)
+        --     log(log_level, "room destroyed: %s, %s", node, room._id);
+        -- end);
+
+        log("info", "room_destroyed: room._id not exist. %s", room.jid);
     end
 end
 
