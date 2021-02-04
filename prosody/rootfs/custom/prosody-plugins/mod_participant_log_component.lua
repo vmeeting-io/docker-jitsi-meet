@@ -161,6 +161,7 @@ function room_destroyed(event)
     if site_id then
         url1 = url1 .. "sites/" .. site_id .. "/";
     end
+
     if room._id then
         url1 = url1 .. "conferences/" .. room._id;
 
@@ -174,7 +175,7 @@ function room_destroyed(event)
             log(log_level, "room destroyed: %s, %s", node, room._id);
         end);
 
-        log("info", "room_destroyed: %s, %s", node, room._data.meetingId);
+        log("info", "room_destroyed: %s, %s", room.jid, room._data.meetingId);
     else
         -- url1 = url1 .. "conferences/";
 
