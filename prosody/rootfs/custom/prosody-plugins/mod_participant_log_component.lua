@@ -35,12 +35,14 @@ function occupant_joined(event)
     local nick = jid_resource(occupant.nick);
 
     if room._id then
+        local email = occupant.sessions[occupant.jid]:get_child_text('email');
+        local name = occupant.sessions[occupant.jid]:get_child_text('nick', 'http://jabber.org/protocol/nick');
         local body = {
             conference = room._id,
             joinTime = os.date("*t"),
             leaveTime = nil,
-            name = occupant.sessions[occupant.jid]:get_child_text('nick', 'http://jabber.org/protocol/nick'),
-            email = occupant.sessions[occupant.jid]:get_child_text('email'),
+            name = name,
+            email = email,
             nick = nick,
             jid = occupant.jid
         };
@@ -59,7 +61,11 @@ function occupant_joined(event)
         function(resp_body, response_code, response)
             if response_code == 201 then
                 local body = json.decode(resp_body);
-                room.participants[occupant.jid] = body._id;
+                room.participants[occupant.jid] = {
+                    id = body._id,
+                    name = name,
+                    email = email
+                };
                 log(log_level, "plog created", room._id, body._id, response_code);
             else
                 log(log_level, "plog create is failed", tostring(response));
@@ -80,7 +86,7 @@ function occupant_leaving(event)
 
     if room._id and room.participants[occupant.jid] then
         local node, host, resource = jid.split(room.jid);
-        local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid];
+        local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid].id;
 
         -- https://prosody.im/doc/developers/net/http
         http.request(url, {
@@ -90,10 +96,39 @@ function occupant_leaving(event)
             }
         },
         function(resp_body, response_code, response)
-            log(log_level, "plod updated", room._id, room.participants[occupant.jid], response_code);
+            log(log_level, "plod updated", room._id, room.participants[occupant.jid].id, response_code);
         end);
 
-        log("info", "occupant_leaving:", room._id, room.participants[occupant.jid]);
+        log("info", "occupant_leaving:", room._id, room.participants[occupant.jid].id);
+    end
+end
+
+function occupant_updated(event)
+    local occupant, room = event.actor, event.occupant, event.room;
+    local name = occupant:get_presence():get_child_text(
+        'nick', 'http://jabber.org/protocol/nick');
+
+    if not room or not name then
+        return;
+    end
+
+    if room.participants[occupant.jid] and room.participants[occupant.jid].name ~= name then
+        local node, host, resource = jid.split(room.jid);
+        local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid].id;
+        local reqbody = { name = name };
+
+        http.request(url, {
+            method = "PATCH",
+            body = http.formencode(reqbody),
+            headers = {
+                Authorization = "Bearer " .. vmeeting_api_token
+            }
+        },
+        function(resp_body, response_code, response)
+            log(log_level, "occupant updated", occupant.jid, response_code);
+        end);
+
+        log("info", "occupant_updated:", occupant.jid, name);
     end
 end
 
@@ -198,11 +233,12 @@ function process_host(host)
     if host == muc_component_host then -- the conference muc component
         module:log("info", "Hook to muc events on %s", host);
 
-       local muc_module = module:context(host)
-       muc_module:hook("muc-room-created", room_created, -1);
-       muc_module:hook("muc-room-destroyed", room_destroyed, -1);
-       muc_module:hook("muc-occupant-joined", occupant_joined, -1);
-       muc_module:hook("muc-occupant-pre-leave", occupant_leaving, -1);
+        local muc_module = module:context(host)
+        muc_module:hook("muc-room-created", room_created, -1);
+        muc_module:hook("muc-room-destroyed", room_destroyed, -1);
+        muc_module:hook("muc-occupant-joined", occupant_joined, -1);
+        muc_module:hook("muc-occupant-pre-leave", occupant_leaving, -1);
+        muc_module:hook('muc-broadcast-presence', occupant_updated, -1);
     end
 end
 
