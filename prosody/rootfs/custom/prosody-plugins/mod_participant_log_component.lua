@@ -104,19 +104,19 @@ function occupant_leaving(event)
 end
 
 function occupant_updated(event)
-    local occupant, room = event.actor, event.occupant, event.room;
-    local name = occupant:get_presence():get_child_text(
-        'nick', 'http://jabber.org/protocol/nick');
+    local occupant, room = event.occupant, event.room;
+    local name = occupant:get_presence():get_child_text('nick', 'http://jabber.org/protocol/nick');
+    local node, host, resource = jid.split(room.jid);
 
-    if not room or not name then
+    if not room or not name or name == '' or host ~= muc_component_host or not room.participants[occupant.jid] then
         return;
     end
 
-    if room.participants[occupant.jid] and room.participants[occupant.jid].name ~= name then
-        local node, host, resource = jid.split(room.jid);
+    if room.participants[occupant.jid].name ~= name then
         local url = "http://vmapi:5000/plog/" .. room.participants[occupant.jid].id;
         local reqbody = { name = name };
 
+        room.participants[occupant.jid].name = name;
         http.request(url, {
             method = "PATCH",
             body = http.formencode(reqbody),
@@ -127,8 +127,6 @@ function occupant_updated(event)
         function(resp_body, response_code, response)
             log(log_level, "occupant updated", occupant.jid, response_code);
         end);
-
-        log("info", "occupant_updated:", occupant.jid, name);
     end
 end
 
@@ -147,7 +145,7 @@ end
 
 function room_created(event)
     local room = event.room;
-    room.participant = {};
+    room.participants = {};
 
     local node, host, resource = jid.split(room.jid);
     local site_id, name = node:match("^%[([^%]]+)%](.+)$");
