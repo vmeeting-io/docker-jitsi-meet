@@ -176,7 +176,6 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
         {{ end }}
         "participant_log";
         "site_license";
-        "muc_ban_ip";
     }
     muc_room_cache_size = 1000
     muc_room_locking = false
