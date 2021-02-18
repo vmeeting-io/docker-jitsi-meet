@@ -5,6 +5,8 @@ local json = require "util.json";
 local ext_events = module:require "ext_events";
 local it = require "util.iterators";
 local jid = require "util.jid";
+local jid_split = require 'util.jid'.split;
+local jid_bare = require 'util.jid'.bare;
 local jid_resource = require "util.jid".resource;
 local is_healthcheck_room = module:require "util".is_healthcheck_room;
 local http = require "net.http";
@@ -30,8 +32,9 @@ end
 
 local default_tenant = module:get_option_string("default_tenant");
 local vmeeting_api_token = module:get_option_string("vmeeting_api_token", "");
+local whitelist;
 
-log("info", "Starting participant logger for %s", muc_component_host, default_tenant);
+log("info", "Starting participant logger for %s:", muc_component_host, default_tenant);
 
 function get_stats_id(occupant)
     if not occupant then
@@ -46,6 +49,16 @@ function occupant_joined(event)
     local node, host, resource = jid.split(room.jid);
     local nick = jid_resource(occupant.nick);
     local stats_id = get_stats_id(occupant);
+
+    local invitee = stanza.attr.from;
+    local invitee_bare_jid = jid_bare(invitee);
+    local _, invitee_domain = jid_split(invitee);
+
+    -- whitelist participants
+    if whitelist:contains(invitee_domain) or whitelist:contains(invitee_bare_jid) then
+        log("info", "occupant_joined: %s is in whitelist", invitee);
+        return;
+    end
 
     if room._id then
         local email = occupant.sessions[occupant.jid]:get_child_text('email');
@@ -91,10 +104,20 @@ function occupant_joined(event)
 end
 
 function occupant_leaving(event)
-    local room, occupant = event.room, event.occupant;
+    local room, occupant, stanza = event.room, event.occupant, event.stanza;
     local stats_id = get_stats_id(occupant);
 
     if is_healthcheck_room(room.jid) then
+        return;
+    end
+
+    local invitee = stanza.attr.from;
+    local invitee_bare_jid = jid_bare(invitee);
+    local _, invitee_domain = jid_split(invitee);
+
+    -- whitelist participants
+    if whitelist:contains(invitee_domain) or whitelist:contains(invitee_bare_jid) then
+        log("info", "occupant_leaving: %s is in whitelist", invitee);
         return;
     end
 
@@ -319,6 +342,9 @@ function process_host(host)
         muc_module:hook("muc-occupant-joined", occupant_joined, -1);
         muc_module:hook("muc-occupant-pre-leave", occupant_leaving, -1);
         muc_module:hook('muc-broadcast-presence', occupant_updated, -1);
+
+        whitelist = muc_module:get_option_set('muc_lobby_whitelist', {});
+        log("info", "whitelist for participant logger: %s", whitelist);
     elseif host == guest_prefix..'.'..domain_base then
         module:log("info", "Hook to guest events on %s", host);
 		muc_module:hook("presence/full", check_for_incoming_ban, 100);
