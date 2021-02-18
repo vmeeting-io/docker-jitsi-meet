@@ -10,6 +10,7 @@ local timer = require "util.timer"
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
 local get_room_from_jid = module:require "util".get_room_from_jid;
 local room_jid_match_rewrite = module:require "util".room_jid_match_rewrite;
+local encodeURI = module:require "util".encodeURI;
 
 local MAX_OCCUPANTS = 50;
 local MAX_DURATIONS = -1;
@@ -173,7 +174,7 @@ function handle_conference_event(event)
 
     local body = json.decode(event.request.body);
 
-    log(log_level, "%s: Update Conference Event Received: %s", event.request.method, tostring(body));
+    log(log_level, "%s: Update Conference Event Received: %s", event.request.method, body["room_name"]);
 
 	local roomName = body["room_name"];
     if not roomName then
@@ -181,6 +182,8 @@ function handle_conference_event(event)
         return { status_code = 400 };
     end
 
+	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
+	roomName = "["..site_id.."]"..encodeURI(name)
 	local roomAddress = roomName.."@"..muc_domain;
 	local room_jid = room_jid_match_rewrite(roomAddress);
 	local room = get_room_from_jid(room_jid);

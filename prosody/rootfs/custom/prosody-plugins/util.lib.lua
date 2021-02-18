@@ -324,6 +324,24 @@ function http_get_with_retry(url, retry)
     return content;
 end
 
+function encodeURI(str)
+    if (str) then
+        str = string.gsub (str, "\n", "\r\n")
+        str = string.gsub (str, "([^%w ])",
+            function (c) return string.format ("%%%02x", string.byte(c)) end)
+        str = string.gsub (str, " ", "+")
+   end
+   return str
+end
+
+function decodeURI(s)
+    if(s) then
+        s = string.gsub(s, '%%(%x%x)', 
+            function (hex) return string.char(tonumber(hex,16)) end )
+    end
+    return s
+end
+
 return {
     extract_subdomain = extract_subdomain;
     is_feature_allowed = is_feature_allowed;
@@ -335,4 +353,6 @@ return {
     internal_room_jid_match_rewrite = internal_room_jid_match_rewrite;
     update_presence_identity = update_presence_identity;
     http_get_with_retry = http_get_with_retry;
+    encodeURI = encodeURI;
+    decodeURI = decodeURI;
 };
