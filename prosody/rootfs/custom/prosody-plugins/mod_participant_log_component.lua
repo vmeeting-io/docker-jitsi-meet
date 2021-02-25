@@ -88,7 +88,7 @@ function occupant_joined(event)
         function(resp_body, response_code, response)
             if response_code == 201 then
                 local body = json.decode(resp_body);
-                room.participants[stats_id] = {
+                room.participants[nick] = {
                     id = body._id,
                     name = name,
                     email = email
@@ -105,7 +105,7 @@ end
 
 function occupant_leaving(event)
     local room, occupant, stanza = event.room, event.occupant, event.stanza;
-    local stats_id = get_stats_id(occupant);
+    local nick = jid_resource(occupant.nick);
 
     if is_healthcheck_room(room.jid) then
         return;
@@ -121,9 +121,9 @@ function occupant_leaving(event)
         return;
     end
 
-    if room._id and room.participants[stats_id] then
+    if room._id and room.participants[nick] then
         local node, host, resource = jid.split(room.jid);
-        local url = "http://vmapi:5000/plog/" .. room.participants[stats_id].id;
+        local url = "http://vmapi:5000/plog/" .. room.participants[nick].id;
 
         -- https://prosody.im/doc/developers/net/http
         http.request(url, {
@@ -133,10 +133,10 @@ function occupant_leaving(event)
             }
         },
         function(resp_body, response_code, response)
-            log(log_level, "plod updated", room._id, room.participants[stats_id].id, response_code);
+            log(log_level, "plod updated", room._id, room.participants[nick].id, response_code);
         end);
 
-        log("info", "occupant_leaving:", room._id, room.participants[stats_id].id);
+        log("info", "occupant_leaving:", room._id, room.participants[nick].id);
     end
 end
 
@@ -144,22 +144,22 @@ function occupant_updated(event)
     local occupant, room, stanza = event.occupant, event.room, event.stanza;
     local name = occupant:get_presence():get_child_text('nick', 'http://jabber.org/protocol/nick');
     local node, host, resource = jid.split(room.jid);
-    local stats_id = get_stats_id(occupant);
+    local nick = jid_resource(occupant.nick);
 
     if  not room or
         not name or
-        not stats_id or
+        not nick or
         name == '' or
         host ~= muc_component_host or
-        not room.participants[stats_id] then
+        not room.participants[nick] then
         return;
     end
 
-    if room.participants[stats_id].name ~= name then
-        local url = "http://vmapi:5000/plog/" .. room.participants[stats_id].id;
+    if room.participants[nick].name ~= name then
+        local url = "http://vmapi:5000/plog/" .. room.participants[nick].id;
         local reqbody = { name = name };
 
-        room.participants[stats_id].name = name;
+        room.participants[nick].name = name;
         http.request(url, {
             method = "PATCH",
             body = http.formencode(reqbody),
