@@ -291,6 +291,7 @@ local xmlns_muc_user = "http://jabber.org/protocol/muc#user";
 local function check_for_incoming_ban(event)
 	local stanza = event.stanza;
 	local to_session = full_sessions[stanza.attr.to];
+    log(log_level, "check_for_incoming_ban: %s", tostring(stanza));
 	if to_session then
 		local directed = to_session.directed;
 		local from = stanza.attr.from;
