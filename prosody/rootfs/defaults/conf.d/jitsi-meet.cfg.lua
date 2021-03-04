@@ -16,6 +16,7 @@ http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 {{ $ENABLE_LOBBY := .Env.ENABLE_LOBBY | default "0" | toBool }}
 
 {{ $ENABLE_XMPP_WEBSOCKET := .Env.ENABLE_XMPP_WEBSOCKET | default "1" | toBool }}
+{{ $ENABLE_INCOMING_BAN := .Env.ENABLE_INCOMING_BAN | default "0" | toBool }}
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_ISSUERS }}
 asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSUERS) }}" }
@@ -30,6 +31,7 @@ consider_bosh_secure = true;
 
 default_tenant = "{{ .Env.DEFAULT_SITE_ID }}";
 vmeeting_api_token = "{{ .Env.VMEETING_API_TOKEN }}";
+enable_incoming_ban = {{ if $ENABLE_INCOMING_BAN }}true{{ else }}false{{ end }};
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_AUDIENCES }}
 asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AUDIENCES) }}" }
