@@ -36,8 +36,8 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
         fi
 
         # setup certbot renewal script
-        if [[ ! -f /etc/cron.daily/letencrypt-renew ]]; then
-            cp /defaults/letsencrypt-renew /etc/cron.daily/
+        if [[ ! -f /etc/cron.weekly/letencrypt-renew ]]; then
+            cp /defaults/letsencrypt-renew /etc/cron.weekly/
         fi
     else
         # use self-signed certs
@@ -70,100 +70,108 @@ if [[ ! -f /config/nginx/site-confs/default ]]; then
     tpl /defaults/default > /config/nginx/site-confs/default
 fi
 
-if [[ ! -f /config/config.js ]]; then
-    cp /defaults/config.js /config/config.js
-    sed -i \
-        -e "s/muc.jitsi-meet.example.com/muc.<\!--# echo var=\"subdomain\" default=\"\" -->jitsi-meet.example.com/g" \
-        /config/config.js
+for config in /defaults/config*.js
+do
+    fname=${config##*/}
+    if [[ ! -f /config/${fname} ]]; then
+        cp /defaults/${fname} /config/${fname}
+        sed -i \
+            -e "s/muc.jitsi-meet.example.com/muc.<\!--# echo var=\"subdomain\" default=\"\" -->jitsi-meet.example.com/g" \
+            /config/${fname}
 
-    sed -i \
-        -e "s#jitsi-meet.example.com#$XMPP_DOMAIN#g" \
-        -e "s#bosh:.*#bosh: '/http-bind',#" \
-        -e "s#// focusUserJid:.*#focusUserJid: '${JICOFO_AUTH_USER}@${XMPP_AUTH_DOMAIN}',#" \
-        /config/config.js
+        sed -i \
+            -e "s#jitsi-meet.example.com#$XMPP_DOMAIN#g" \
+            -e "s#bosh:.*#bosh: '/http-bind',#" \
+            -e "s#// focusUserJid:.*#focusUserJid: '${JICOFO_AUTH_USER}@${XMPP_AUTH_DOMAIN}',#" \
+            /config/${fname}
 
-    sed -i \
-        -e "s#// startAudioMuted:.*#startAudioMuted: 20,#" \
-        -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
-        /config/config.js
+        sed -i \
+            -e "s#// startAudioMuted:.*#startAudioMuted: 20,#" \
+            -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
+            /config/${fname}
 
-    sed -i \
-        -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
-        /config/config.js
+        sed -i \
+            -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
+            /config/${fname}
 
-    sed -i \
-        -e "s#// opusMaxAverageBitrate:.*#opusMaxAverageBitrate: 64000,#" \
-        /config/config.js
+        sed -i \
+            -e "s#// opusMaxAverageBitrate:.*#opusMaxAverageBitrate: 64000,#" \
+            /config/${fname}
 
-    if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
-        if [[ -z "$PUBLIC_URL" ]]; then
-            echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
-            exit 1
+        if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
+            if [[ -z "$PUBLIC_URL" ]]; then
+                echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
+                exit 1
+            fi
+
+            sed -i \
+            -e "s#// websocket:.*#websocket: '${PUBLIC_URL/http/ws}/xmpp-websocket',#" \
+            /config/${fname}
         fi
 
-        sed -i \
-          -e "s#// websocket:.*#websocket: '${PUBLIC_URL/http/ws}/xmpp-websocket',#" \
-        /config/config.js
-    fi
-
-    if [[ $ENABLE_RECORDING -eq 1 || x$ENABLE_RECORDING == xtrue ]]; then
-        sed -i \
-            -e "/\/\/ Recording.*/a hiddenDomain: '$XMPP_RECORDER_DOMAIN'," \
-            -e "s#// fileRecordingsEnabled:.*#fileRecordingsEnabled: true,#" \
-            -e "s#// liveStreamingEnabled:.*#liveStreamingEnabled: true,#" \
-        /config/config.js
-    fi
-
-    if [[ $ENABLE_AUTH -eq 1 ]]; then
-        if [[ $ENABLE_GUESTS -eq 1 ]]; then
+        if [[ $ENABLE_RECORDING -eq 1 || x$ENABLE_RECORDING == xtrue ]]; then
             sed -i \
-                -e "s#// anonymousdomain:.*#anonymousdomain: '${XMPP_GUEST_DOMAIN}',#" \
-                /config/config.js
+                -e "/\/\/ Recording.*/a hiddenDomain: '$XMPP_RECORDER_DOMAIN'," \
+                -e "s#// fileRecordingsEnabled:.*#fileRecordingsEnabled: true,#" \
+                -e "s#// liveStreamingEnabled:.*#liveStreamingEnabled: true,#" \
+            /config/${fname}
         fi
 
-        sed -i \
-            -e "s#// authdomain:.*#authdomain: '${XMPP_DOMAIN}',#" \
-            /config/config.js
-    fi
+        if [[ $ENABLE_AUTH -eq 1 ]]; then
+            if [[ $ENABLE_GUESTS -eq 1 ]]; then
+                sed -i \
+                    -e "s#// anonymousdomain:.*#anonymousdomain: '${XMPP_GUEST_DOMAIN}',#" \
+                    /config/${fname}
+            fi
 
-    if [[ -z "$(grep -om1 'etherpad_base:' /config/config.js)" ]]; then
-        if [[ ! -z "${ETHERPAD_PUBLIC_URL}" ]]; then
             sed -i \
-                -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
-                /config/config.js
-        elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
+                -e "s#// authdomain:.*#authdomain: '${XMPP_DOMAIN}',#" \
+                /config/${fname}
+        fi
+
+        if [[ -z "$(grep -om1 'etherpad_base:' /config/${fname})" ]]; then
+            if [[ ! -z "${ETHERPAD_PUBLIC_URL}" ]]; then
+                sed -i \
+                    -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
+                    /config/${fname}
+            elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
+                sed -i \
+                    -e "/enableWelcomePage/a\    etherpad_base: '${PUBLIC_URL}/etherpad/p/'," \
+                    /config/${fname}
+            fi
+        fi
+
+        if [[ $ENABLE_TRANSCRIPTIONS -eq 1 || "$ENABLE_TRANSCRIPTIONS" == "true" ]]; then
             sed -i \
-                -e "/enableWelcomePage/a\    etherpad_base: '${PUBLIC_URL}/etherpad/p/'," \
-                /config/config.js
+                -e "s#// transcribingEnabled:.*#transcribingEnabled: true,#" \
+                /config/${fname}
         fi
     fi
+done
 
-    if [[ $ENABLE_TRANSCRIPTIONS -eq 1 || "$ENABLE_TRANSCRIPTIONS" == "true" ]]; then
-        sed -i \
-             -e "s#// transcribingEnabled:.*#transcribingEnabled: true,#" \
-             /config/config.js
+for interface_config in /defaults/interface_config*.js
+do
+    fname=${interface_config##*/}
+    if [[ ! -f /config/${fname} ]]; then
+        cp /defaults/${fname} /config/${fname}
+
+        # It will remove parameter 'closedcaptions' from TOOLBAR_BUTTONS if ENABLE_TRANSCRIPTIONS is false,
+        # because it enabled by default, but not supported out of the box.
+        if [[ $ENABLE_TRANSCRIPTIONS -ne 1 && "$ENABLE_TRANSCRIPTIONS" != "true" ]]; then
+            sed -i \
+                -e "s#'closedcaptions', ##" \
+                /config/${fname}
+        fi
+
+        if [[ $ENABLE_RECORDING -ne 1 && "$ENABLE_RECORDING" != "true" ]]; then
+            sed -i \
+                -e "s#'recording',##" \
+                -e "s#'livestreaming',##" \
+                /config/${fname}
+        fi
+
     fi
-fi
-
-if [[ ! -f /config/interface_config.js ]]; then
-    cp /defaults/interface_config.js /config/interface_config.js
-
-    # It will remove parameter 'closedcaptions' from TOOLBAR_BUTTONS if ENABLE_TRANSCRIPTIONS is false,
-    # because it enabled by default, but not supported out of the box.
-    if [[ $ENABLE_TRANSCRIPTIONS -ne 1 && "$ENABLE_TRANSCRIPTIONS" != "true" ]]; then
-        sed -i \
-            -e "s#'closedcaptions', ##" \
-            /config/interface_config.js
-    fi
-
-    if [[ $ENABLE_RECORDING -ne 1 && "$ENABLE_RECORDING" != "true" ]]; then
-        sed -i \
-            -e "s#'recording',##" \
-            -e "s#'livestreaming',##" \
-            /config/interface_config.js
-    fi
-
-fi
+done
 
 if [[ ! -f /config/passni-config.json ]]; then
     cp /defaults/passni-config.json /config/passni-config.json
