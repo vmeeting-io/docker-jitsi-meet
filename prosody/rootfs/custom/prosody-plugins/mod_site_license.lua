@@ -89,7 +89,7 @@ local function destroy_meeting(now, id, room)
 
 	for _, p in room:each_occupant() do
 		if not is_admin(p.jid) then
-			room:set_affiliation(true, p.jid, "outcast");
+			room:set_affiliation(true, p.jid, "outcast", "duration_expired");
 			log(log_level, "kick the occupant, %s", p.jid);
 		end
 	end
