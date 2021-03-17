@@ -1,6 +1,6 @@
 #!/bin/bash
-TARGET="$LETSENCRYPT_DOMAIN";
-RECIPIENT="$LETSENCRYPT_EMAIL";
+TARGET=$LETSENCRYPT_DOMAIN;
+RECIPIENT=$LETSENCRYPT_EMAIL;
 DAYS=7;
 echo "checking if $TARGET expires in less than $DAYS days";
 expirationdate=$(date -d "$(: | openssl s_client -connect $TARGET:443 -servername $TARGET 2>/dev/null \
