@@ -2,15 +2,47 @@
 TARGET=$LETSENCRYPT_DOMAIN;
 RECIPIENT=$LETSENCRYPT_EMAIL;
 DAYS=7;
-echo "checking if $TARGET expires in less than $DAYS days";
+echo "checking if $TARGET expires in less than $DAYS days" >> /config/le-renew.log ;
 expirationdate=$(date -d "$(: | openssl s_client -connect $TARGET:443 -servername $TARGET 2>/dev/null \
                               | openssl x509 -text \
                               | grep 'Not After' \
                               |awk '{print $4,$5,$7}')" '+%s');
 in7days=$(($(date +%s) + (86400*$DAYS)));
-if [ $in7days -gt $expirationdate ]; then
-    echo "KO - Certificate for $TARGET expires in less than $DAYS days, on $(date -d @$expirationdate '+%Y-%m-%d')" >> /config/le-renew.log \
-    | certbot-auto certonly --no-self-upgrade --noninteractive --preferred-challenges http -d $TARGET --agree-tos --email $RECIPIENT --nginx --force-renewal --post-hook "nginx -s reload" >> /config/le-renew.log ;
-else
-    echo "OK - Certificate expires on $expirationdate" >> /config/le-renew.log ;
-fi;
+
+case "$(uname)" in
+    Darwin|*BSD) sed="sed -E" ;;
+    *) sed="sed -r" ;;
+esac
+
+replace_word() {
+    source=$1
+    expr=$2
+
+    tempfile="tempfile"
+    mv $source $tempfile
+    cat $tempfile | $sed -e "$expr" | tee $source
+    rm $tempfile
+}
+
+renew() {
+    nginx_conf_file="/config/nginx/site-confs/default"
+    replace_word $nginx_conf_file "s/return/# return/"
+    nginx -s reload
+
+    certbot-auto certonly --no-self-upgrade --noninteractive --preferred-challenges http -d $TARGET --agree-tos --email $RECIPIENT --nginx --force-renewal >> /config/le-renew.log ;
+
+    replace_word $nginx_conf_file "s/# return/return/"
+    nginx -s reload
+}
+
+main() {
+    # renew ;
+    if [ $in7days -gt $expirationdate ]; then
+        echo "KO - Certificate for $TARGET expires in less than $DAYS days, on $(date -d @$expirationdate '+%Y-%m-%d')" >> /config/le-renew.log \
+        | renew ;
+    else
+        echo "OK - Certificate expires on $expirationdate" >> /config/le-renew.log ;
+    fi;
+}
+
+main

@@ -3,11 +3,10 @@ server {
 {{ if .Env.ENABLE_IPv6 }}
 	listen [::]:80 default_server;
 {{ end }}
-	{{ if .Env.ENABLE_HTTP_REDIRECT | default "0" | toBool }}
+{{ if .Env.ENABLE_HTTP_REDIRECT | default "0" | toBool }}
 	return 301 https://$host$request_uri;
-	{{ else }}
+{{ end }}
 	include /config/nginx/meet.conf;
-	{{ end }}
 }
 
 {{ if not (.Env.DISABLE_HTTPS | default "0" | toBool) }}
