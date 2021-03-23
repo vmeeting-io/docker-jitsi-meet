@@ -117,6 +117,20 @@ else
 
 # create email content
 EMAIL_MESSAGE="\
+${RECORDER_NAME}님께,
+
+Vmeeting을 이용해주셔서 감사합니다.
+
+\"${MEETING_NAME}\" 회의에 대한 녹화 파일은 아래 위치에서 다운로드 받을 수 있습니다:
+${DOWNLOAD_LINKS}
+
+주의: 녹화된 파일은 7일 후 서버에서 자동으로 삭제됩니다.
+
+
+이 메일은 발신 전용입니다.
+Copyright@2021 (주)케이에듀텍. ALL RIGHTS RESERVED.
+
+
 Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
@@ -128,7 +142,7 @@ NOTE: The recorded file(s) will be automatically DELETED from our servers after 
 
 
 This is out-going email only.
-Copyright@2020 Pohang University of Science and Technology. ALL RIGHTS RESERVED."
+Copyright@2020 KeduTech, Inc. ALL RIGHTS RESERVED."
 
 if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
     if [[ -z $AWS_ACCESS_KEY_ID ]]; then
@@ -143,20 +157,22 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
     # sync everything to storage
     rsync -r $REC_DIR root@storage:/recordings
 
-    DATE="$(date -R)"
-    SIGNATURE="$(echo -n "$DATE" | openssl dgst -sha256 -hmac "${AWS_SECRET_ACCESS_KEY}" -binary | base64 -w 0)"
-    AUTH_HEADER="X-Amzn-Authorization: AWS3-HTTPS AWSAccessKeyId=${AWS_ACCESS_KEY_ID}, Algorithm=HmacSHA256, Signature=$SIGNATURE"
+    # delegate to vmapi
     EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
-    ENDPOINT="https://email.us-west-2.amazonaws.com/"
+    ENDPOINT="http://vmapi:5000/send-email"
 
-    ACTION="Action=SendEmail"
-    SOURCE="Source=${NOREPLY_MAIL}"
-    DEST="Destination.ToAddresses.member.1=${RECORDER_EMAIL}"
-    SUBJECT="Message.Subject.Data=${EMAIL_SUBJECT}"
-    MESSAGE="Message.Body.Text.Data=${EMAIL_MESSAGE}"
+    FROM="from=${NOREPLY_MAIL}"
+    DEST="to=${RECORDER_EMAIL}"
+    SUBJECT="subject=${EMAIL_SUBJECT}"
+    MESSAGE="text=${EMAIL_MESSAGE}"
 
-    curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" --data-urlencode "$MESSAGE" --data-urlencode "$DEST" \
-        --data-urlencode "$SOURCE" --data-urlencode "$ACTION" --data-urlencode "$SUBJECT"  "$ENDPOINT"
+    AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
+    curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
+        --data-urlencode "$MESSAGE" \
+        --data-urlencode "$DEST" \
+        --data-urlencode "$FROM" \
+        --data-urlencode "$SUBJECT" \
+        "$ENDPOINT"
 
 else
     # send using postech smtp server
