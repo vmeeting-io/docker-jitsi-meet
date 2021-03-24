@@ -1,3 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-exec node /opt/etherpad-lite/node_modules/ep_etherpad-lite/node/server.js
