@@ -1,4 +1,4 @@
-ARG JITSI_REPO=theun
+ARG JITSI_REPO=jitsi
 FROM ${JITSI_REPO}/base
 
 ARG DEV_ROOT_PASSWD=vmeeting
@@ -6,7 +6,7 @@ RUN echo "root:${DEV_ROOT_PASSWD}" | chpasswd
 
 # xrdp
 RUN \
-    echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
+    echo "deb http://ftp.debian.org/debian buster-backports main" >> /etc/apt/sources.list && \
     apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y wget openbox xvfb xterm && \
     apt-dpkg-wrap apt-get -t stretch-backports install -y xrdp xorgxrdp && \

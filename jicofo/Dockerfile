@@ -1,11 +1,12 @@
-ARG JITSI_REPO=theun
+ARG JITSI_REPO=jitsi
 FROM ${JITSI_REPO}/base-java
 
-COPY jicofo_1.0-664-1_all.deb /
+COPY jicofo_1.0-725-1_all.deb /
 
 RUN \
-    apt install -y /jicofo_1.0-664-1_all.deb && \
-    rm /jicofo_1.0-664-1_all.deb
+    apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y /jicofo_1.0-725-1_all.deb && \
+    rm /jicofo_1.0-725-1_all.deb
 
 # Telegrapf
 RUN apt-dpkg-wrap apt-get update && \

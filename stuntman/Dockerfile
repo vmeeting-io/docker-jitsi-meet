@@ -1,10 +1,9 @@
-ARG JITSI_REPO=theun
-FROM ${JITSI_REPO}/base
+FROM debian:stretch-slim
 
 RUN  \
-    apt-dpkg-wrap apt-get update && \
-    apt-dpkg-wrap apt-get install -y --no-install-recommends stuntman-server && \
-    apt-cleanup
+    apt-get update && \
+    apt-get install -y --no-install-recommends stuntman-server && \
+    apt-get clean
 
 COPY rootfs/ /
 RUN chmod a+x /run.sh
