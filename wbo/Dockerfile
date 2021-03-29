@@ -28,5 +28,3 @@ ENTRYPOINT []
 EXPOSE 9002
 
 VOLUME /wbo/whitebophir/server-data
-
-CMD PORT=9002 npm start
