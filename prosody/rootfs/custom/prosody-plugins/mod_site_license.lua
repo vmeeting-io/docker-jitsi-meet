@@ -128,6 +128,11 @@ local function start_time_restrict_task(room)
 	end
 
 	room._data.task_id = timer.add_task(time_remained, destroy_meeting, room);
+
+	room:broadcast_message(
+		st.message({ type = 'groupchat', from = room.jid })
+		  :tag('timeremained')
+		  :text(tostring(time_remained)):up());
 	log(log_level, "It will terminate after %s seconds", time_remained);
 end
 
@@ -152,6 +157,22 @@ module:hook("muc-occupant-pre-join", function(event)
 	local origin, room, stanza = event.origin, event.room, event.stanza;
 	log(log_level, "pre join: %s %s", tostring(room), tostring(stanza));
 	return check_for_max_occupants(origin, room, stanza);
+end);
+
+module:hook("muc-disco#info", function(event)
+	local room = event.room;
+	local time_remained = 0;
+	
+	if room._data.max_durations > 0 and room._data.tstart then
+		local time_elapsed = os.difftime(os.time(), room._data.tstart);
+		time_remained = room._data.max_durations - time_elapsed;
+	end
+	if time_remained > 0 then
+		table.insert(event.form, {
+			name = 'muc#roominfo_timeremained',
+			value = time_remained
+		});
+	end
 end);
 
 local function get_authorization_token(request)
