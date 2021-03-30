@@ -35,7 +35,7 @@ fi
 #
 
 RECORDER_EMAIL=$(cat $METADATA_JSON | jq -r ".recorder_identity.email")
-if [ -n "$RECORDER_EMAIL" ]; then
+if [ "$RECORDER_EMAIL" == "null" ]; then
     echo "ERROR: No RECORDER_EMAIL provided, failing..."
     exit 1
 fi
