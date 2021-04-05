@@ -10,7 +10,6 @@ local timer = require "util.timer"
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
 local get_room_from_jid = module:require "util".get_room_from_jid;
 local room_jid_match_rewrite = module:require "util".room_jid_match_rewrite;
-local encodeURI = module:require "util".encodeURI;
 
 local MAX_OCCUPANTS = 50;
 local MAX_DURATIONS = -1;
@@ -163,7 +162,7 @@ module:hook("muc-disco#info", function(event)
 	local room = event.room;
 	local time_remained = 0;
 	
-	if room._data.max_durations > 0 and room._data.tstart then
+	if room._data.max_durations and room._data.max_durations > 0 and room._data.tstart then
 		local time_elapsed = os.difftime(os.time(), room._data.tstart);
 		time_remained = room._data.max_durations - time_elapsed;
 	end
@@ -204,7 +203,7 @@ function handle_conference_event(event)
     end
 
 	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
-	roomName = "["..site_id.."]"..encodeURI(name)
+	roomName = "["..site_id.."]"..http.urlencode(name)
 	local roomAddress = roomName.."@"..muc_domain;
 	local room_jid = room_jid_match_rewrite(roomAddress);
 	local room = get_room_from_jid(room_jid);
@@ -215,7 +214,7 @@ function handle_conference_event(event)
 
 	local max_durations;
 	if body["max_durations"] ~= json.null then
-		max_durations = body["max_durations"];
+		max_durations = body["max_durations"] or -1;
 	else
 		max_durations = -1;
 	end
