@@ -184,7 +184,7 @@ end
 
 --- Handles request for updating conference info
 -- @param event the http event, holds the request query
--- @return GET response, containing a json with response details
+-- @return POST response, containing a json with response details
 function handle_conference_event(event)
 	local token = get_authorization_token(event.request);
 	if not token or token ~= vmeeting_api_token then
@@ -233,6 +233,45 @@ function handle_conference_event(event)
     return { status_code = 200; };
 end
 
+--- Handles request for conference notice event
+-- @param event the http event, holds the request query
+-- @return POST response, containing a json with response details
+function handle_conference_notice(event)
+	local token = get_authorization_token(event.request);
+	if not token or token ~= vmeeting_api_token then
+		log("info", "Forbidden: Authorization token is needed.");
+		return { status_code = 403 };
+	end
+
+    local body = json.decode(event.request.body);
+
+    log(log_level, "%s: Conference Notice Event Received: %s", event.request.method, body["notice"]);
+
+	local roomName = body["room_name"];
+	local notice = body["notice"];
+    if not notice or not roomName then
+		log(log_level, "Invalid params, %s, %s", roomName, notice);
+        return { status_code = 400 };
+    end
+
+	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
+	roomName = "["..site_id.."]"..http.urlencode(name)
+	local roomAddress = roomName.."@"..muc_domain;
+	local room_jid = room_jid_match_rewrite(roomAddress);
+	local room = get_room_from_jid(room_jid);
+	if not room or not room._data then
+		log(log_level, "Not Found %s %s", roomAddress, room_jid);
+		return { status_code = 400 };
+	end
+
+	room:broadcast_message(
+		st.message({ type = 'groupchat', from = room.jid })
+		  :tag('notice')
+		  :text(notice):up());
+
+    return { status_code = 200; };
+end
+
 function module.load()
 	module:depends("http");
 	module:provides("http", {
@@ -240,6 +279,7 @@ function module.load()
 		name = "conferences";
 		route = {
 			["POST /conferences/events"] = function (event) return async_handler_wrapper(event,handle_conference_event) end;
+			["POST /conferences/notice"] = function (event) return async_handler_wrapper(event,handle_conference_notice) end;
 		};
 	});
 end
