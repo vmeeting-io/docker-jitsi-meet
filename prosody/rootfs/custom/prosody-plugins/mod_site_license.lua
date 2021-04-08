@@ -249,7 +249,7 @@ function handle_conference_notice(event)
 
 	local roomName = body["room_name"];
 	local notice = body["notice"];
-    if not notice or not roomName then
+    if not roomName then
 		log(log_level, "Invalid params, %s, %s", roomName, notice);
         return { status_code = 400 };
     end
@@ -267,7 +267,7 @@ function handle_conference_notice(event)
 	room:broadcast_message(
 		st.message({ type = 'groupchat', from = room.jid })
 		  :tag('notice')
-		  :text(notice):up());
+		  :text(notice or ''):up());
 
     return { status_code = 200; };
 end

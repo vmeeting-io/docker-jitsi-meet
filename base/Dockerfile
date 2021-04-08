@@ -28,6 +28,4 @@ RUN \
 	apt-cleanup || \
 	true
 
-RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
-
 ENTRYPOINT [ "/init" ]

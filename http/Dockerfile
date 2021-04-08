@@ -16,6 +16,8 @@ RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
 	certbot-auto --no-self-upgrade --noninteractive --install-only
 
+RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
+
 EXPOSE 80 443 8080
 
 VOLUME ["/config", "/etc/letsencrypt"]

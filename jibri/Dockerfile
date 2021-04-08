@@ -73,6 +73,8 @@ RUN \
 RUN adduser jibri rtkit
 
 
+RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
+
 RUN mv /usr/bin/google-chrome /usr/bin/google-chrome-bin
 RUN mv /usr/bin/ffmpeg /usr/bin/ffmpeg-bin
 COPY rootfs/ /
