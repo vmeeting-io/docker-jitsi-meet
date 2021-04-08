@@ -41,6 +41,8 @@ RUN \
     && apt-cleanup \
     && rm -rf /etc/prosody
 
+RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
+
 ENV JITSI_MEET_PROSODY_VERSION=1.0.4466-1
 
 RUN \

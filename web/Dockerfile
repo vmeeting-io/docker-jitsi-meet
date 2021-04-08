@@ -21,6 +21,8 @@ RUN \
 	rm -f /etc/nginx/conf.d/default.conf && \
 	rm -rf /tmp/pkg /var/cache/apt
 
+RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
+
 RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
 	certbot-auto --no-self-upgrade --noninteractive --install-only
