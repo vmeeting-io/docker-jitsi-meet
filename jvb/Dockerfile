@@ -1,10 +1,12 @@
 ARG JITSI_REPO=theun
 
 FROM ${JITSI_REPO}/base as builder
-RUN \
-    mkdir -p /usr/share/man/man1 && \
+RUN	\
+	mkdir -p /usr/share/man/man1 && \
+	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
+	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y openjdk-8-jdk-headless wget && \
+	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot && \
 	apt-cleanup
 
 RUN \
