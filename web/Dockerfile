@@ -12,14 +12,16 @@ ENV JITSI_MEET_WEB_CONFIG_VERSION=1.0.4289-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y cron nginx-extras vim curl make jitsi-meet-web=${JITSI_MEET_WEB_VERSION} && \
-	apt-dpkg-wrap apt-get -d install -y jitsi-meet-web-config=${JITSI_MEET_WEB_CONFIG_VERSION} && \
+	apt-dpkg-wrap apt-get install -y --allow-unauthenticated cron nginx-extras vim curl make jitsi-meet-web=${JITSI_MEET_WEB_VERSION} && \
+	apt-dpkg-wrap apt-get -d install -y --allow-unauthenticated jitsi-meet-web-config=${JITSI_MEET_WEB_CONFIG_VERSION} && \
     dpkg -x /var/cache/apt/archives/jitsi-meet-web-config*.deb /tmp/pkg && \
     mv /tmp/pkg/usr/share/jitsi-meet-web-config/config.js /defaults && \
 	mv /usr/share/jitsi-meet/interface_config.js /defaults && \
 	apt-cleanup && \
 	rm -f /etc/nginx/conf.d/default.conf && \
 	rm -rf /tmp/pkg /var/cache/apt
+
+RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
 
 RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \

@@ -6,10 +6,10 @@ RUN echo "root:${DEV_ROOT_PASSWD}" | chpasswd
 
 # xrdp
 RUN \
-    echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
+    # echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
     apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y wget openbox xvfb xterm && \
-    apt-dpkg-wrap apt-get -t stretch-backports install -y xrdp xorgxrdp && \
+    apt-dpkg-wrap apt-get install -y xrdp xorgxrdp && \
     apt-cleanup
 
 ENV LANG=en_US.UTF-8 \

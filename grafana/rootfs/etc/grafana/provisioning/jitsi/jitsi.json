@@ -492,7 +492,7 @@
             [
               {
                 "params": [
-                  "recording_active"
+                  "jibri_recording_active"
                 ],
                 "type": "field"
               },
@@ -571,7 +571,7 @@
             [
               {
                 "params": [
-                  "live_streaming_active"
+                  "jibri_live_streaming_active"
                 ],
                 "type": "field"
               },

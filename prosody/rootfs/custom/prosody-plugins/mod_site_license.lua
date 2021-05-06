@@ -10,7 +10,6 @@ local timer = require "util.timer"
 local async_handler_wrapper = module:require "util".async_handler_wrapper;
 local get_room_from_jid = module:require "util".get_room_from_jid;
 local room_jid_match_rewrite = module:require "util".room_jid_match_rewrite;
-local encodeURI = module:require "util".encodeURI;
 
 local MAX_OCCUPANTS = 50;
 local MAX_DURATIONS = -1;
@@ -128,6 +127,11 @@ local function start_time_restrict_task(room)
 	end
 
 	room._data.task_id = timer.add_task(time_remained, destroy_meeting, room);
+
+	room:broadcast_message(
+		st.message({ type = 'groupchat', from = room.jid })
+		  :tag('timeremained')
+		  :text(tostring(time_remained)):up());
 	log(log_level, "It will terminate after %s seconds", time_remained);
 end
 
@@ -154,6 +158,33 @@ module:hook("muc-occupant-pre-join", function(event)
 	return check_for_max_occupants(origin, room, stanza);
 end);
 
+module:hook("muc-disco#info", function(event)
+	local room = event.room;
+	local time_remained = 0;
+	
+	if room._data.max_durations and room._data.max_durations > 0 and room._data.tstart then
+		local time_elapsed = os.difftime(os.time(), room._data.tstart);
+		time_remained = room._data.max_durations - time_elapsed;
+	end
+
+	-- retrieve the room data on userDeviceAccessDisabled and send it to chatroom disco info
+	local UDAD;
+	UDAD = room._data.userDeviceAccessDisabled;
+	if UDAD then
+		table.insert(event.form, {
+			name = 'muc#roominfo_userDeviceAccessDisabled',
+			value = tostring(UDAD)
+		});
+	end
+
+	if time_remained > 0 then
+		table.insert(event.form, {
+			name = 'muc#roominfo_timeremained',
+			value = time_remained
+		});
+	end
+end);
+
 local function get_authorization_token(request)
 	local authorization = request.headers.authorization;
 	if authorization then
@@ -164,7 +195,7 @@ end
 
 --- Handles request for updating conference info
 -- @param event the http event, holds the request query
--- @return GET response, containing a json with response details
+-- @return POST response, containing a json with response details
 function handle_conference_event(event)
 	local token = get_authorization_token(event.request);
 	if not token or token ~= vmeeting_api_token then
@@ -183,7 +214,7 @@ function handle_conference_event(event)
     end
 
 	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
-	roomName = "["..site_id.."]"..encodeURI(name)
+	roomName = "["..site_id.."]"..http.urlencode(name)
 	local roomAddress = roomName.."@"..muc_domain;
 	local room_jid = room_jid_match_rewrite(roomAddress);
 	local room = get_room_from_jid(room_jid);
@@ -194,10 +225,19 @@ function handle_conference_event(event)
 
 	local max_durations;
 	if body["max_durations"] ~= json.null then
-		max_durations = body["max_durations"];
+		max_durations = body["max_durations"] or -1;
 	else
 		max_durations = -1;
 	end
+
+	-- get userDeviceAccessDisabled info from database and save it to room._data.userDeviceAccessDisabled
+	local userDeviceAccessDisabled;
+	if body["userDeviceAccessDisabled"] ~= json.null then
+		userDeviceAccessDisabled = body["userDeviceAccessDisabled"];
+		room._data.userDeviceAccessDisabled = userDeviceAccessDisabled;
+	end
+	log(log_level, "Conference updated. userDeviceAccessDisabled set to %s", tostring(userDeviceAccessDisabled));
+
 	if body["delete_yn"] then
 		log(log_level, "Conference Removed: %s", room._data.meetingId);
 		room._data.max_occupants = 0;
@@ -213,6 +253,45 @@ function handle_conference_event(event)
     return { status_code = 200; };
 end
 
+--- Handles request for conference notice event
+-- @param event the http event, holds the request query
+-- @return POST response, containing a json with response details
+function handle_conference_notice(event)
+	local token = get_authorization_token(event.request);
+	if not token or token ~= vmeeting_api_token then
+		log("info", "Forbidden: Authorization token is needed.");
+		return { status_code = 403 };
+	end
+
+    local body = json.decode(event.request.body);
+
+    log(log_level, "%s: Conference Notice Event Received: %s", event.request.method, body["notice"]);
+
+	local roomName = body["room_name"];
+	local notice = body["notice"];
+    if not roomName then
+		log(log_level, "Invalid params, %s, %s", roomName, notice);
+        return { status_code = 400 };
+    end
+
+	local site_id, name = roomName:match("^%[([^%]]+)%](.+)$");
+	roomName = "["..site_id.."]"..http.urlencode(name)
+	local roomAddress = roomName.."@"..muc_domain;
+	local room_jid = room_jid_match_rewrite(roomAddress);
+	local room = get_room_from_jid(room_jid);
+	if not room or not room._data then
+		log(log_level, "Not Found %s %s", roomAddress, room_jid);
+		return { status_code = 400 };
+	end
+
+	room:broadcast_message(
+		st.message({ type = 'groupchat', from = room.jid })
+		  :tag('notice')
+		  :text(notice or ''):up());
+
+    return { status_code = 200; };
+end
+
 function module.load()
 	module:depends("http");
 	module:provides("http", {
@@ -220,6 +299,7 @@ function module.load()
 		name = "conferences";
 		route = {
 			["POST /conferences/events"] = function (event) return async_handler_wrapper(event,handle_conference_event) end;
+			["POST /conferences/notice"] = function (event) return async_handler_wrapper(event,handle_conference_notice) end;
 		};
 	});
 end
