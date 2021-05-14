@@ -166,6 +166,17 @@ module:hook("muc-disco#info", function(event)
 		local time_elapsed = os.difftime(os.time(), room._data.tstart);
 		time_remained = room._data.max_durations - time_elapsed;
 	end
+
+	-- retrieve the room data on userDeviceAccessDisabled and send it to chatroom disco info
+	local UDAD;
+	UDAD = room._data.userDeviceAccessDisabled;
+	if UDAD then
+		table.insert(event.form, {
+			name = 'muc#roominfo_userDeviceAccessDisabled',
+			value = tostring(UDAD)
+		});
+	end
+
 	if time_remained > 0 then
 		table.insert(event.form, {
 			name = 'muc#roominfo_timeremained',
@@ -218,6 +229,15 @@ function handle_conference_event(event)
 	else
 		max_durations = -1;
 	end
+
+	-- get userDeviceAccessDisabled info from database and save it to room._data.userDeviceAccessDisabled
+	local userDeviceAccessDisabled;
+	if body["userDeviceAccessDisabled"] ~= json.null then
+		userDeviceAccessDisabled = body["userDeviceAccessDisabled"];
+		room._data.userDeviceAccessDisabled = userDeviceAccessDisabled;
+	end
+	log(log_level, "Conference updated. userDeviceAccessDisabled set to %s", tostring(userDeviceAccessDisabled));
+
 	if body["delete_yn"] then
 		log(log_level, "Conference Removed: %s", room._data.meetingId);
 		room._data.max_occupants = 0;
