@@ -81,7 +81,7 @@ local function check_for_max_occupants(session, room, stanza)
     end
 end
 
-local function destroy_meeting(now, id, room)
+local function expire_meeting(now, id, room)
 	if is_healthcheck_room(room.jid) then
 		return;
 	end
@@ -89,6 +89,21 @@ local function destroy_meeting(now, id, room)
 	for _, p in room:each_occupant() do
 		if not is_admin(p.jid) then
 			room:set_affiliation(true, p.jid, "outcast", "duration_expired");
+			log(log_level, "kick the occupant, %s", p.jid);
+		end
+	end
+
+	log(log_level, "conference terminated: %s", room.jid);
+end
+
+local function terminate_meeting(room)
+	if is_healthcheck_room(room.jid) then
+		return;
+	end
+
+	for _, p in room:each_occupant() do
+		if not is_admin(p.jid) then
+			room:set_affiliation(true, p.jid, "outcast", "destroyed_by_host");
 			log(log_level, "kick the occupant, %s", p.jid);
 		end
 	end
@@ -122,11 +137,11 @@ local function start_time_restrict_task(room)
 	local time_remained = room._data.max_durations - time_elapsed;
 	if time_remained <= 0 then
 		log(log_level, "No time is remained: %s", time_remained);
-		destroy_meeting(os.time(), room._data.task_id, room);
+		expire_meeting(os.time(), room._data.task_id, room);
 		return;
 	end
 
-	room._data.task_id = timer.add_task(time_remained, destroy_meeting, room);
+	room._data.task_id = timer.add_task(time_remained, expire_meeting, room);
 
 	room:broadcast_message(
 		st.message({ type = 'groupchat', from = room.jid })
@@ -239,10 +254,10 @@ function handle_conference_event(event)
 	log(log_level, "Conference updated. userDeviceAccessDisabled set to %s", tostring(userDeviceAccessDisabled));
 
 	if body["delete_yn"] then
-		log(log_level, "Conference Removed: %s", room._data.meetingId);
 		room._data.max_occupants = 0;
 		room._data.max_durations = 0;
-		start_time_restrict_task(room);
+		terminate_meeting(room);
+		log(log_level, "Conference Removed: %s", room._data.meetingId, roomAddress);
     else
 		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;
 		room._data.max_durations = max_durations;
