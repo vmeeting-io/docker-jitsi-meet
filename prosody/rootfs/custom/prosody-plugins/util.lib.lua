@@ -72,6 +72,30 @@ local function room_jid_match_rewrite(room_jid, stanza)
     return room_jid
 end
 
+local function room_jid_match_rewrite_without_resource(room_jid, stanza)
+    local node, _, resource, target_subdomain = room_jid_split_subdomain(room_jid);
+    log('info', "node : %s, resource: %s, target_subdomain: %s", node, resource, target_subdomain); 
+    if not target_subdomain then
+        -- module:log("debug", "No need to rewrite out 'to' %s", room_jid);
+        return room_jid;
+    end
+    -- Ok, rewrite room_jid  address to new format
+    local new_node, new_host, new_resource;
+    if node then
+        new_node, new_host, new_resource = "["..target_subdomain.."]"..node, muc_domain, resource;
+    else
+        -- module:log("debug", "No room name provided so rewriting only host 'to' %s", room_jid);
+        new_host, new_resource = muc_domain, resource;
+
+        if (stanza and stanza.attr and stanza.attr.id) then
+            roomless_iqs[stanza.attr.id] = stanza.attr.to;
+        end
+    end
+    room_jid = jid.join(new_node, new_host);
+    -- module:log("debug", "Rewrote to %s", room_jid);
+    return room_jid
+end
+
 -- Utility function to check and convert a room JID from real [foo]room1@muc.example.com to virtual room1@muc.foo.example.com
 local function internal_room_jid_match_rewrite(room_jid, stanza)
     local node, host, resource = jid.split(room_jid);
@@ -331,6 +355,7 @@ return {
     get_room_from_jid = get_room_from_jid;
     async_handler_wrapper = async_handler_wrapper;
     room_jid_match_rewrite = room_jid_match_rewrite;
+    room_jid_match_rewrite_without_resource = room_jid_match_rewrite_without_resource;
     room_jid_split_subdomain = room_jid_split_subdomain;
     internal_room_jid_match_rewrite = internal_room_jid_match_rewrite;
     update_presence_identity = update_presence_identity;
