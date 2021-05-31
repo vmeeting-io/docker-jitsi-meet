@@ -12,4 +12,4 @@ RUN \
 
 COPY rootfs/ /
 
-VOLUME /recordings
+VOLUME ["/recordings"]

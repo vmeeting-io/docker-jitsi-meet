@@ -51,6 +51,11 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
     fi
 fi
 
+# generate username/password for individual downloading
+[ -z "$IND_REC_DOWNLOAD_USER" ] && echo "ENV $IND_REC_DOWNLOAD_USER does NOT set." && exit 1
+[ -z "$IND_REC_DOWNLOAD_PASSWORD" ] && echo "ENV $IND_REC_DOWNLOAD_PASSWORD does NOT set." && exit 1
+htpasswd -b -c /config/nginx/.htpasswd $IND_REC_DOWNLOAD_USER $IND_REC_DOWNLOAD_PASSWORD
+
 # copy config files
 tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
@@ -148,6 +153,11 @@ do
         fi
     fi
 done
+
+# for new config, we can use the new method with tpl
+if [[ -f /defaults/custom-config.js ]]; then
+    tpl /defaults/custom-config.js >> /config/config.js
+fi
 
 for interface_config in /defaults/interface_config*.js
 do

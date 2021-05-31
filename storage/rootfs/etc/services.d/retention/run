@@ -4,13 +4,15 @@ shopt -s nullglob
 
 RECORDING_DIR=/recordings
 
-[ ! -d "$RECORDING_DIR" ] && echo "Directory ${RECORDING_DIR} DOES NOT exists." && exit 1
+[ ! -d "$INDIVIDUAL_REC_DIR" ] && echo "Directory ${INDIVIDUAL_REC_DIR} DOES NOT exists." && exit 1
 
 if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
     while true; do
         # remove old recordings
         cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
         cd $RECORDING_DIR && find * -type d -empty -delete
+        cd $INDIVIDUAL_REC_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
+        cd $INDIVIDUAL_REC_DIR && find * -type d -empty -delete
 
         # check every 12h
         sleep 12h

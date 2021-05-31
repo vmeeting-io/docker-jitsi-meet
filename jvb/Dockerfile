@@ -19,8 +19,8 @@ ENV PATH=${M2_HOME}/bin:${PATH}
 
 COPY jitsi-videobridge /jitsi-videobridge
 
-RUN cd /jitsi-videobridge/jvb && \
-    mvn clean verify package
+RUN cd /jitsi-videobridge && \
+    mvn clean package -am -pl jvb
 
 
 FROM ${JITSI_REPO}/base-java
@@ -29,8 +29,9 @@ ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils && \
+	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils libpcap-dev openssh-server rsync && \
 	apt-cleanup
+
 
 # Telegrapf
 RUN apt-dpkg-wrap apt-get update && \
@@ -55,10 +56,19 @@ RUN \
     dpkg -i telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
+# gstreamer
+RUN \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl && \
+	apt-cleanup
+
+
 EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
 
 COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
+RUN rm -f /usr/share/jitsi-videobridge/lib/jitsi-media-transform*.jar
+COPY --from=builder /jitsi-videobridge/jitsi-media-transform/target/jitsi-media-transform-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/lib/jitsi-media-transform.jar
 
 VOLUME /config
