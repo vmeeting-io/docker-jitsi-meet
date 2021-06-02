@@ -52,8 +52,8 @@ chmod 600 /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa.pub
 chmod 644 /etc/ssh/ssh_config
 
-mkdir -p $JVB_VIDEO_PCAP_DIR
-chown -R jvb $JVB_VIDEO_PCAP_DIR
+mkdir -p $REC_PCAP_DIR
+chown -R jvb $REC_PCAP_DIR
 
 
 tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties

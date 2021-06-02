@@ -1,0 +1,23 @@
+#!/usr/bin/with-contenv bash
+set -x
+
+if ! [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
+    sleep infinity
+fi
+
+if [[ -z $REC_PCAP_DIR ]]; then
+    echo 'FATAL ERROR: REC_PCAP_DIR must be set'
+    exit 1
+fi
+
+cd $REC_PCAP_DIR
+
+while true; do
+    # find pcap file with last modified time > 0.1 minutes, to ensure the pcap file is in finish state
+    for PCAP_FILE in $(find *.pcap -mmin +0.1 2>/dev/null); do
+        rsync $PCAP_FILE root@storage:${REC_PCAP_DIR}/
+        rm -f $PCAP_FILE
+    done
+
+    sleep 5
+done

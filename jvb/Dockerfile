@@ -56,13 +56,6 @@ RUN \
     dpkg -i telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
-# gstreamer
-RUN \
-	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl && \
-	apt-cleanup
-
-
 EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /

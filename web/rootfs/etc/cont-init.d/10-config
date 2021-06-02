@@ -52,10 +52,11 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
 fi
 
 # generate username/password for individual downloading
-[ -z "$IND_REC_DOWNLOAD_USER" ] && echo "ENV $IND_REC_DOWNLOAD_USER does NOT set." && exit 1
-[ -z "$IND_REC_DOWNLOAD_PASSWORD" ] && echo "ENV $IND_REC_DOWNLOAD_PASSWORD does NOT set." && exit 1
-htpasswd -b -c /config/nginx/.htpasswd $IND_REC_DOWNLOAD_USER $IND_REC_DOWNLOAD_PASSWORD
-
+if [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
+    [ -z "$IND_REC_DOWNLOAD_USER" ] && echo "ENV $IND_REC_DOWNLOAD_USER does NOT set." && exit 1
+    [ -z "$IND_REC_DOWNLOAD_PASSWORD" ] && echo "ENV $IND_REC_DOWNLOAD_PASSWORD does NOT set." && exit 1
+    htpasswd -b -c /config/nginx/.htpasswd $IND_REC_DOWNLOAD_USER $IND_REC_DOWNLOAD_PASSWORD
+fi
 # copy config files
 tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
