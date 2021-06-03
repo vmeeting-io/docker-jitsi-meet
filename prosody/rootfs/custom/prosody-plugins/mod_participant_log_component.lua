@@ -99,7 +99,7 @@ function occupant_joined(event)
             end
         end);
 
-        log("info", "occupant_joined:", room._id, body.nick, stats_id);
+        log("info", "occupant_joined:", invitee, room._id, body.nick, stats_id);
     end
 end
 

@@ -81,7 +81,7 @@ local function check_for_max_occupants(session, room, stanza)
     end
 end
 
-local function destroy_meeting(now, id, room)
+local function expire_meeting(now, id, room)
 	if is_healthcheck_room(room.jid) then
 		return;
 	end
@@ -89,6 +89,21 @@ local function destroy_meeting(now, id, room)
 	for _, p in room:each_occupant() do
 		if not is_admin(p.jid) then
 			room:set_affiliation(true, p.jid, "outcast", "duration_expired");
+			log(log_level, "kick the occupant, %s", p.jid);
+		end
+	end
+
+	log(log_level, "conference terminated: %s", room.jid);
+end
+
+local function terminate_meeting(room)
+	if is_healthcheck_room(room.jid) then
+		return;
+	end
+
+	for _, p in room:each_occupant() do
+		if not is_admin(p.jid) then
+			room:set_affiliation(true, p.jid, "outcast", "destroyed_by_host");
 			log(log_level, "kick the occupant, %s", p.jid);
 		end
 	end
@@ -122,11 +137,11 @@ local function start_time_restrict_task(room)
 	local time_remained = room._data.max_durations - time_elapsed;
 	if time_remained <= 0 then
 		log(log_level, "No time is remained: %s", time_remained);
-		destroy_meeting(os.time(), room._data.task_id, room);
+		expire_meeting(os.time(), room._data.task_id, room);
 		return;
 	end
 
-	room._data.task_id = timer.add_task(time_remained, destroy_meeting, room);
+	room._data.task_id = timer.add_task(time_remained, expire_meeting, room);
 
 	room:broadcast_message(
 		st.message({ type = 'groupchat', from = room.jid })
@@ -154,8 +169,33 @@ end);
 
 module:hook("muc-occupant-pre-join", function(event)
 	local origin, room, stanza = event.origin, event.room, event.stanza;
-	log(log_level, "pre join: %s %s", tostring(room), tostring(stanza));
+
 	return check_for_max_occupants(origin, room, stanza);
+end);
+
+-- module:hook("muc-occupant-joined", function(event)
+-- 	local origin, room, stanza = event.origin, event.room, event.stanza;
+
+-- 	for _, occupant in room:each_occupant() do
+-- 		log("info", "occupant-join: %s", occupant.jid);
+-- 	end
+-- end);
+
+module:hook("muc-occupant-left", function(event)
+    local room, nick, occupant = event.room, event.nick, event.occupant;
+	local host_leaved = true;
+
+	for _, occupant in room:each_occupant() do
+		local user, domain, res = split_jid(occupant.bare_jid);
+		if domain == muc_domain_base then
+			host_leaved = false;
+		end
+		-- log("info", "occupant-left: %s", occupant.jid);
+	end
+
+	if host_leaved then
+		terminate_meeting(room);
+	end
 end);
 
 module:hook("muc-disco#info", function(event)
@@ -239,10 +279,10 @@ function handle_conference_event(event)
 	log(log_level, "Conference updated. userDeviceAccessDisabled set to %s", tostring(userDeviceAccessDisabled));
 
 	if body["delete_yn"] then
-		log(log_level, "Conference Removed: %s", room._data.meetingId);
 		room._data.max_occupants = 0;
 		room._data.max_durations = 0;
-		start_time_restrict_task(room);
+		terminate_meeting(room);
+		log(log_level, "Conference Removed: %s", room._data.meetingId, roomAddress);
     else
 		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;
 		room._data.max_durations = max_durations;
