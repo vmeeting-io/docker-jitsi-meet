@@ -1,13 +1,21 @@
 FROM debian:stretch-slim
 
+# Set the locale UTF8 to correctly handle non-ASCII chars
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.1/s6-overlay-amd64-installer /tmp/
 RUN chmod +x /tmp/s6-overlay-amd64-installer && /tmp/s6-overlay-amd64-installer /
 
 RUN \
 	apt-get update && \
-	apt-get install -y openssh-server rsync curl &&\
+	apt-get install -y openssh-server rsync curl locales &&\
 	apt-get clean
 
+RUN locale-gen && \
+	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+	locale-gen
 
 RUN \
 	apt-get update && \

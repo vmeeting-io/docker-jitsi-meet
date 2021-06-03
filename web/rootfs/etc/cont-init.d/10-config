@@ -152,13 +152,13 @@ do
                 -e "s#// transcribingEnabled:.*#transcribingEnabled: true,#" \
                 /config/${fname}
         fi
+
+        # for new config, we can use the new method with tpl
+        if [[ -f /defaults/custom-${fname} ]]; then
+            tpl /defaults/custom-${fname} >> /config/${fname}
+        fi
     fi
 done
-
-# for new config, we can use the new method with tpl
-if [[ -f /defaults/custom-config.js ]]; then
-    tpl /defaults/custom-config.js >> /config/config.js
-fi
 
 for interface_config in /defaults/interface_config*.js
 do
