@@ -1,5 +1,4 @@
 #!/usr/bin/with-contenv bash
-set -x
 
 if ! [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
     sleep infinity
