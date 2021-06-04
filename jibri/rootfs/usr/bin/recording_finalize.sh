@@ -73,12 +73,12 @@ ${LINK}"
 done
 
 if [[ "$USE_AMAZON_S3" -ne "" ]]; then
-    if [[ -z $S3_ACCESS_KEY_ID ]]; then
-        echo 'FATAL ERROR: S3_ACCESS_KEY_ID must be set'
+    if [[ -z $AWS_ACCESS_KEY_ID ]]; then
+        echo 'FATAL ERROR: AWS_ACCESS_KEY_ID must be set'
         exit 1
     fi
-    if [[ -z $S3_SECRET_ACCESS_KEY ]]; then
-        echo 'FATAL ERROR: S3_SECRET_ACCESS_KEY must be set'
+    if [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
+        echo 'FATAL ERROR: AWS_SECRET_ACCESS_KEY must be set'
         exit 1
     fi
     if [[ -z $S3_BUCKET ]]; then
@@ -97,22 +97,31 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
     echo 'S3_FILE_PATH=' $S3_FILE_PATH
 
     relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${S3_FILE_PATH}"
-    contentType="application/octet-stream"
-    stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
-    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${S3_SECRET_ACCESS_KEY} -binary | base64`
+    # contentType="application/octet-stream"
+    # stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
+    # signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${AWS_SECRET_ACCESS_KEY} -binary | base64`
 
-    curl -X PUT -T "${REC_FILE_NAME}" \
-        -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
-        -H "Date: ${dateFormatted}" \
-        -H "Content-Type: ${contentType}" \
-        -H "Authorization: AWS ${S3_ACCESS_KEY_ID}:${signature}" \
-        http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${S3_FILE_PATH}
+    rsync -r $REC_DIR root@storage:/recordings
 
-    curl -X POST \
+    ENDPOINT="http://vmapi:5000/upload-s3"
+    AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
+    curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${S3_UPLOAD_NOTIFY_TOKEN}"
         -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
-        ${S3_UPLOAD_NOTIFY_URL}
+        "$ENDPOINT"
+
+    # curl -X PUT -T "${REC_FILE_NAME}" \
+    #     -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
+    #     -H "Date: ${dateFormatted}" \
+    #     -H "Content-Type: ${contentType}" \
+    #     -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:${signature}" \
+    #     http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${S3_FILE_PATH}
+
+    # curl -X POST \
+    #     -H "Content-Type: application/json" \
+    #     -H "Authorization: Bearer ${S3_UPLOAD_NOTIFY_TOKEN}"
+    #     -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
+    #     ${S3_UPLOAD_NOTIFY_URL}
 
 else
 
