@@ -110,6 +110,7 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
 
     curl -X POST \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${S3_UPLOAD_NOTIFY_TOKEN}"
         -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
         ${S3_UPLOAD_NOTIFY_URL}
 
