@@ -21,7 +21,7 @@ fi
 [ -z "${DISPLAY}" ] \
 && ( echo -e "\e[31mERROR: Please set DISPLAY variable.\e[39m"; kill 1; exit 1 )
 
-# jibri ssh key
+# ssh key to connect to storage
 if [[ -z $ID_RSA_BASE64 ]]; then
     echo 'FATAL ERROR: ID_RSA_BASE64 must be set'
     exit 1

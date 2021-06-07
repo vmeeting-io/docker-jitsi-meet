@@ -31,6 +31,31 @@ if [[ ! -z $JVB_MAX_MEMORY ]]; then
         /usr/share/jitsi-videobridge/lib/videobridge.rc
 fi
 
+chown -R jvb:jitsi /config
+
+# ssh key to connect to storage
+if [[ -z $ID_RSA_BASE64 ]]; then
+    echo 'FATAL ERROR: ID_RSA_BASE64 must be set'
+    exit 1
+fi
+
+if [[ -z $ID_RSA_PUB_BASE64 ]]; then
+    echo 'FATAL ERROR: ID_RSA_PUB_BASE64 must be set'
+    exit 1
+fi
+
+mkdir -p /root/.ssh/
+echo $ID_RSA_BASE64 | openssl base64 -A -d | tee /root/.ssh/id_rsa
+echo $ID_RSA_PUB_BASE64 | openssl base64 -A -d | tee /root/.ssh/id_rsa.pub
+
+chmod 600 /root/.ssh/id_rsa
+chmod 600 /root/.ssh/id_rsa.pub
+chmod 644 /etc/ssh/ssh_config
+
+mkdir -p $REC_PCAP_DIR
+chown -R jvb $REC_PCAP_DIR
+
+
 tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
 if [[ -f /config/custom-sip-communicator.properties ]]; then
     cat /config/custom-sip-communicator.properties >> /config/sip-communicator.properties
@@ -41,5 +66,3 @@ tpl /defaults/jvb.conf > /config/jvb.conf
 if [[ ! -f /config/logging.properties ]]; then
     cp /defaults/logging.properties /config
 fi
-
-chown -R jvb:jitsi /config
