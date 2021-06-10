@@ -32,11 +32,17 @@ RUN \
     wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
 	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils vim git adoptopenjdk-8-hotspot && \
+	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils vim git adoptopenjdk-8-hotspot libpcap-dev openssh-server rsync && \
+	apt-cleanup
+
+# gstreamer
+RUN \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl && \
 	apt-cleanup
 
 # in dev mode, we run jvb manually, so we modify original jvb service to generate run script and then go to sleep
-RUN sed -i 's#\(exec java .*\)#echo "\1" > /run_jvb.sh#g' /usr/share/jitsi-videobridge/jvb.sh && \
+RUN sed -i 's#\(exec java .*\)#echo "\1" > /tmp/run_jvb.sh#g' /usr/share/jitsi-videobridge/jvb.sh && \
     echo  "sleep 1000000" >> /usr/share/jitsi-videobridge/jvb.sh
 
 COPY rootfs/ /
