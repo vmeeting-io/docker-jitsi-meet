@@ -25,7 +25,7 @@ RUN cd /jitsi-videobridge && \
 
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
+ENV VIDEOBRIDGE_VERSION=2.1-492-g5edaf7dd-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \

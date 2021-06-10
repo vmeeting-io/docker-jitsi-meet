@@ -1,19 +1,15 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
-# COPY jicofo_1.0-664-1_all.deb /
+ARG JICOFO_VERSION=1.0-747-1
 
-# RUN \
-#     apt install -y /jicofo_1.0-664-1_all.deb && \
-#     rm /jicofo_1.0-664-1_all.deb
-
-# Telegrapf
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y rubygems && \
     gem install hocon && \
-    apt-dpkg-wrap apt-get install -y --no-install-recommends dirmngr wget iputils-ping snmp procps lm-sensors jicofo=1.0-690-1 && \
+    apt-dpkg-wrap apt-get install -y --no-install-recommends dirmngr wget iputils-ping snmp procps lm-sensors jicofo=${JICOFO_VERSION} && \
     rm -rf /var/lib/apt/lists/*
 
+# Telegrapf
 RUN set -ex && \
     for key in \
         05CE15085FC09D18E99EFB22684A14CF2582E0C5 ; \
