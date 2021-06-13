@@ -13,8 +13,8 @@ cd $REC_PCAP_DIR
 while true; do
     # find pcap file with last modified time > 0.1 minutes, to ensure the pcap file is in finish state
     for PCAP_FILE in $(find *.pcap -mmin +0.1 2>/dev/null); do
-    # PCAP_FILE name has the information as: confID__confName__participanID.pcap, separated by "__"
-    # https://stackoverflow.com/questions/918886/how-do-i-split-a-string-on-a-delimiter-in-bash
+        # PCAP_FILE name has the information as: confID__confName__participanID.pcap, separated by "__"
+        # https://stackoverflow.com/questions/918886/how-do-i-split-a-string-on-a-delimiter-in-bash
         INFOS=(${PCAP_FILE//__/ })
         # The confname can has string "__" inside
         VIDEO_DIR=${PCAP_FILE%"__${INFOS[-1]}"}
@@ -22,10 +22,9 @@ while true; do
         VIDEO_DIR=$(echo "$VIDEO_DIR" | sed 's@+@ @g;s@%@\\x@g' | xargs -0 printf "%b")
         VIDEO_FILE=$(basename ${INFOS[-1]} .pcap)
         VIDEO_FILE_MP4=$VIDEO_FILE.mp4
-        VIDEO_FILE_MKV=$VIDEO_FILE.mkv
 
         if gst-launch-1.0 filesrc location = $PCAP_FILE ! pcapparse ! \
-                "application/x-rtp, media=video, clock-rate=90000, encoding-name=VP8-DRAFT-IETF-01, payload=100" ! \
+                "application/x-rtp, media=video, clock-rate=90000, encoding-name=VP9" ! \
                 decodebin ! videoscale ! video/x-raw,width=$[ $REC_RESOLUTION * 16 / 9 ],height=$REC_RESOLUTION ! \
                 videorate ! video/x-raw,framerate=15/1 ! x264enc pass=5 quantizer=23 ! mp4mux ! \
                 filesink location=$VIDEO_FILE_MP4 >/dev/null; then
@@ -33,15 +32,6 @@ while true; do
             echo "Converted $PCAP_FILE to $VIDEO_FILE_MP4"
             mkdir -p $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"
             mv $VIDEO_FILE_MP4 $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"/
-            rm -f $PCAP_FILE
-        elif
-            gst-launch-1.0 filesrc location = $PCAP_FILE ! pcapparse ! \
-                "application/x-rtp, media=video, clock-rate=90000, encoding-name=VP8-DRAFT-IETF-01, payload=100" ! \
-                rtpvp8depay ! matroskamux ! filesink location=$VIDEO_FILE_MKV >/dev/null; then
-
-            echo "Converted $PCAP_FILE to $VIDEO_FILE_MKV"
-            mkdir -p $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"
-            mv $VIDEO_FILE_MKV $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"/
             rm -f $PCAP_FILE
         else
             echo "Error converting $PCAP_FILE"

@@ -11,3 +11,7 @@ config.minSendFrameHeight = Math.max({{ .Env.REC_RESOLUTION | default 0 }}, conf
 // directly set focus full JID with resource
 // https://community.jitsi.org/t/add-back-the-option-to-set-jicofo-as-xmpp-server-component/101029
 config.hosts.focus = 'focus@{{ .Env.XMPP_AUTH_DOMAIN }}/focus'
+
+// force VP9
+config.videoQuality.preferredCodec = 'VP9'
+config.videoQuality.enforcePreferredCodec = true

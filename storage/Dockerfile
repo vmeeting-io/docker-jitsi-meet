@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:buster-slim
 
 # Set the locale UTF8 to correctly handle non-ASCII chars
 ENV LANG=en_US.UTF-8
