@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.2
+
 ARG JITSI_REPO=theun
 
 FROM ${JITSI_REPO}/base as builder
@@ -19,8 +21,8 @@ ENV PATH=${M2_HOME}/bin:${PATH}
 
 COPY jitsi-videobridge /jitsi-videobridge
 
-RUN cd /jitsi-videobridge && \
-    mvn clean package -am -pl jvb
+WORKDIR /jitsi-videobridge
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -am -pl jvb
 
 
 FROM ${JITSI_REPO}/base-java
