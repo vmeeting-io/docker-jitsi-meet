@@ -72,13 +72,15 @@ local function room_jid_match_rewrite(room_jid, stanza)
     return room_jid
 end
 
-local function room_jid_match_rewrite_without_resource(room_jid, stanza)
-    local node, _, resource, target_subdomain = room_jid_split_subdomain(room_jid);
-    log('info', "node : %s, resource: %s, target_subdomain: %s", node, resource, target_subdomain); 
+local function room_jid_match_for_recorder(room_jid)
+    local node, host, resource, target_subdomain = room_jid_split_subdomain(room_jid);
+    
+    -- already in format [foo]room1@conference.example.com
     if not target_subdomain then
-        -- module:log("debug", "No need to rewrite out 'to' %s", room_jid);
+        room_jid = jid.join(node, host);
         return room_jid;
     end
+
     -- Ok, rewrite room_jid  address to new format
     local new_node, new_host, new_resource;
     if node then
@@ -355,7 +357,7 @@ return {
     get_room_from_jid = get_room_from_jid;
     async_handler_wrapper = async_handler_wrapper;
     room_jid_match_rewrite = room_jid_match_rewrite;
-    room_jid_match_rewrite_without_resource = room_jid_match_rewrite_without_resource;
+    room_jid_match_for_recorder = room_jid_match_for_recorder;
     room_jid_split_subdomain = room_jid_split_subdomain;
     internal_room_jid_match_rewrite = internal_room_jid_match_rewrite;
     update_presence_identity = update_presence_identity;
