@@ -7,3 +7,6 @@
 [submodule "web/jitsi-meet"]
 	path = web/jitsi-meet
 	url = git@github.com:vmeeting-io/jitsi-meet.git
+[submodule "wbo/whitebophir"]
+	path = wbo/whitebophir
+	url = git@github.com:SangwooRyu/whitebophir.git
