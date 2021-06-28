@@ -97,9 +97,6 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
     echo 'S3_FILE_PATH=' $S3_FILE_PATH
 
     relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${S3_FILE_PATH}"
-    # contentType="application/octet-stream"
-    # stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
-    # signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${AWS_SECRET_ACCESS_KEY} -binary | base64`
 
     rsync -r $REC_DIR root@storage:/recordings
 
@@ -109,19 +106,6 @@ if [[ "$USE_AMAZON_S3" -ne "" ]]; then
         -H "Content-Type: application/json" \
         -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
         "$ENDPOINT"
-
-    # curl -X PUT -T "${REC_FILE_NAME}" \
-    #     -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
-    #     -H "Date: ${dateFormatted}" \
-    #     -H "Content-Type: ${contentType}" \
-    #     -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:${signature}" \
-    #     http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${S3_FILE_PATH}
-
-    # curl -X POST \
-    #     -H "Content-Type: application/json" \
-    #     -H "Authorization: Bearer ${S3_UPLOAD_NOTIFY_TOKEN}"
-    #     -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
-    #     ${S3_UPLOAD_NOTIFY_URL}
 
 else
 
