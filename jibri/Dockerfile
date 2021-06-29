@@ -6,7 +6,7 @@ FROM ${JITSI_REPO}/base-java
 ARG CHROME_RELEASE=90.0.4430.212
 ARG CHROMEDRIVER_MAJOR_RELEASE=90
 
-ENV JIBRI_VERSION=8.0-61-g99288dc-1
+ENV JIBRI_VERSION=8.0-93-g51fe7a2-1
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -14,21 +14,6 @@ RUN \
 	apt-dpkg-wrap apt-get update \
 	&& apt-dpkg-wrap apt-get install -y jibri=${JIBRI_VERSION} libgl1-mesa-dri libnss3-dev \
 	&& apt-cleanup
-
-
-#  RUN \
-# 	apt-dpkg-wrap apt-get update \
-# 	&& apt-dpkg-wrap apt-get install -y wget libgl1-mesa-dri \
-# 	&& wget https://download.jitsi.org/unstable/jibri_8.0-58-g7e3714b-1_all.deb -q -O jibri.deb \
-# 	&& apt-dpkg-wrap apt-get install -y ./jibri.deb \
-# 	&& rm jibri.deb \
-# 	&& apt-cleanup
-
-RUN \
-	apt-dpkg-wrap apt-get update \
-	&& apt-dpkg-wrap apt-get install -y fonts-noto fonts-noto-cjk \
-	&& apt-cleanup
-
 
 RUN \
 	[ "${CHROME_RELEASE}" = "latest" ] \
@@ -57,19 +42,10 @@ RUN \
 	&& chromedriver --version
 
 RUN \
-        apt-dpkg-wrap apt-get update \
-        && apt-dpkg-wrap apt-get install -y jitsi-upload-integrations jq \
-        && apt-cleanup
+	apt-dpkg-wrap apt-get update \
+	&& apt-dpkg-wrap apt-get install -y jitsi-upload-integrations jq fonts-noto fonts-noto-cjk openssh-server rsync dos2unix dbus-x11 pulseaudio rtkit vim \
+	&& apt-cleanup
 
-RUN \
-        apt-dpkg-wrap apt-get update \
-        && apt-dpkg-wrap apt-get install -y openssh-server rsync dos2unix \
-        && apt-cleanup
-
-RUN \
-        apt-dpkg-wrap apt-get update \
-        && apt-dpkg-wrap apt-get install -y dbus-x11 pulseaudio rtkit vim \
-        && apt-cleanup
 RUN adduser jibri rtkit
 
 
