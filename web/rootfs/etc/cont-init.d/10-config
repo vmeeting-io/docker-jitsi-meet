@@ -93,7 +93,7 @@ do
 
         sed -i \
             -e "s#// startAudioMuted:.*#startAudioMuted: 20,#" \
-            -e "s#// startVideoMuted:.*#startVideoMuted: 20,#" \
+            -e "s#// startVideoMuted:.*#startVideoMuted: 500,#" \
             /config/${fname}
 
         sed -i \
