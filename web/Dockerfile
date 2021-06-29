@@ -27,7 +27,8 @@ RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
 	certbot-auto --no-self-upgrade --noninteractive --install-only
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+ADD https://deb.nodesource.com/setup_14.x /node_setup.sh
+RUN chmod +x /node_setup.sh && /node_setup.sh && rm /node_setup.sh
 RUN apt-get install -y nodejs git
 
 WORKDIR /web/jitsi-meet
