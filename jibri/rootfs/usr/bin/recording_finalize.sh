@@ -46,6 +46,7 @@ URL=$(cat $METADATA_JSON | jq -r ".meeting_url")
 URL=$(input=${URL//+/ }; printf "${URL//%/\\x}")
 [[ "$URL" == "null" ]] && URL=""
 MEETING_NAME="${URL##*/}"
+MEETING_ID_FROM_JSON=$(cat $METADATA_JSON | jq -r ".meetingId")
 FDATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 #
@@ -164,12 +165,15 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
 
     # delegate to vmapi
     EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
-    ENDPOINT="http://vmapi:5000/send-email"
+    ENDPOINT="http://vmapi:5000/send-recording-email"
+    # ENDPOINT="http://vmapi:5000/send-email"
 
     FROM="from=${NOREPLY_MAIL}"
     DEST="to=${RECORDER_EMAIL}"
     SUBJECT="subject=${EMAIL_SUBJECT}"
     MESSAGE="text=${EMAIL_MESSAGE}"
+    MEETING_ID="meetingId=${MEETING_ID_FROM_JSON}"
+    ROOM_NAME="roomName=${MEETING_NAME}"
 
     AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
     curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
@@ -177,6 +181,8 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
         --data-urlencode "$DEST" \
         --data-urlencode "$FROM" \
         --data-urlencode "$SUBJECT" \
+        --data-urlencode "$MEETING_ID" \
+        --data-urlencode "$ROOM_NAME" \
         "$ENDPOINT"
 
 else
