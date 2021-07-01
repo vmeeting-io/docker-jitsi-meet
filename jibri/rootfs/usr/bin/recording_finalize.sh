@@ -161,7 +161,7 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
 
     # delegate to vmapi
     EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
-    ENDPOINT="http://vmapi:5000/send-recording-email"
+    ENDPOINT="http://vmapi:5000/recordings"
     # ENDPOINT="http://vmapi:5000/send-email"
 
     FROM="from=${NOREPLY_MAIL}"
