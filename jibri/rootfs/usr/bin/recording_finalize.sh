@@ -123,8 +123,6 @@ else
 
 # create email content
 EMAIL_MESSAGE="\
-${RECORDER_NAME}님께,
-
 Vmeeting을 이용해주셔서 감사합니다.
 
 \"${MEETING_NAME}\" 회의에 대한 녹화 파일은 아래 위치에서 다운로드 받을 수 있습니다:
@@ -136,8 +134,6 @@ ${DOWNLOAD_LINKS}
 이 메일은 발신 전용입니다.
 Copyright@2021 (주)케이에듀텍. ALL RIGHTS RESERVED.
 
-
-Dear ${RECORDER_NAME},
 
 Thank you for using Vmeeting!
 
@@ -174,6 +170,7 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
     MESSAGE="text=${EMAIL_MESSAGE}"
     MEETING_ID="meetingId=${MEETING_ID_FROM_JSON}"
     ROOM_NAME="roomName=${MEETING_NAME}"
+    RECORD_LINK="recordLink=${DOWNLOAD_LINKS}"
 
     AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
     curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
@@ -183,6 +180,7 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
         --data-urlencode "$SUBJECT" \
         --data-urlencode "$MEETING_ID" \
         --data-urlencode "$ROOM_NAME" \
+        --data-urlencode "$RECORD_LINK" \
         "$ENDPOINT"
 
 else
