@@ -128,7 +128,7 @@ Vmeeting을 이용해주셔서 감사합니다.
 \"${MEETING_NAME}\" 회의에 대한 녹화 파일은 아래 위치에서 다운로드 받을 수 있습니다:
 ${DOWNLOAD_LINKS}
 
-주의: 녹화된 파일은 7일 후 서버에서 자동으로 삭제됩니다.
+주의: 녹화된 파일은 녹화일로부터 7일 후 서버에서 자동으로 삭제됩니다.
 
 
 이 메일은 발신 전용입니다.
@@ -140,7 +140,7 @@ Thank you for using Vmeeting!
 The recorded file(s) for the meeting named \"${MEETING_NAME}\" is now available for downloading at:
 ${DOWNLOAD_LINKS}
 
-NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days.
+NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days after the recording.
 
 
 This is out-going email only.
