@@ -46,6 +46,7 @@ URL=$(cat $METADATA_JSON | jq -r ".meeting_url")
 URL=$(input=${URL//+/ }; printf "${URL//%/\\x}")
 [[ "$URL" == "null" ]] && URL=""
 MEETING_NAME="${URL##*/}"
+MEETING_ID_FROM_JSON=$(cat $METADATA_JSON | jq -r ".meetingId")
 FDATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 #
@@ -122,28 +123,24 @@ else
 
 # create email content
 EMAIL_MESSAGE="\
-${RECORDER_NAME}님께,
-
 Vmeeting을 이용해주셔서 감사합니다.
 
 \"${MEETING_NAME}\" 회의에 대한 녹화 파일은 아래 위치에서 다운로드 받을 수 있습니다:
 ${DOWNLOAD_LINKS}
 
-주의: 녹화된 파일은 7일 후 서버에서 자동으로 삭제됩니다.
+주의: 녹화된 파일은 녹화일로부터 7일 후 서버에서 자동으로 삭제됩니다.
 
 
 이 메일은 발신 전용입니다.
 Copyright@2021 (주)케이에듀텍. ALL RIGHTS RESERVED.
 
 
-Dear ${RECORDER_NAME},
-
 Thank you for using Vmeeting!
 
 The recorded file(s) for the meeting named \"${MEETING_NAME}\" is now available for downloading at:
 ${DOWNLOAD_LINKS}
 
-NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days.
+NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days after the recording.
 
 
 This is out-going email only.
@@ -164,12 +161,16 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
 
     # delegate to vmapi
     EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
-    ENDPOINT="http://vmapi:5000/send-email"
+    ENDPOINT="http://vmapi:5000/recordings"
+    # ENDPOINT="http://vmapi:5000/send-email"
 
     FROM="from=${NOREPLY_MAIL}"
     DEST="to=${RECORDER_EMAIL}"
     SUBJECT="subject=${EMAIL_SUBJECT}"
     MESSAGE="text=${EMAIL_MESSAGE}"
+    MEETING_ID="meetingId=${MEETING_ID_FROM_JSON}"
+    ROOM_NAME="roomName=${MEETING_NAME}"
+    RECORD_LINK="recordLink=${DOWNLOAD_LINKS}"
 
     AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
     curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
@@ -177,6 +178,9 @@ if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
         --data-urlencode "$DEST" \
         --data-urlencode "$FROM" \
         --data-urlencode "$SUBJECT" \
+        --data-urlencode "$MEETING_ID" \
+        --data-urlencode "$ROOM_NAME" \
+        --data-urlencode "$RECORD_LINK" \
         "$ENDPOINT"
 
 else
