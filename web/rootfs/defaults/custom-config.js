@@ -14,4 +14,4 @@ config.hosts.focus = 'focus@{{ .Env.XMPP_AUTH_DOMAIN }}/focus'
 
 // force VP9
 config.videoQuality.preferredCodec = 'VP9'
-config.videoQuality.enforcePreferredCodec = true
+// config.videoQuality.enforcePreferredCodec = true
