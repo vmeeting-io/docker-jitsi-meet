@@ -11,8 +11,8 @@ if [ ! -z "$RECORDING_RETETION_DAYS" ]; then
         # remove old recordings
         cd $RECORDING_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
         cd $RECORDING_DIR && find * -type d -empty -delete
-        cd $INDIVIDUAL_REC_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
-        cd $INDIVIDUAL_REC_DIR && find * -type d -empty -delete
+        # cd $INDIVIDUAL_REC_DIR && find * -mtime +${RECORDING_RETETION_DAYS} -type f -exec rm {} \;
+        # cd $INDIVIDUAL_REC_DIR && find * -type d -empty -delete
 
         # check every 12h
         sleep 12h
