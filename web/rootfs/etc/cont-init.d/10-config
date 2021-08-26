@@ -134,10 +134,6 @@ do
                 sed -i \
                     -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
                     /config/${fname}
-            elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
-                sed -i \
-                    -e "/enableWelcomePage/a\    etherpad_base: '${PUBLIC_URL}/etherpad/p/'," \
-                    /config/${fname}
             fi
         fi
 

@@ -25,7 +25,6 @@ services:
             - XMPP_GUEST_DOMAIN
             - XMPP_MUC_DOMAIN
             - XMPP_RECORDER_DOMAIN
-            - ETHERPAD_URL_BASE
             - ETHERPAD_PUBLIC_URL
             - TZ
             - JIBRI_BREWERY_MUC
