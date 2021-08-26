@@ -96,7 +96,7 @@ local function expire_meeting(now, id, room)
 	log(log_level, "conference terminated: %s", room.jid);
 end
 
-local function terminate_meeting(room)
+local function terminate_meeting(now, id, room)
 	if is_healthcheck_room(room.jid) then
 		return;
 	end
@@ -150,6 +150,20 @@ local function start_time_restrict_task(room)
 	log(log_level, "It will terminate after %s seconds", time_remained);
 end
 
+local function start_terminate_meeting(room, duration)
+	if is_healthcheck_room(room.jid) or not room._data then
+		log(log_level, "skip termiate");
+		return;
+	end
+
+	if room._data.terminate_meeting_id then
+		timer.stop(room._data.terminate_meeting_id);
+		room._data.terminate_meeting_id = nil;
+	end
+
+	room._data.terminate_meeting_id = timer.add_task(duration, terminate_meeting, room);
+end
+
 module:hook("muc-room-created", function(event)
 	local room = event.room;
 
@@ -170,6 +184,13 @@ end);
 module:hook("muc-occupant-pre-join", function(event)
 	local origin, room, stanza = event.origin, event.room, event.stanza;
 
+    local user, domain, res = split_jid(stanza.attr.from);
+	if domain == muc_domain_base and room._data.terminate_meeting_id then
+		timer.stop(room._data.terminate_meeting_id);
+		room._data.terminate_meeting_id = nil;
+		log(log_level, "terminate meeting is canceled");
+	end
+
 	return check_for_max_occupants(origin, room, stanza);
 end);
 
@@ -189,12 +210,13 @@ module:hook("muc-occupant-left", function(event)
 		local user, domain, res = split_jid(occupant.bare_jid);
 		if domain == muc_domain_base then
 			host_leaved = false;
+			break;
 		end
-		-- log("info", "occupant-left: %s", occupant.jid);
+		log("info", "occupant-left: %s %s", host_leaved, occupant.jid);
 	end
 
 	if host_leaved then
-		terminate_meeting(room);
+		start_terminate_meeting(room, 3);
 	end
 end);
 
@@ -281,7 +303,7 @@ function handle_conference_event(event)
 	if body["delete_yn"] then
 		room._data.max_occupants = 0;
 		room._data.max_durations = 0;
-		terminate_meeting(room);
+		terminate_meeting(os.time(), room._data.terminate_meeting_id, room);
 		log(log_level, "Conference Removed: %s", room._data.meetingId, roomAddress);
     else
 		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;
