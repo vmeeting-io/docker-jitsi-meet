@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn clean package -am -pl jvb
 
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-492-g5edaf7dd-1
+ENV VIDEOBRIDGE_VERSION=2.1-538-g062e9f56-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
