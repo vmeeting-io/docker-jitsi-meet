@@ -13,7 +13,7 @@ config.minSendFrameHeight = Math.max({{ .Env.REC_RESOLUTION | default 0 }}, conf
 config.hosts.focus = 'focus@{{ .Env.XMPP_AUTH_DOMAIN }}/focus';
 
 // force VP9
-config.videoQuality.preferredCodec = 'VP9';
+// config.videoQuality.preferredCodec = 'VP9';
 // config.videoQuality.enforcePreferredCodec = true;
 
 config.enableReactions = true;
