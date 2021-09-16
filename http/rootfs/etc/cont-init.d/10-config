@@ -10,51 +10,20 @@ mkdir -p \
 # generate keys (maybe)
 if [[ $DISABLE_HTTPS -ne 1 ]]; then
     if [[ $ENABLE_LETSENCRYPT -eq 1 ]]; then
-        if [[ ! -f /etc/letsencrypt/live/$LETSENCRYPT_DOMAIN/fullchain.pem ]]; then
-            if ! certbot-auto \
-                  certonly \
-                  --no-self-upgrade \
-                  --noninteractive \
-                  --standalone \
-                  --preferred-challenges http \
-                  -d $LETSENCRYPT_DOMAIN \
-                  --agree-tos \
-                  --email $LETSENCRYPT_EMAIL ; then
-
-                echo "Failed to obtain a certificate from the Let's Encrypt CA."
-                # this tries to get the user's attention and to spare the
-                # authority's rate limit:
-                sleep 15
-                echo "Exiting."
-                exit 1
-            fi
-        fi
-
-        # remove default certbot renewal
-        if [[ -f /etc/cron.d/certbot ]]; then
-            rm /etc/cron.d/certbot
-        fi
-
-        # setup certbot renewal script
-        if [[ ! -f /etc/cron.daily/letencrypt-renew ]]; then
-            cp /defaults/letsencrypt-renew /etc/cron.daily/
-        fi
+        while [[ ! -f /etc/letsencrypt/live/$LETSENCRYPT_DOMAIN/fullchain.pem ]]; do
+            sleep 15
+        done
+        echo "using keys found in /etc/letsencrypt/liv/$LETSENCRYPT_DOMAIN"
     else
         # use self-signed certs
-        if [[ -f /config/keys/cert.key && -f /config/keys/cert.crt ]]; then
+        until [[ -f /config/keys/cert.key && -f /config/keys/cert.crt ]]; do
             echo "using keys found in /config/keys"
-        else
-            echo "generating self-signed keys in /config/keys, you can replace these with your own keys if required"
-            SUBJECT="/C=US/ST=TX/L=Austin/O=jitsi.org/OU=Jitsi Server/CN=*"
-            openssl req -new -x509 -days 3650 -nodes -out /config/keys/cert.crt -keyout /config/keys/cert.key -subj "$SUBJECT"
-        fi
+        done
     fi
 fi
 
 # copy config files
-if [[ ! -f /config/nginx/nginx.conf ]]; then
-    cp /defaults/nginx.conf /config/nginx/nginx.conf
-fi
+tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
 if [[ ! -f /config/nginx/meet.conf ]]; then
     tpl /defaults/meet.$NODE_ENV.conf > /config/nginx/meet.conf
