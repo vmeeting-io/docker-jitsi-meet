@@ -1,7 +1,7 @@
 ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base-java
 
-ARG JICOFO_VERSION=1.0-747-1
+ARG JICOFO_VERSION=1.0-786-1
 
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y rubygems && \
