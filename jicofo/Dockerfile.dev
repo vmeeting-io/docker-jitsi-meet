@@ -22,7 +22,7 @@ RUN \
     dpkg -i telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb && \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
-ARG JICOFO_VERSION=1.0-786-1
+ARG JICOFO_VERSION=1.0-798-1
 
 RUN \
 	mkdir -p /usr/share/man/man1 && \
