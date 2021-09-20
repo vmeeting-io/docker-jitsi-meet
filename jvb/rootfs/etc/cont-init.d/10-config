@@ -55,6 +55,8 @@ chmod 644 /etc/ssh/ssh_config
 mkdir -p $REC_PCAP_DIR
 chown -R jvb $REC_PCAP_DIR
 
+mkdir -p $RL_STATS_DUMP_DIR
+chown -R jvb $RL_STATS_DUMP_DIR
 
 tpl /defaults/sip-communicator.properties > /config/sip-communicator.properties
 if [[ -f /config/custom-sip-communicator.properties ]]; then

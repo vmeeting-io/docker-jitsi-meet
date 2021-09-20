@@ -23,7 +23,7 @@ RUN \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
 # jvb
-ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
+ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
 
 RUN \
 	mkdir -p /usr/share/man/man1 && \
