@@ -22,7 +22,7 @@ ENV PATH=${M2_HOME}/bin:${PATH}
 COPY jicofo /jicofo
 
 WORKDIR /jicofo
-RUN --mount=type=cache,target=/root/.m2 mvn clean package
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
 
 FROM ${JITSI_REPO}/base-java
 
@@ -53,8 +53,8 @@ RUN \
 
 COPY rootfs/ /
 
-COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT.jar /usr/share/jicofo/jicofo.jar
-# COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
+# COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT.jar /usr/share/jicofo/jicofo.jar
+COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
 
 VOLUME /config
 
