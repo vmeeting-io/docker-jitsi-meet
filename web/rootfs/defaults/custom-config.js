@@ -17,3 +17,5 @@ config.hosts.focus = 'focus@{{ .Env.XMPP_AUTH_DOMAIN }}/focus';
 // config.videoQuality.enforcePreferredCodec = true;
 
 config.enableReactions = true;
+
+config.etherpad_base = '{{ .Env.ETHERPAD_PUBLIC_URL }}';
