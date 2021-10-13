@@ -1,7 +1,32 @@
+# syntax=docker/dockerfile:1.2
+
 ARG JITSI_REPO=theun
+
+FROM ${JITSI_REPO}/base as builder
+RUN	\
+	mkdir -p /usr/share/man/man1 && \
+	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
+	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot && \
+	apt-cleanup
+
+RUN \
+    cd /opt/ && \
+    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
+    mv apache-maven-3.5.4 maven
+ENV M2_HOME=/opt/maven
+ENV PATH=${M2_HOME}/bin:${PATH}
+
+COPY jicofo /jicofo
+
+WORKDIR /jicofo
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
+
 FROM ${JITSI_REPO}/base-java
 
-ARG JICOFO_VERSION=1.0-747-1
+ARG JICOFO_VERSION=1.0-798-1
 
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y rubygems && \
@@ -27,6 +52,9 @@ RUN \
     rm -f telegraf_${TELEGRAF_VERSION}-1_${ARCH}.deb*
 
 COPY rootfs/ /
+
+# COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT.jar /usr/share/jicofo/jicofo.jar
+COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
 
 VOLUME /config
 

@@ -22,12 +22,13 @@ ENV PATH=${M2_HOME}/bin:${PATH}
 COPY jitsi-videobridge /jitsi-videobridge
 
 WORKDIR /jitsi-videobridge
-RUN --mount=type=cache,target=/root/.m2 mvn clean package -am -pl jvb
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
+RUN ls -lha /jitsi-videobridge/jvb/target
 
 
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-492-g5edaf7dd-1
+ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
@@ -60,8 +61,6 @@ EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
 
-COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
-RUN rm -f /usr/share/jitsi-videobridge/lib/jitsi-media-transform*.jar
-COPY --from=builder /jitsi-videobridge/jitsi-media-transform/target/jitsi-media-transform-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/lib/jitsi-media-transform.jar
+COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
 
 VOLUME /config
