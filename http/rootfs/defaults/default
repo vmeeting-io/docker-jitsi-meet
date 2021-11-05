@@ -11,7 +11,7 @@ server {
 	listen 8080 ssl;
 
 	include /config/nginx/ssl.conf;
-	location /sockjs-web/ {
+	location /ws {
 		proxy_pass https://web-dev:8080;
 
 		proxy_redirect off;
