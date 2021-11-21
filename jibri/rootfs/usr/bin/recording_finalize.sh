@@ -73,7 +73,7 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
     new_file_name="recorded_${FDATE}.${file_extension}"
     mv $f ${REC_DIR}/${new_file_name}
     REC_FILE_NAME=${REC_DIR}/${new_file_name}
-    REC_FILE_SIZE=$(stat -c%s "$f")
+    REC_FILE_SIZE=$(stat -c%s "$REC_FILE_NAME")
     LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${new_file_name}"
     # one line for each link
     DOWNLOAD_LINKS="${DOWNLOAD_LINKS}
@@ -83,7 +83,7 @@ done
 # sync everything to storage
 rsync -r $REC_DIR root@storage:/recordings
 
-if [[ "$RECORDING_FINALIZE_METHOD" -eq "s3" ]]; then
+if [[ "$RECORDING_FINALIZE_METHOD" == "s3" ]]; then
     if [[ -z $S3_ACCESS_KEY_ID ]]; then
         echo 'ERROR: S3_ACCESS_KEY_ID must be set'
         exit 1
@@ -124,7 +124,7 @@ if [[ "$RECORDING_FINALIZE_METHOD" -eq "s3" ]]; then
         -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
         ${S3_UPLOAD_NOTIFY_URL}
 
-elif [[ "$RECORDING_FINALIZE_METHOD" -eq "vmapi" ]]; then
+elif [[ "$RECORDING_FINALIZE_METHOD" == "vmapi" ]]; then
     ENDPOINT="http://vmapi:5000/recording-finalize"
     AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
     curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
