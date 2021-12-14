@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.2
+
 ARG JITSI_REPO=theun
 
 FROM ${JITSI_REPO}/base as builder
@@ -19,18 +21,20 @@ ENV PATH=${M2_HOME}/bin:${PATH}
 
 COPY jitsi-videobridge /jitsi-videobridge
 
-RUN cd /jitsi-videobridge/jvb && \
-    mvn clean verify package
+WORKDIR /jitsi-videobridge
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
+RUN ls -lha /jitsi-videobridge/jvb/target
 
 
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
+ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils && \
+	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils libpcap-dev openssh-server rsync && \
 	apt-cleanup
+
 
 # Telegrapf
 RUN apt-dpkg-wrap apt-get update && \
@@ -57,6 +61,6 @@ EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
 
-COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
+COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
 
 VOLUME /config
