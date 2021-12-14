@@ -12,7 +12,7 @@ ENV JITSI_MEET_WEB_CONFIG_VERSION=1.0.4289-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y --allow-unauthenticated cron nginx-extras vim curl make jitsi-meet-web=${JITSI_MEET_WEB_VERSION} && \
+	apt-dpkg-wrap apt-get install -y --allow-unauthenticated cron nginx-extras vim curl make apache2-utils jitsi-meet-web=${JITSI_MEET_WEB_VERSION} && \
 	apt-dpkg-wrap apt-get -d install -y --allow-unauthenticated jitsi-meet-web-config=${JITSI_MEET_WEB_CONFIG_VERSION} && \
     dpkg -x /var/cache/apt/archives/jitsi-meet-web-config*.deb /tmp/pkg && \
     mv /tmp/pkg/usr/share/jitsi-meet-web-config/config.js /defaults && \
@@ -27,7 +27,8 @@ RUN \
 	chmod a+x /usr/local/bin/certbot-auto && \
 	certbot-auto --no-self-upgrade --noninteractive --install-only
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+ADD https://deb.nodesource.com/setup_16.x /node_setup.sh
+RUN chmod +x /node_setup.sh && /node_setup.sh && rm /node_setup.sh
 RUN apt-get install -y nodejs git
 
 WORKDIR /web/jitsi-meet

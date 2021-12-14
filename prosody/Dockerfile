@@ -39,7 +39,7 @@ RUN \
 
 RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
 
-ENV JITSI_MEET_PROSODY_VERSION=1.0.4628-1
+ENV JITSI_MEET_PROSODY_VERSION=1.0.4985-1
 
 RUN \
     apt-dpkg-wrap apt-get update \

@@ -1,6 +1,10 @@
 #!/bin/bash
 ARGS=$@
 
+if [ "$ENABLE_LETSENCRYPT" == "0" ]; then
+    ARGS="$ARGS --ignore-certificate-errors --disable-dev-shm-usage"
+fi
+
 ARGS=$(echo $ARGS | sed 's/--kiosk/--kiosk --no-sandbox/')
 
 exec /usr/bin/google-chrome-bin $ARGS

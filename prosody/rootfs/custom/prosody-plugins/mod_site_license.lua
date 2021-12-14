@@ -96,7 +96,7 @@ local function expire_meeting(now, id, room)
 	log(log_level, "conference terminated: %s", room.jid);
 end
 
-local function terminate_meeting(now, id, room)
+local function terminate_meeting(room)
 	if is_healthcheck_room(room.jid) then
 		return;
 	end
@@ -303,7 +303,7 @@ function handle_conference_event(event)
 	if body["delete_yn"] then
 		room._data.max_occupants = 0;
 		room._data.max_durations = 0;
-		terminate_meeting(os.time(), room._data.terminate_meeting_id, room);
+		terminate_meeting(room);
 		log(log_level, "Conference Removed: %s", room._data.meetingId, roomAddress);
     else
 		room._data.max_occupants = body["max_occupants"] or MAX_OCCUPANTS;

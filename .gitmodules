@@ -10,3 +10,9 @@
 [submodule "wbo/whitebophir"]
 	path = wbo/whitebophir
 	url = git@github.com:vmeeting-io/whitebophir.git
+[submodule "jicofo/jicofo"]
+	path = jicofo/jicofo
+	url = git@github.com:vmeeting-io/jicofo
+[submodule "jibri/jibri"]
+	path = jibri/jibri
+	url = git@github.com:vmeeting-io/jibri

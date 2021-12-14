@@ -8,4 +8,9 @@ fi
 mkdir -p  /root/.ssh/
 echo $ID_RSA_PUB_BASE64 | openssl base64 -A -d | tee /root/.ssh/authorized_keys
 
+if [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
+    [[ -z $REC_PCAP_DIR ]] && echo 'FATAL ERROR: REC_PCAP_DIR must be set' && exit 1
+    mkdir -p $REC_PCAP_DIR
+fi
+
 chmod 644 /root/.ssh/authorized_keys

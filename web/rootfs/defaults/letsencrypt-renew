@@ -38,10 +38,10 @@ renew() {
 main() {
     # renew ;
     if [ $in7days -gt $expirationdate ]; then
-        echo "KO - Certificate for $TARGET expires in less than $DAYS days, on $(date -d @$expirationdate '+%Y-%m-%d')" >> /config/le-renew.log \
-        | renew ;
+        echo "KO - Certificate for $TARGET expires in less than $DAYS days, on $(date -d @$expirationdate '+%Y-%m-%d')" >> /config/le-renew.log
+        renew ;
     else
-        echo "OK - Certificate expires on $expirationdate" >> /config/le-renew.log ;
+        echo "OK - Certificate expires on $(date -d @$expirationdate '+%Y-%m-%d')" >> /config/le-renew.log ;
     fi;
 }
 
