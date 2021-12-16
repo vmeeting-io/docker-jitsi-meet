@@ -79,12 +79,12 @@ ${LINK}"
 done
 
 if [[ "$USE_AMAZON_S3" -ne "" ]]; then
-    if [[ -z $S3_ACCESS_KEY_ID ]]; then
-        echo 'ERROR: S3_ACCESS_KEY_ID must be set'
+    if [[ -z $AWS_ACCESS_KEY_ID ]]; then
+        echo 'ERROR: AWS_ACCESS_KEY_ID must be set'
         exit 1
     fi
-    if [[ -z $S3_SECRET_ACCESS_KEY ]]; then
-        echo 'ERROR: S3_SECRET_ACCESS_KEY must be set'
+    if [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
+        echo 'ERROR: AWS_SECRET_ACCESS_KEY must be set'
         exit 1
     fi
     if [[ -z $S3_BUCKET ]]; then
