@@ -183,3 +183,7 @@ done
 if [[ ! -f /config/passni-config.json ]]; then
     cp /defaults/passni-config.json /config/passni-config.json
 fi
+
+if [[ ! -f /config/title.html ]]; then
+    cp /defaults/title*.html /config/
+fi
