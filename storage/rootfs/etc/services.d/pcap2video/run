@@ -1,0 +1,79 @@
+#!/usr/bin/with-contenv bash
+
+if ! [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
+    sleep infinity
+fi
+
+[[ -z $REC_PCAP_DIR ]] && echo 'FATAL ERROR: REC_PCAP_DIR must be set' && exit 1
+[[ -z $INDIVIDUAL_REC_DIR ]] && echo 'FATAL ERROR: INDIVIDUAL_REC_DIR must be set' && exit 1
+
+
+cd $REC_PCAP_DIR
+
+while true; do
+    # There can be a bunch or very short VP8/VP9 pcap files because sometime jitsi can constantly switching
+    # between vp8 and vp9 in short periods. We do not really need these files, therefore delete if
+    # the file is too small (<50kB)
+    find . -name "*" -type 'f' -size -100k -delete
+
+    # find pcap file with last modified time > 0.1 minutes, to ensure the pcap file is in finish state
+    # PCAP_FILE name has the information as: confSite_confName__confID__participanID__pcapIndex__streamType__.pcap,
+    # the result are numerically sorted
+    for PCAP_FILE in $(find *.pcap -mmin +0.1 2>/dev/null | sort -g); do
+        # https://stackoverflow.com/questions/918886/how-do-i-split-a-string-on-a-delimiter-in-bash
+        INFOS=(${PCAP_FILE//__/ })
+        # CODEC can be VP8 or VP9
+        CODEC=${INFOS[-2]}
+        INDEX=${INFOS[-3]}
+        PARTICIPANT=${INFOS[-4]}
+        TAIL_NAME=${INFOS[-1]}
+
+        # The confname can has string "__" inside. Video Dir is confSite_confName__confID
+        VIDEO_DIR=${PCAP_FILE%"__${INFOS[-4]}__${INFOS[-3]}__${INFOS[-2]}__${INFOS[-1]}"}
+
+        # incase confName has non-ascii chars, it is percent-encoded, so we need to decode
+        VIDEO_DIR=$(echo "$VIDEO_DIR" | sed 's@+@ @g;s@%@\\x@g' | xargs -0 printf "%b")
+        VIDEO_DIR="$VIDEO_DIR"/$PARTICIPANT
+        VIDEO_PART=$INDEX.mp4
+
+        if gst-launch-1.0 filesrc location = $PCAP_FILE ! pcapparse ! \
+                "application/x-rtp, media=video, clock-rate=90000, encoding-name=$CODEC" ! \
+                decodebin ! videoscale ! video/x-raw,width=$[ $REC_RESOLUTION * 16 / 9 ],height=$REC_RESOLUTION ! \
+                videorate ! video/x-raw,framerate=15/1 ! x264enc pass=5 quantizer=23 ! mp4mux ! \
+                filesink location=$VIDEO_PART >/dev/null; then
+
+            echo "Converted $PCAP_FILE to $VIDEO_PART"
+            mkdir -p "$VIDEO_DIR"
+            mv $VIDEO_PART "$VIDEO_DIR"/
+            rm -f $PCAP_FILE
+        else
+            echo "Error converting $PCAP_FILE"
+            mv $PCAP_FILE $PCAP_FILE.error
+            rm $VIDEO_PART
+        fi
+
+        # if its the final file, then merge the video files into FINAL_VIDEO
+        if [ "$TAIL_NAME" = "finish.pcap" ]; then
+            FINAL_VIDEO="$PARTICIPANT.mp4"
+            for VIDEO in $(find "$VIDEO_DIR"/* 2>/dev/null | sort -g); do
+                if test -f "$FINAL_VIDEO"; then
+                    gst-launch-1.0 concat name=c ! queue ! m.video_0 qtmux name=m ! filesink location="$FINAL_VIDEO".tmp \
+                        filesrc location=$FINAL_VIDEO ! qtdemux ! h264parse ! c. \
+                        filesrc location="$VIDEO" ! qtdemux ! h264parse ! c.
+                    rm $FINAL_VIDEO
+                    mv "$FINAL_VIDEO".tmp "$FINAL_VIDEO"
+                else
+                    mv "$VIDEO" $FINAL_VIDEO
+                fi
+            done
+            mkdir -p $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"
+            mv $FINAL_VIDEO $INDIVIDUAL_REC_DIR/"$VIDEO_DIR"/
+            rm -rf "$VIDEO_DIR"
+            echo "finished final video $FINAL_VIDEO"
+        fi
+
+        # top videodir directory can still remain, so find and delete them periodically
+        find . -empty -type d -mmin +60 -delete
+    done
+    sleep 5
+done

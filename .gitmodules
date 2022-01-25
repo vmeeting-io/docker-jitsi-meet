@@ -7,3 +7,9 @@
 [submodule "web/jitsi-meet"]
 	path = web/jitsi-meet
 	url = git@github.com:vmeeting-io/jitsi-meet.git
+[submodule "jicofo/jicofo"]
+	path = jicofo/jicofo
+	url = git@github.com:vmeeting-io/jicofo
+[submodule "jibri/jibri"]
+	path = jibri/jibri
+	url = git@github.com:vmeeting-io/jibri
