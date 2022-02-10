@@ -41,7 +41,7 @@ RUN cp -f /web/jitsi-meet/config*.js /defaults
 RUN cp -f /web/jitsi-meet/title*.html /defaults
 RUN cp -f /defaults/crontab /etc
 RUN chmod 755 /wait-for-it.sh
-
+RUN make all
 
 ENTRYPOINT []
 

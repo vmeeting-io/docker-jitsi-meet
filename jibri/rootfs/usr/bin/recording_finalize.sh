@@ -60,6 +60,7 @@ REC_FOLDER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 REC_DIR=${UPLOAD_DIR}/${REC_FOLDER}
 REC_FILE_PATH=""
 REC_FILE_NAME=""
+REC_FILE_SIZE=""
 mkdir -p ${REC_DIR}
 
 for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
@@ -72,151 +73,22 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
     new_file_name="recorded_${FDATE}.${file_extension}"
     mv $f ${REC_DIR}/${new_file_name}
     REC_FILE_NAME=${REC_DIR}/${new_file_name}
+    REC_FILE_SIZE=$(stat -c%s "$REC_FILE_NAME")
     LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${new_file_name}"
     # one line for each link
-    DOWNLOAD_LINKS="${DOWNLOAD_LINKS}
-${LINK}"
+    DOWNLOAD_LINKS="${LINK}"
 done
 
-if [[ "$USE_AMAZON_S3" -ne "" ]]; then
-    if [[ -z $AWS_ACCESS_KEY_ID ]]; then
-        echo 'ERROR: AWS_ACCESS_KEY_ID must be set'
-        exit 1
-    fi
-    if [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
-        echo 'ERROR: AWS_SECRET_ACCESS_KEY must be set'
-        exit 1
-    fi
-    if [[ -z $S3_BUCKET ]]; then
-        echo 'ERROR: S3_BUCKET must be set'
-        exit 1
-    fi
-    if [[ -z $S3_UPLOAD_NOTIFY_URL ]]; then
-        echo 'ERROR: S3_UPLOAD_NOTIFY_URL must be set'
-        exit 1
-    fi
+# sync everything to storage
+rsync -r $REC_DIR root@storage:/recordings
 
-    date=`date +%Y%m%d`
-    dateFormatted=`date -R`
+ENDPOINT="http://vmapi:5000/recordings"
+AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
 
-    S3_FILE_PATH=`echo $REC_FILE_NAME | cut -d'/' -f5-`
-    echo 'S3_FILE_PATH=' $S3_FILE_PATH
-
-    relativePath="/${S3_BUCKET}${S3_BUCKET_PATH}/${S3_FILE_PATH}"
-    contentType="application/octet-stream"
-    stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
-    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${S3_SECRET_ACCESS_KEY} -binary | base64`
-
-    curl -X PUT -T "${REC_FILE_NAME}" \
-        -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
-        -H "Date: ${dateFormatted}" \
-        -H "Content-Type: ${contentType}" \
-        -H "Authorization: AWS ${S3_ACCESS_KEY_ID}:${signature}" \
-        http://${S3_BUCKET}.s3.amazonaws.com${S3_BUCKET_PATH}/${S3_FILE_PATH}
-
-    curl -X POST \
-        -H "Content-Type: application/json" \
-        -d "{\"uploadVideo\": \"${relativePath}\", \"roomUrl\": \"${URL}\"}" \
-        ${S3_UPLOAD_NOTIFY_URL}
-
-else
-
-# create email content
-EMAIL_MESSAGE="\
-Vmeeting을 이용해주셔서 감사합니다.
-
-\"${MEETING_NAME}\" 회의에 대한 녹화 파일은 아래 위치에서 다운로드 받을 수 있습니다:
-${DOWNLOAD_LINKS}
-
-주의: 녹화된 파일은 녹화일로부터 7일 후 서버에서 자동으로 삭제됩니다.
-
-
-이 메일은 발신 전용입니다.
-Copyright@2021 (주)케이에듀텍. ALL RIGHTS RESERVED.
-
-
-Thank you for using Vmeeting!
-
-The recorded file(s) for the meeting named \"${MEETING_NAME}\" is now available for downloading at:
-${DOWNLOAD_LINKS}
-
-NOTE: The recorded file(s) will be automatically DELETED from our servers after ${RECORDING_RETETION_DAYS} days after the recording.
-
-
-This is out-going email only.
-Copyright@2020 KeduTech, Inc. ALL RIGHTS RESERVED."
-
-if [[ $USE_AMAZON_SES -eq 1 || x$USE_AMAZON_SES == xtrue ]]; then
-    if [[ -z $AWS_ACCESS_KEY_ID ]]; then
-        echo 'ERROR: AWS_ACCESS_KEY_ID must be set'
-        exit 1
-    fi
-    if [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
-        echo 'ERROR: AWS_SECRET_ACCESS_KEY must be set'
-        exit 1
-    fi
-
-    # sync everything to storage
-    rsync -r $REC_DIR root@storage:/recordings
-
-    # delegate to vmapi
-    EMAIL_SUBJECT="[Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\""
-    ENDPOINT="http://vmapi:5000/recordings"
-    # ENDPOINT="http://vmapi:5000/send-email"
-
-    FROM="from=${NOREPLY_MAIL}"
-    DEST="to=${RECORDER_EMAIL}"
-    SUBJECT="subject=${EMAIL_SUBJECT}"
-    MESSAGE="text=${EMAIL_MESSAGE}"
-    MEETING_ID="meetingId=${MEETING_ID_FROM_JSON}"
-    ROOM_NAME="roomName=${MEETING_NAME}"
-    RECORD_LINK="recordLink=${DOWNLOAD_LINKS}"
-
-    AUTH_HEADER="Authorization: Bearer ${VMEETING_DB_PASS}"
-    curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
-        --data-urlencode "$MESSAGE" \
-        --data-urlencode "$DEST" \
-        --data-urlencode "$FROM" \
-        --data-urlencode "$SUBJECT" \
-        --data-urlencode "$MEETING_ID" \
-        --data-urlencode "$ROOM_NAME" \
-        --data-urlencode "$RECORD_LINK" \
-        "$ENDPOINT"
-
-else
-    # send using postech smtp server
-    if [[ -z $SMTP_SERVER ]]; then
-        echo 'ERROR: SMTP_SERVER must be set'
-        exit 1
-    fi
-    # FIXME: NOT indent the string is needed here.
-    EMAIL_HEADER="\
-From: Vmeeting <${NOREPLY_MAIL}>
-To: <${RECORDER_EMAIL}>
-Subject: [Vmeeting] Download recorded file for Vmeeting \"${MEETING_NAME}\"
-"
-    echo "$EMAIL_HEADER" > ${REC_DIR}/email.txt
-    echo "$EMAIL_MESSAGE" >> ${REC_DIR}/email.txt
-
-    # RFC 5322 require CRLF line ending for email content
-    unix2dos ${REC_DIR}/email.txt
-
-    # finally sync everything to storage
-    rsync -r $REC_DIR root@storage:/recordings
-
-    #
-    # send email about download link to the recorder user
-    # email is sent via the storage container, which runs in manager node.
-    # port 25 should be opened by the ISP for the manager node
-    #
-
-    ssh root@storage "curl --url \"$SMTP_SERVER\" \
-                    --mail-from \"$NOREPLY_MAIL\" \
-                    --mail-rcpt \"$RECORDER_EMAIL\" \
-                    --upload-file /recordings/$REC_FOLDER/email.txt"
-fi
-
-fi
+curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
+    -H "Content-Type: application/json" \
+    -d "{\"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\"}" \
+    "$ENDPOINT"
 
 #
 # finally remove the recorded folder
