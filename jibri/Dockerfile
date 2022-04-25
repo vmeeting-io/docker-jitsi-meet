@@ -1,37 +1,47 @@
 # syntax=docker/dockerfile:1.2
 
-ARG JITSI_REPO=theun
+# ARG JITSI_REPO=theun
 
-FROM ${JITSI_REPO}/base as builder
+# FROM ${JITSI_REPO}/base as builder
+# RUN	\
+# 	mkdir -p /usr/share/man/man1 && \
+# 	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
+# 	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
+# 	apt-dpkg-wrap apt-get update && \
+# 	apt-dpkg-wrap apt-get install -y openjdk-11-jdk-headless && \
+# 	apt-cleanup
+
+# RUN \
+#     cd /opt/ && \
+#     wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+#     tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
+#     mv apache-maven-3.5.4 maven
+# ENV M2_HOME=/opt/maven
+# ENV PATH=${M2_HOME}/bin:${PATH}
+
+# COPY jibri /jibri
+
+# WORKDIR /jibri
+# RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
+
+
+# TODO: use jre 11 instead of jre 8 same with base-java when this bug is fixed
+# https://github.com/jitsi/jibri/issues/441
+ARG JITSI_REPO=theun
+FROM ${JITSI_REPO}/base
+
 RUN	\
 	mkdir -p /usr/share/man/man1 && \
 	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
 	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot && \
+	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot-jre && \
 	apt-cleanup
-
-RUN \
-    cd /opt/ && \
-    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
-    tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
-    mv apache-maven-3.5.4 maven
-ENV M2_HOME=/opt/maven
-ENV PATH=${M2_HOME}/bin:${PATH}
-
-COPY jibri /jibri
-
-WORKDIR /jibri
-RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
-
-
-ARG JITSI_REPO=theun
-FROM ${JITSI_REPO}/base-java
 
 #ARG CHROME_RELEASE=latest
 #ARG CHROMEDRIVER_MAJOR_RELEASE=latest
-ARG CHROME_RELEASE=94.0.4606.61
-ARG CHROMEDRIVER_MAJOR_RELEASE=94
+ARG CHROME_RELEASE=95.0.4638.69
+ARG CHROMEDRIVER_MAJOR_RELEASE=95
 
 ENV JIBRI_VERSION=8.0-93-g51fe7a2-1
 
@@ -93,7 +103,7 @@ RUN chown jibri:jibri /home/jibri -R
 
 RUN chmod 644 /etc/ssh/ssh_config
 
-COPY --from=builder /jibri/target/jibri-8.0-SNAPSHOT-jar-with-dependencies.jar /opt/jitsi/jibri/jibri.jar
+# COPY --from=builder /jibri/target/jibri-8.0-SNAPSHOT-jar-with-dependencies.jar /opt/jitsi/jibri/jibri.jar
 
 # override the base image s6-overlay entrypoint
 ENTRYPOINT []

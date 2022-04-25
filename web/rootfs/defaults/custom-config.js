@@ -1,3 +1,4 @@
+{{ $ENABLE_BREAKOUT_ROOMS := .Env.ENABLE_BREAKOUT_ROOMS | default "true" | toBool -}}
 {{ if (.Env.ENABLE_INDIVIDUAL_REC | default "false" | toBool) }}
 config.p2p.enabled = false;
 {{ end }}
@@ -22,3 +23,9 @@ config.etherpad_base = '{{ .Env.ETHERPAD_PUBLIC_URL }}';
 
 config.disableJoinLeaveSounds = true;
 config.disableShortcuts = true;
+
+
+// Breakout Rooms
+//
+
+config.hideAddRoomButton = {{ $ENABLE_BREAKOUT_ROOMS | not }};
