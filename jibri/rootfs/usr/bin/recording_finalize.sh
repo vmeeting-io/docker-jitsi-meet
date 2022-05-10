@@ -87,7 +87,7 @@ AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
 
 curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
-    -d "{\"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\"}" \
+    -d "{\"uploadVideo\": \"$REC_FILE_NAME\", \"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\"}" \
     "$ENDPOINT"
 
 #
