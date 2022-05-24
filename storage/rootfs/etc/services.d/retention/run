@@ -4,6 +4,7 @@ shopt -s nullglob
 
 RECORDING_DIR=/recordings
 UPLOAD_DIR=/uploads
+WHITEBOARD_DIR=/files
 
 [ ! -d "$INDIVIDUAL_REC_DIR" ] && echo "Directory ${INDIVIDUAL_REC_DIR} DOES NOT exists." && exit 1
 
@@ -16,6 +17,8 @@ if [ ! -z "$RECORDING_RETENTION_DAYS" ]; then
         # cd $INDIVIDUAL_REC_DIR && find * -type d -empty -delete
         cd $UPLOAD_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
         cd $UPLOAD_DIR && find * -type d -empty -delete
+        cd $WHITEBOARD_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
+        cd $WHITEBOARD_DIR && find * -type d -empty -delete
 
         # check every 12h
         sleep 12h
