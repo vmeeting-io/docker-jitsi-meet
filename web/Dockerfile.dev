@@ -11,4 +11,4 @@ RUN cd /web/lib-jitsi-meet/ && npm install
 WORKDIR /web/jitsi-meet
 
 COPY jitsi-meet/ /web/jitsi-meet/
-RUN cd /web/jitsi-meet/ && npm install && make dev
+RUN cd /web/jitsi-meet/ && npm install --legacy-peer-deps && make dev
