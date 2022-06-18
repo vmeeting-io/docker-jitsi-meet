@@ -19,7 +19,7 @@ config.hosts.focus = 'focus@{{ .Env.XMPP_AUTH_DOMAIN }}/focus';
 
 config.enableReactions = true;
 
-config.etherpad_base = '{{ .Env.ETHERPAD_PUBLIC_URL }}';
+config.whiteboard_base = '{{ .Env.WHITEBOARD_PUBLIC_URL }}';
 
 config.disableJoinLeaveSounds = true;
 config.disableShortcuts = true;
