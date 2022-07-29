@@ -131,14 +131,14 @@ do
                 /config/${fname}
         fi
 
-        if [[ -z "$(grep -om1 'etherpad_base:' /config/${fname})" ]]; then
-            if [[ ! -z "${ETHERPAD_PUBLIC_URL}" ]]; then
+        if [[ -z "$(grep -om1 'whiteboard_base:' /config/${fname})" ]]; then
+            if [[ ! -z "${WHITEBOARD_PUBLIC_URL}" ]]; then
                 sed -i \
-                    -e "/enableWelcomePage/a\    etherpad_base: '${ETHERPAD_PUBLIC_URL}'," \
+                    -e "/enableWelcomePage/a\    whiteboard_base: '${WHITEBOARD_PUBLIC_URL}'," \
                     /config/${fname}
-            elif [[ ! -z "${ETHERPAD_URL_BASE}" ]]; then
+            elif [[ ! -z "${WHITEBOARD_URL_BASE}" ]]; then
                 sed -i \
-                    -e "/enableWelcomePage/a\    etherpad_base: '${PUBLIC_URL}/etherpad/p/'," \
+                    -e "/enableWelcomePage/a\    whiteboard_base: '${PUBLIC_URL}/whiteboard/'," \
                     /config/${fname}
             fi
         fi

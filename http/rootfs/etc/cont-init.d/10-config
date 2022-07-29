@@ -25,6 +25,10 @@ fi
 # copy config files
 tpl /defaults/nginx.conf > /config/nginx/nginx.conf
 
+if [[ ! -f /config/nginx/whiteboard.conf ]]; then
+    tpl /defaults/whiteboard.conf > /config/nginx/whiteboard.conf
+fi
+
 if [[ ! -f /config/nginx/meet.conf ]]; then
     tpl /defaults/meet.$NODE_ENV.conf > /config/nginx/meet.conf
 fi
