@@ -53,6 +53,8 @@ RUN \
 
 COPY rootfs/ /
 
+RUN chmod 755 /wait-for-it.sh
+
 # COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT.jar /usr/share/jicofo/jicofo.jar
 COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
 

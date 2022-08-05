@@ -61,6 +61,8 @@ EXPOSE 8125/udp 8092/udp 8094 9090
 
 COPY rootfs/ /
 
+RUN chmod 755 /wait-for-it.sh
+
 COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
 
 VOLUME /config
