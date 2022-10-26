@@ -12,7 +12,7 @@ else
 fi
 
 export LOCAL_ADDRESS=$(ip route get "$PUBLIC_ADDRESS" | head -n1 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
-export SWARM_ADDRESS=$(ip route | grep "${JITSI_MEET_SUBNET}" | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+export SWARM_ADDRESS=$(ip route get "$PUBLIC_ADDRESS" | grep -oP '(?<=src ).*' | awk '{ print $1 '})
 
 if [[ -z $JVB_AUTH_PASSWORD ]]; then
     echo 'FATAL ERROR: JVB auth password must be set'
