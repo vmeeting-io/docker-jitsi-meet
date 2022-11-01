@@ -21,7 +21,7 @@ config.enableReactions = true;
 
 config.whiteboard_base = '{{ .Env.WHITEBOARD_PUBLIC_URL }}';
 
-config.disableJoinLeaveSounds = true;
+// config.disableJoinLeaveSounds = true;
 config.disableShortcuts = true;
 
 
