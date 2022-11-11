@@ -79,7 +79,8 @@ RUN \
 	&& chromedriver --version
 
 RUN \
-	apt-dpkg-wrap apt-get update \
+	apt-dpkg-wrap apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B \
+	&& apt-dpkg-wrap apt-get update \
 	&& apt-dpkg-wrap apt-get install -y jitsi-upload-integrations jq fonts-noto fonts-noto-cjk openssh-server rsync dos2unix dbus-x11 pulseaudio rtkit vim \
 	&& apt-cleanup
 

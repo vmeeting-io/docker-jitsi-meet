@@ -33,7 +33,7 @@ RUN apt-get install -y nodejs git
 
 WORKDIR /web/jitsi-meet
 COPY jitsi-meet/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY jitsi-meet/ /web/jitsi-meet/
 RUN cp -f /web/jitsi-meet/interface_config*.js /defaults
