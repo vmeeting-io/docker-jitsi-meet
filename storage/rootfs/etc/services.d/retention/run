@@ -11,8 +11,8 @@ WHITEBOARD_DIR=/files
 if [ ! -z "$RECORDING_RETENTION_DAYS" ]; then
     while true; do
         # remove old recordings
-        cd $RECORDING_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
-        cd $RECORDING_DIR && find * -type d -empty -delete
+        # cd $RECORDING_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
+        # cd $RECORDING_DIR && find * -type d -empty -delete
         # cd $INDIVIDUAL_REC_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
         # cd $INDIVIDUAL_REC_DIR && find * -type d -empty -delete
         cd $UPLOAD_DIR && find * -mtime +${RECORDING_RETENTION_DAYS} -type f -exec rm {} \;
