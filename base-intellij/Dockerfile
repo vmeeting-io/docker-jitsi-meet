@@ -13,9 +13,9 @@ RUN \
     apt-cleanup
 
 # IDEA
-RUN wget -q https://download-cf.jetbrains.com/idea/ideaIC-2020.2.3.tar.gz && \
+RUN wget -q https://download-cf.jetbrains.com/idea/ideaIC-2022.2.2.tar.gz && \
     mkdir -p /opt/idea && \
-    tar -xzf ideaIC-2020.2.3.tar.gz -C /opt/idea --strip-components 1
+    tar -xzf ideaIC-2022.2.2.tar.gz -C /opt/idea --strip-components 1
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \

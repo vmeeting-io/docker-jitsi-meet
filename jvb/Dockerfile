@@ -5,17 +5,15 @@ ARG JITSI_REPO=theun
 FROM ${JITSI_REPO}/base as builder
 RUN	\
 	mkdir -p /usr/share/man/man1 && \
-	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
-	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot && \
+	apt-dpkg-wrap apt-get install -y openjdk-11-jdk-headless && \
 	apt-cleanup
 
 RUN \
     cd /opt/ && \
-    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
-    tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
-    mv apache-maven-3.5.4 maven
+    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.tar.gz && \
+    tar -xvzf apache-maven-3.9.1-bin.tar.gz && \
+    mv apache-maven-3.9.1 maven
 ENV M2_HOME=/opt/maven
 ENV PATH=${M2_HOME}/bin:${PATH}
 
@@ -28,7 +26,7 @@ RUN ls -lha /jitsi-videobridge/jvb/target
 
 FROM ${JITSI_REPO}/base-java
 
-ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
+ENV VIDEOBRIDGE_VERSION=2.1-681-g3544ed05-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
