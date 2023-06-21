@@ -109,6 +109,13 @@ do
             -e "s#// requireDisplayName:.*#requireDisplayName: true,#" \
             /config/${fname}
 
+        if [[ $AUTO_LOBBY_ENABLED -eq 1 ]]; then
+            sed -i \
+            -e "s#// autoKnockLobby:.*#autoKnockLobby: true,#" \
+            -e "s#// autoLobbyEnabled:.*#autoLobbyEnabled: true,#" \
+            /config/${fname}
+        fi
+
         if [[ $ENABLE_XMPP_WEBSOCKET -eq 1 ]]; then
             if [[ -z "$PUBLIC_URL" ]]; then
                 echo 'FATAL ERROR: If ENABLE_XMPP_WEBSOCKET is set to 1, PUBLIC_URL must be defined!'
