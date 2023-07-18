@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/usr/sbin/stunserver --verbosity 4 "$@"
+/stunserver/stunserver --verbosity 4 "$@"

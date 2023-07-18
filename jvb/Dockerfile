@@ -13,7 +13,7 @@ RUN	\
 
 RUN \
     cd /opt/ && \
-    wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    wget -q https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
     tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
     mv apache-maven-3.5.4 maven
 ENV M2_HOME=/opt/maven

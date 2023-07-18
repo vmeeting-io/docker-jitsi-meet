@@ -1,10 +1,14 @@
 ARG JITSI_REPO=theun
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
-RUN  \
-    apt-get update && \
-    apt-get install -y stuntman-server && \
-    apt-get clean
+RUN apt-get update && \
+	apt-get install -y wget g++ make libboost-dev libssl-dev
+
+RUN cd / && \
+    wget -q https://www.stunprotocol.org/stunserver-1.2.16.tgz && \
+    tar -xvzf stunserver-1.2.16.tgz
+
+RUN cd /stunserver && make
 
 COPY rootfs/ /
 RUN chmod a+x /run.sh
