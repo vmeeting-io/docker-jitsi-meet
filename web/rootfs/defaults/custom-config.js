@@ -1,4 +1,6 @@
 {{ $ENABLE_BREAKOUT_ROOMS := .Env.ENABLE_BREAKOUT_ROOMS | default "true" | toBool -}}
+{{ $PASSWORD_REQUIRED := .Env.PASSWORD_REQUIRED | default "false" | toBool -}}
+
 {{ if (.Env.ENABLE_INDIVIDUAL_REC | default "false" | toBool) }}
 config.p2p.enabled = false;
 {{ end }}
@@ -29,3 +31,6 @@ config.disableShortcuts = true;
 //
 
 config.hideAddRoomButton = {{ $ENABLE_BREAKOUT_ROOMS | not }};
+
+// The password is required to enter the room. The default value is false.
+config.passwordRequired = {{ $PASSWORD_REQUIRED }};
