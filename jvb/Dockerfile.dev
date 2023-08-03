@@ -27,8 +27,6 @@ ENV VIDEOBRIDGE_VERSION=2.1-376-g9f12bfe2-1
 
 RUN \
 	mkdir -p /usr/share/man/man1 && \
-    wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
-	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
 	apt-dpkg-wrap apt-get update && \
 	apt-dpkg-wrap apt-get install -y jitsi-videobridge2=${VIDEOBRIDGE_VERSION} jq curl iproute2 dnsutils vim git openjdk-11-jdk-headless libpcap-dev openssh-server rsync && \
 	apt-cleanup
