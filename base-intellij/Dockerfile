@@ -1,5 +1,6 @@
 ARG JITSI_REPO=theun
-FROM ${JITSI_REPO}/base
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base:${VMEETING_TAG}
 
 ARG DEV_ROOT_PASSWD=vmeeting
 RUN echo "root:${DEV_ROOT_PASSWD}" | chpasswd

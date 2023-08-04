@@ -7,6 +7,9 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
 COPY rootfs /
 
+RUN useradd -ou 0 -g 0 vmeeting
+USER vmeeting
+
 RUN \
 	apt-dpkg-wrap apt-get update && \
 	apt-dpkg-wrap apt-get install -y apt-transport-https apt-utils ca-certificates gnupg && \

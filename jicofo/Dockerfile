@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.2
 
 ARG JITSI_REPO=theun
-
-FROM ${JITSI_REPO}/base as builder
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base:${VMEETING_TAG} as builder
 RUN	\
 	mkdir -p /usr/share/man/man1 && \
     apt-dpkg-wrap apt-get update && \
@@ -21,8 +21,8 @@ COPY jicofo /jicofo
 
 WORKDIR /jicofo
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
-
-FROM ${JITSI_REPO}/base-java
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
 
 ARG JICOFO_VERSION=1.0-798-1
 
