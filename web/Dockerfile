@@ -1,5 +1,6 @@
 ARG JITSI_REPO=theun
-FROM ${JITSI_REPO}/base
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base:${VMEETING_TAG}
 
 ADD https://raw.githubusercontent.com/acmesh-official/acme.sh/2.8.8/acme.sh /opt
 

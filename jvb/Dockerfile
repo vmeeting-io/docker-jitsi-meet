@@ -1,15 +1,13 @@
 # syntax=docker/dockerfile:1.2
 
 ARG JITSI_REPO=theun
-
-FROM ${JITSI_REPO}/base as builder
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base:${VMEETING_TAG} as builder
 RUN	\
 	mkdir -p /usr/share/man/man1 && \
-	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
-	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
-	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot && \
-	apt-cleanup
+    apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y openjdk-11-jre-headless && \
+    apt-cleanup
 
 RUN \
     cd /opt/ && \
@@ -25,8 +23,8 @@ WORKDIR /jitsi-videobridge
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
 RUN ls -lha /jitsi-videobridge/jvb/target
 
-
-FROM ${JITSI_REPO}/base-java
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
 
 ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
 

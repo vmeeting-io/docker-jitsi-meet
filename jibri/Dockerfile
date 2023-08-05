@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.2
 
 # ARG JITSI_REPO=theun
-
-# FROM ${JITSI_REPO}/base as builder
+# ARG VMEETING_TAG
+# FROM ${JITSI_REPO}/base:${VMEETING_TAG} as builder
 # RUN	\
 # 	mkdir -p /usr/share/man/man1 && \
 # 	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
@@ -28,15 +28,14 @@
 # TODO: use jre 11 instead of jre 8 same with base-java when this bug is fixed
 # https://github.com/jitsi/jibri/issues/441
 ARG JITSI_REPO=theun
-FROM ${JITSI_REPO}/base
+ARG VMEETING_TAG
+FROM ${JITSI_REPO}/base:${VMEETING_TAG}
 
 RUN	\
 	mkdir -p /usr/share/man/man1 && \
-	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
-	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
-	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y adoptopenjdk-8-hotspot-jre && \
-	apt-cleanup
+    apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y openjdk-11-jre-headless && \
+    apt-cleanup
 
 #ARG CHROME_RELEASE=latest
 #ARG CHROMEDRIVER_MAJOR_RELEASE=latest
