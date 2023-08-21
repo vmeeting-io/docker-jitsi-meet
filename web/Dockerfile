@@ -12,8 +12,9 @@ ENV JITSI_MEET_WEB_VERSION=1.0.4289-1
 ENV JITSI_MEET_WEB_CONFIG_VERSION=1.0.4289-1
 
 RUN \
+	apt-dpkg-wrap apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62 && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y --allow-unauthenticated cron nginx-extras vim curl make apache2-utils jitsi-meet-web=${JITSI_MEET_WEB_VERSION} socat && \
+	apt-dpkg-wrap apt-get install -y --allow-unauthenticated cron nginx vim curl make apache2-utils jitsi-meet-web=${JITSI_MEET_WEB_VERSION} socat && \
 	apt-dpkg-wrap apt-get -d install -y --allow-unauthenticated jitsi-meet-web-config=${JITSI_MEET_WEB_CONFIG_VERSION} && \
     dpkg -x /var/cache/apt/archives/jitsi-meet-web-config*.deb /tmp/pkg && \
     mv /tmp/pkg/usr/share/jitsi-meet-web-config/config.js /defaults && \
