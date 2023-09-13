@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 ARG JITSI_RELEASE=stable
 ARG FREP_VERSION=1.3.11

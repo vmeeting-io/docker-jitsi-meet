@@ -22,7 +22,7 @@ FROM ${JITSI_REPO}/base:${VMEETING_TAG}
 
 RUN \
     wget -q https://prosody.im/files/prosody-debian-packages.key -O - | gpg --enarmor > /etc/apt/trusted.gpg.d/prosody.asc \
-    && echo "deb http://packages.prosody.im/debian buster main" > /etc/apt/sources.list.d/prosody.list \
+    && echo "deb http://packages.prosody.im/debian bullseye main" > /etc/apt/sources.list.d/prosody.list \
     && apt-dpkg-wrap apt-get update \
     && apt-dpkg-wrap apt-get install -y \
       prosody \
