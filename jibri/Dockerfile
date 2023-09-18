@@ -42,13 +42,13 @@ RUN	\
 ARG CHROME_RELEASE=114.0.5735.90
 ARG CHROMEDRIVER_MAJOR_RELEASE=114
 
-ENV JIBRI_VERSION=8.0-93-g51fe7a2-1
+ENV JIBRI_VERSION=8.0-105-gddca7a2-1
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN \
 	apt-dpkg-wrap apt-get update \
-	&& apt-dpkg-wrap apt-get install -y jibri libgl1-mesa-dri libnss3-dev unzip \
+	&& apt-dpkg-wrap apt-get install -y jibri=${JIBRI_VERSION} libgl1-mesa-dri libnss3-dev unzip \
 	&& apt-cleanup
 
 RUN \
