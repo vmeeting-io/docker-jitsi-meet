@@ -1,14 +1,14 @@
 ARG JITSI_REPO=theun
 FROM debian:bullseye-slim
 
-ARG VMEETING_USER_GID=1001
-ARG VMEETING_USER_UID=1001
+# ARG VMEETING_USER_GID=1001
+# ARG VMEETING_USER_UID=1001
 
-RUN \
-    groupadd --gid "$VMEETING_USER_GID" vmeeting &&\
-    useradd --uid "$VMEETING_USER_UID" --gid vmeeting --shell /bin/bash --home /home/vmeeting --no-create-home vmeeting &&\
-    mkdir /home/vmeeting &&\
-    chown vmeeting: /home/vmeeting
+# RUN \
+#     groupadd --gid "$VMEETING_USER_GID" vmeeting &&\
+#     useradd --uid "$VMEETING_USER_UID" --gid vmeeting --shell /bin/bash --home /home/vmeeting --no-create-home vmeeting &&\
+#     mkdir /home/vmeeting &&\
+#     chown vmeeting: /home/vmeeting
 
 RUN apt-get update && \
 	apt-get install -y wget g++ make libboost-dev libssl-dev
@@ -25,5 +25,5 @@ RUN chmod a+x /run.sh
 EXPOSE 3478/tcp 3478/udp
 
 # USER nobody
-USER vmeeting
+# USER vmeeting
 ENTRYPOINT ["/run.sh"]
