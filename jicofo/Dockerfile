@@ -21,10 +21,11 @@ COPY jicofo /jicofo
 
 WORKDIR /jicofo
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
+
 ARG VMEETING_TAG
 FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
 
-ARG JICOFO_VERSION=1.0-798-1
+ARG JICOFO_VERSION=1.0-1075-1
 
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y rubygems && \
@@ -54,7 +55,7 @@ COPY rootfs/ /
 RUN chmod 755 /wait-for-it.sh
 
 # COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT.jar /usr/share/jicofo/jicofo.jar
-COPY --from=builder /jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
+COPY --from=builder /jicofo/jicofo/target/jicofo-1.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jicofo/jicofo.jar
 
 VOLUME /config
 

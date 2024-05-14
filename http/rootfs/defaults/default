@@ -8,11 +8,11 @@ server {
 {{ end }}
 
 server {
-	listen 8080 ssl;
+	listen 8088 ssl;
 
 	include /config/nginx/ssl.conf;
 	location /ws {
-		proxy_pass https://web-dev:8080;
+		proxy_pass https://web-dev:8088;
 
 		proxy_redirect off;
 		proxy_http_version 1.1;

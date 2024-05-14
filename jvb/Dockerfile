@@ -26,7 +26,7 @@ RUN ls -lha /jitsi-videobridge/jvb/target
 ARG VMEETING_TAG
 FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
 
-ENV VIDEOBRIDGE_VERSION=2.1-551-g2ad6eb0b-1
+ENV VIDEOBRIDGE_VERSION=2.3-92-g64f9f34f-1
 
 RUN \
 	apt-dpkg-wrap apt-get update && \
@@ -61,6 +61,6 @@ COPY rootfs/ /
 
 RUN chmod 755 /wait-for-it.sh
 
-COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.1-SNAPSHOT-jar-with-dependencies.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
+COPY --from=builder /jitsi-videobridge/jvb/target/jitsi-videobridge-2.3-SNAPSHOT-jar-with-dependencies.jar /usr/share/jitsi-videobridge/jitsi-videobridge.jar
 
 VOLUME /config

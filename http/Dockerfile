@@ -15,6 +15,6 @@ RUN \
 
 RUN echo "set encoding=utf-8" >> /etc/vim/vimrc
 
-EXPOSE 80 443 8080
+EXPOSE 80 443 8088
 
 VOLUME ["/config"]

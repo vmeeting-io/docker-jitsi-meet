@@ -1,16 +1,11 @@
 #!/usr/bin/with-contenv bash
-set -x
 
 JAVA_SYS_PROPS="-Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jicofo.conf"
 DAEMON=/usr/share/jicofo/jicofo.sh
 DAEMON_DIR=/usr/share/jicofo/
-DAEMON_OPTS="--domain=$XMPP_DOMAIN --host=$XMPP_SERVER --user_name=$JICOFO_AUTH_USER --user_domain=$XMPP_AUTH_DOMAIN --user_password=$JICOFO_AUTH_PASSWORD"
 
-# in dev mode, we run manually using intellij
-if [ "$VMEETING_MODE" == "development" ]; then
-    echo "parameters for intellij: mainClass: org.jitsi.jicofo.Main, JAVA_SYS_PROPS: $JAVA_SYS_PROPS, DAEMON_OPTS: $DAEMON_OPTS"
-    sleep infinity
-else
+JICOFO_CMD="exec $DAEMON"
 
-    exec s6-setuidgid jicofo /bin/bash -c "cd $DAEMON_DIR; JAVA_SYS_PROPS=\"$JAVA_SYS_PROPS\" exec $DAEMON $DAEMON_OPTS"
-fi
+[ -n "$JICOFO_LOG_FILE" ] && JICOFO_CMD="$JICOFO_CMD 2>&1 | tee $JICOFO_LOG_FILE"
+
+exec s6-setuidgid jicofo /bin/bash -c "cd $DAEMON_DIR; JAVA_SYS_PROPS=\"$JAVA_SYS_PROPS\" $JICOFO_CMD"
