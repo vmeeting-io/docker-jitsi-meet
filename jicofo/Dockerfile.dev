@@ -27,7 +27,7 @@ ARG JICOFO_VERSION=1.0-798-1
 RUN \
 	mkdir -p /usr/share/man/man1 && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y dirmngr iputils-ping snmp procps lm-sensors jicofo=${JICOFO_VERSION} jq curl iproute2 dnsutils vim git openjdk-11-jdk-headless libpcap-dev && \
+	apt-dpkg-wrap apt-get install -y dirmngr iputils-ping snmp procps lm-sensors jicofo=${JICOFO_VERSION} jq curl iproute2 dnsutils vim git libpcap-dev && \
 	apt-cleanup
 
 COPY rootfs/ /

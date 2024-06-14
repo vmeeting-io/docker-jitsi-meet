@@ -29,17 +29,11 @@
 # https://github.com/jitsi/jibri/issues/441
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base:${VMEETING_TAG}
-
-RUN	\
-	mkdir -p /usr/share/man/man1 && \
-    apt-dpkg-wrap apt-get update && \
-    apt-dpkg-wrap apt-get install -y openjdk-11-jre-headless && \
-    apt-cleanup
+FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
 
 #ARG CHROME_RELEASE=latest
 #ARG CHROMEDRIVER_MAJOR_RELEASE=latest
-ARG CHROME_RELEASE=114.0.5735.90
+ARG CHROME_RELEASE=121.0.6167.85
 ARG CHROMEDRIVER_MAJOR_RELEASE=114
 
 ENV JIBRI_VERSION=8.0-105-gddca7a2-1
