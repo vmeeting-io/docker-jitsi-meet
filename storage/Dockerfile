@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:buster-slim
 
 # Set the locale UTF8 to correctly handle non-ASCII chars
 ENV LANG=en_US.UTF-8
@@ -24,6 +24,15 @@ RUN \
 	apt-get update && \
 	apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x && \
 	apt-get clean
+
+RUN	\
+	apt-get install -y gnupg curl && \
+	curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | \
+   	gpg -o /usr/share/keyrings/mongodb-server-4.4.gpg --dearmor && \
+	echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | \
+	tee /etc/apt/sources.list.d/mongodb-org-4.4.list && \
+	apt-get update && \
+	apt-get install -y mongodb-database-tools
 
 RUN \
     mkdir -p /run/sshd && \
