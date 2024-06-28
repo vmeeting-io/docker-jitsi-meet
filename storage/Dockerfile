@@ -40,6 +40,8 @@ RUN \
 
 COPY rootfs/ /
 
+RUN chmod 755 /wait-for-it.sh
+
 VOLUME ["/recordings"]
 
 ENTRYPOINT ["/init"]
