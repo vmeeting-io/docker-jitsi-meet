@@ -29,7 +29,7 @@
 # https://github.com/jitsi/jibri/issues/441
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base-java
 
 #ARG CHROME_RELEASE=latest
 #ARG CHROMEDRIVER_MAJOR_RELEASE=latest

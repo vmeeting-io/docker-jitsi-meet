@@ -1,6 +1,6 @@
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base
 
 RUN	\
 	mkdir -p /usr/share/man/man1 && \

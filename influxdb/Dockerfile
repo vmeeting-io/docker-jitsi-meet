@@ -1,7 +1,7 @@
 FROM influxdb:1.8
 
-RUN useradd -ou 0 -g 0 vmeeting
-USER vmeeting
+COPY rootfs/ /
+RUN chmod +x /init-permission.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["influxd"]

@@ -8,5 +8,5 @@ RUN apk --no-cache add curl
 RUN chmod a+x /entrypoint.sh
 RUN chown -R grafana /etc/grafana/provisioning/jitsi
 
-# USER grafana
+USER grafana
 ENTRYPOINT [ "/entrypoint.sh" ]
