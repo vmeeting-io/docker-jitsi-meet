@@ -1,6 +1,6 @@
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base-java
 
 LABEL org.opencontainers.image.title="Jitsi Gateway to SIP (jigasi)"
 LABEL org.opencontainers.image.description="Server-side application that allows regular SIP clients to join conferences."

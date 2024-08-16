@@ -2,7 +2,7 @@
 
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG} as builder
+FROM ${JITSI_REPO}/base-java as builder
 
 RUN \
     cd /opt/ && \
@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
 RUN ls -lha /jitsi-videobridge/jvb/target
 
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base-java
 
 ENV VIDEOBRIDGE_VERSION=2.3-92-g64f9f34f-1
 
