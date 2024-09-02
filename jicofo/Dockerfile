@@ -2,7 +2,7 @@
 
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG} as builder
+FROM ${JITSI_REPO}/base-java as builder
 
 RUN \
     cd /opt/ && \
@@ -18,7 +18,7 @@ WORKDIR /jicofo
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
 
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base-java
 
 ARG JICOFO_VERSION=1.0-1075-1
 

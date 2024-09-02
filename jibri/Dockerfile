@@ -2,7 +2,7 @@
 
 # ARG JITSI_REPO=theun
 # ARG VMEETING_TAG
-# FROM ${JITSI_REPO}/base:${VMEETING_TAG} as builder
+# FROM ${JITSI_REPO}/base as builder
 # RUN	\
 # 	mkdir -p /usr/share/man/man1 && \
 # 	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
@@ -29,14 +29,11 @@
 # https://github.com/jitsi/jibri/issues/441
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base-java:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base-java
 
-#ARG CHROME_RELEASE=latest
-#ARG CHROMEDRIVER_MAJOR_RELEASE=latest
-ARG CHROME_RELEASE=121.0.6167.85
-ARG CHROMEDRIVER_MAJOR_RELEASE=114
+ARG CHROME_RELEASE=126.0.6478.126
 
-ENV JIBRI_VERSION=8.0-105-gddca7a2-1
+ENV JIBRI_VERSION=8.0-169-g1258814-1
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

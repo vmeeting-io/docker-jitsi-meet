@@ -7,21 +7,22 @@
             // A friendly name for this environment which can be used
             //  for logging, stats, etc.
             "name": "prod environment",
+            "security_mode": "disabled",
             // The hosts of the XMPP servers to connect to as part of
             //  this environment
             "xmpp_server_hosts": [
                 "{{ .Env.XMPP_SERVER }}"
             ],
             "xmpp_domain": "{{ .Env.XMPP_DOMAIN }}",
-            // Jibri will login to the xmpp server as a privileged user 
+            // Jibri will login to the xmpp server as a privileged user
             "control_login": {
                 "domain": "{{ .Env.XMPP_AUTH_DOMAIN }}",
                 // The credentials for logging in
                 "username": "{{ .Env.JIBRI_XMPP_USER }}",
                 "password": "{{ .Env.JIBRI_XMPP_PASSWORD }}"
             },
-            // Using the control_login information above, Jibri will join 
-            //  a control muc as a means of announcing its availability 
+            // Using the control_login information above, Jibri will join
+            //  a control muc as a means of announcing its availability
             //  to provide services for a given environment
             "control_muc": {
                 "domain": "{{ .Env.XMPP_INTERNAL_MUC_DOMAIN }}",

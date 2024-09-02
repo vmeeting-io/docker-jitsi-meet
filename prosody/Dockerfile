@@ -1,6 +1,6 @@
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base:${VMEETING_TAG} as builder
+FROM ${JITSI_REPO}/base as builder
 
 RUN \
     apt-dpkg-wrap apt-get update \
@@ -18,7 +18,7 @@ RUN \
     # newer cjson has error: https://github.com/mpx/lua-cjson/issues/56
     && luarocks install lua-cjson 2.1.0-1
 ARG VMEETING_TAG
-FROM ${JITSI_REPO}/base:${VMEETING_TAG}
+FROM ${JITSI_REPO}/base
 
 RUN \
     wget -q https://prosody.im/files/prosody-debian-packages.key -O - | gpg --enarmor > /etc/apt/trusted.gpg.d/prosody.asc \
