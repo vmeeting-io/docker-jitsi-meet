@@ -34,10 +34,6 @@ RUN	\
 	apt-get update && \
 	apt-get install -y mongodb-database-tools
 
-RUN \
-    mkdir -p /run/sshd && \
-    mkdir -p /var/run/sshd
-
 COPY rootfs/ /
 
 RUN chmod 755 /wait-for-it.sh
