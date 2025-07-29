@@ -1,5 +1,5 @@
 ARG JITSI_REPO=theun
-FROM debian:bullseye-slim
+FROM docker.io/library/debian:bookworm-slim
 
 # ARG VMEETING_USER_GID=1001
 # ARG VMEETING_USER_UID=1001

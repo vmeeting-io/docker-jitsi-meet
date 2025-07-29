@@ -1,32 +1,3 @@
-# syntax=docker/dockerfile:1.2
-
-# ARG JITSI_REPO=theun
-# ARG VMEETING_TAG
-# FROM ${JITSI_REPO}/base as builder
-# RUN	\
-# 	mkdir -p /usr/share/man/man1 && \
-# 	wget -q https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public -O /etc/apt/trusted.gpg.d/openjdk.asc && \
-# 	echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" > /etc/apt/sources.list.d/openjdk.list && \
-# 	apt-dpkg-wrap apt-get update && \
-# 	apt-dpkg-wrap apt-get install -y openjdk-11-jdk-headless && \
-# 	apt-cleanup
-
-# RUN \
-#     cd /opt/ && \
-#     wget -q http://apache.mirrors.pair.com/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
-#     tar -xvzf apache-maven-3.5.4-bin.tar.gz && \
-#     mv apache-maven-3.5.4 maven
-# ENV M2_HOME=/opt/maven
-# ENV PATH=${M2_HOME}/bin:${PATH}
-
-# COPY jibri /jibri
-
-# WORKDIR /jibri
-# RUN --mount=type=cache,target=/root/.m2 mvn clean package -P buildFatJar
-
-
-# TODO: use jre 11 instead of jre 8 same with base-java when this bug is fixed
-# https://github.com/jitsi/jibri/issues/441
 ARG JITSI_REPO=theun
 ARG VMEETING_TAG
 FROM ${JITSI_REPO}/base-java

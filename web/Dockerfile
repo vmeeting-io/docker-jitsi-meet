@@ -11,6 +11,7 @@ COPY rootfs/ /
 ENV JITSI_MEET_WEB_VERSION=1.0.4289-1
 ENV JITSI_MEET_WEB_CONFIG_VERSION=1.0.4289-1
 
+# wget -qO - https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
 RUN \
 	apt-dpkg-wrap apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62 && \
 	apt-dpkg-wrap apt-get update && \

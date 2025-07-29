@@ -1,7 +1,6 @@
-FROM debian:bullseye-slim
+FROM docker.io/library/debian:bookworm-slim
 
 ARG JITSI_RELEASE=stable
-ARG FREP_VERSION=1.3.11
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
@@ -11,17 +10,30 @@ RUN useradd -ou 0 -g 0 vmeeting
 USER vmeeting
 
 RUN \
+	dpkgArch="$(dpkg --print-architecture)" && \
+	case "${dpkgArch##*-}" in \
+		"amd64") TPL_ARCH="amd64"; S6_ARCH="amd64" ;; \
+		"arm64") TPL_ARCH="arm64"; S6_ARCH="arm64" ;; \
+		*) echo "Unsupported architecture"; exit 1 ;; \
+	esac && \
 	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get install -y apt-transport-https apt-utils ca-certificates gnupg && \
-	apt-dpkg-wrap apt-get install -y wget && \
-	wget -qO - https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-amd64.tar.gz | tar xfz - -C / && \
-	wget -qO - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add - && \
-	wget -q https://github.com/subchen/frep/releases/download/v$FREP_VERSION/frep-$FREP_VERSION-linux-amd64 -O /usr/bin/frep && \
-	echo "deb https://download.jitsi.org $JITSI_RELEASE/" > /etc/apt/sources.list.d/jitsi.list && \
-	apt-dpkg-wrap apt-get update && \
-	apt-dpkg-wrap apt-get dist-upgrade -y && \
-	apt-cleanup && \
-	chmod +x /usr/bin/frep
+	apt-dpkg-wrap apt-get install -y apt-transport-https apt-utils ca-certificates gnupg wget curl && \
+	wget -qO /usr/bin/tpl https://github.com/jitsi/tpl/releases/download/v1.4.0/tpl-linux-${TPL_ARCH} && \
+    # Workaround S6 bug when /bin is a symlink
+    wget -qO /tmp/s6.tar.gz https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-${S6_ARCH}.tar.gz && \
+    mkdir /tmp/s6 && \
+    tar xfz /tmp/s6.tar.gz -C /tmp/s6 && \
+    tar hxfz /tmp/s6.tar.gz -C / && \
+    rm -f /usr/bin/execlineb && \
+    cp /tmp/s6/bin/execlineb /usr/bin/ && \
+    rm -rf /tmp/s6* && \
+    wget -qO - https://download.jitsi.org/jitsi-key.gpg.key | gpg --dearmour > /etc/apt/trusted.gpg.d/jitsi.gpg && \
+    echo "deb https://download.jitsi.org $JITSI_RELEASE/" > /etc/apt/sources.list.d/jitsi.list && \
+    echo "deb http://ftp.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/backports.list && \
+    apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get dist-upgrade -y && \
+    apt-cleanup && \
+    chmod +x /usr/bin/tpl
 
 RUN \
 	[ "$JITSI_RELEASE" = "unstable" ] && \

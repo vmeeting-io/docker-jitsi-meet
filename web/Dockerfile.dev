@@ -1,4 +1,4 @@
-FROM node:16
+FROM docker.io/library/node:24
 
 RUN apt-get update && apt-get install -y vim inotify-tools curl make
 
