@@ -13,7 +13,7 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
         if [[ ! -f /config/acme.sh/acme.sh ]]; then
             mkdir -p /config/acme.sh
             pushd /opt
-            sh ./acme.sh --install --home /config/acme.sh --accountemail $LETSENCRYPT_EMAIL
+            sh ./acme.sh --install --home /config/acme.sh --register-account -m $LETSENCRYPT_EMAIL --accountkeylength ec-256
             popd
         fi
 
