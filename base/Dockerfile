@@ -6,7 +6,13 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
 COPY rootfs /
 
-RUN useradd -ou 0 -g 0 vmeeting
+RUN useradd -ou 0 -g 0 vmeeting && \
+	apt-dpkg-wrap apt-get update && \
+	apt-dpkg-wrap apt-get install -y sudo vim && \
+	echo "vmeeting ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    echo "set encoding=utf-8" >> /etc/vim/vimrc && \
+	apt-cleanup
+
 USER vmeeting
 
 RUN \

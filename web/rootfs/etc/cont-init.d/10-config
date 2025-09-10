@@ -12,7 +12,7 @@ if [[ $DISABLE_HTTPS -ne 1 ]]; then
     if [[ $ENABLE_LETSENCRYPT -eq 1 ]]; then
         mkdir -p /config/acme.sh
         pushd /opt
-        sh ./acme.sh --install --home /config/acme.sh --register-account -m $LETSENCRYPT_EMAIL --accountkeylength ec-256
+        sh ./acme.sh --install --home /config/acme.sh -m $LETSENCRYPT_EMAIL
         popd
 
         if [[ $LETSENCRYPT_USE_STAGING -ne 1 || ! -f /config/acme-certs/$LETSENCRYPT_DOMAIN/fullchain.pem ]]; then
