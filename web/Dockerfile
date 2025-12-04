@@ -11,7 +11,15 @@ COPY rootfs/ /
 ENV JITSI_MEET_WEB_VERSION=1.0.4289-1
 ENV JITSI_MEET_WEB_CONFIG_VERSION=1.0.4289-1
 
-# wget -qO - https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
+# nginx 공식 GPG 키 추가
+RUN wget -qO - https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+
+# nginx 공식 저장소 추가
+RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian bookworm nginx" | tee /etc/apt/sources.list.d/nginx.list
+
+# nginx 공식 저장소 업데이트
+RUN apt-get update
+
 RUN \
 	apt-dpkg-wrap apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62 && \
 	apt-dpkg-wrap apt-get update && \
