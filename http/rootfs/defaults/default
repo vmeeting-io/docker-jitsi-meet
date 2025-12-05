@@ -1,6 +1,6 @@
 {{ if not (.Env.DISABLE_HTTPS | default "0" | toBool) }}
 server {
-	listen 8443 ssl http2;
+	listen 8443 ssl;
 
 	include /config/nginx/ssl.conf;
 	include /config/nginx/meet.conf;
@@ -9,6 +9,7 @@ server {
 
 server {
 	listen 8088 ssl;
+	http2 on;
 
 	include /config/nginx/ssl.conf;
 	location /ws {
