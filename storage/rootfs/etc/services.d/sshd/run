@@ -1,6 +1,2 @@
 #!/usr/bin/with-contenv bash
-if [ "$DISABLE_SSH" -eq 1 ]; then
-    exit 0
-fi
-
 /usr/sbin/sshd -D

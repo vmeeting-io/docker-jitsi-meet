@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+
+IFS=','
+
+for svc in $DISABLE_SERVICES; do
+  if [ -d "/etc/services.d/$svc" ]; then
+    echo "[s6] disabling service: $svc"
+    touch "/etc/services.d/$svc/down"
+  else
+    echo "[s6] service not found: $svc"
+  fi
+done
