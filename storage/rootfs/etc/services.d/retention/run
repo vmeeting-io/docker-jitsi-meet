@@ -24,8 +24,8 @@ if [ ! -z "$RECORDING_RETENTION_DAYS" ]; then
         # backup mongodb
         DATE=$(date +"%Y-%m-%d")
         BACKUP_NAME="mongodb_backup_$DATE.gz"
-        echo "Backing up mongodb : mongodump --username $VMEETING_DB_USER --password $VMEETING_DB_PASS --uri=\"$VMEETING_DB_URL&readPreference=secondary\" --gzip --archive=$BACKUP_DIR/$BACKUP_NAME"
-        cd $BACKUP_DIR && mongodump --username $VMEETING_DB_USER --password $VMEETING_DB_PASS --uri="$VMEETING_DB_URL&readPreference=secondary" --gzip --archive=$BACKUP_DIR/$BACKUP_NAME
+        echo "Backing up mongodb : mongodump --username $VMEETING_DB_USER --password $VMEETING_DB_PASS VMEETING_DB_URL --gzip --archive=$BACKUP_DIR/$BACKUP_NAME"
+        cd $BACKUP_DIR && mongodump --username $VMEETING_DB_USER --password $VMEETING_DB_PASS $VMEETING_DB_URL --gzip --archive=$BACKUP_DIR/$BACKUP_NAME
 
         # 7일 이상된 백업 삭제
         find $BACKUP_DIR -mtime +7 -type f -exec rm -f {} \;
