@@ -49,6 +49,11 @@ MEETING_NAME="${URL##*/}"
 MEETING_ID_FROM_JSON=$(cat $METADATA_JSON | jq -r ".meetingId")
 FDATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
+ENABLE_MEETING_MINUTES=$(cat $METADATA_JSON | jq -r ".enable_meeting_minutes")
+if [ "$ENABLE_MEETING_MINUTES" == "null" ]; then
+    ENABLE_MEETING_MINUTES=false
+fi
+
 #
 # copy recorded folder to the central storage (only copy video and transcript)
 # generate download link and email content
@@ -87,7 +92,7 @@ AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
 
 curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
-    -d "{\"uploadVideo\": \"$REC_FILE_NAME\", \"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\"}" \
+    -d "{\"uploadVideo\": \"$REC_FILE_NAME\", \"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\", \"enableMeetingMinutes\": ${ENABLE_MEETING_MINUTES}}" \
     "$ENDPOINT"
 
 #
