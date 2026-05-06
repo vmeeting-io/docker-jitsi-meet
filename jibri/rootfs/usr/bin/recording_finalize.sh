@@ -66,6 +66,7 @@ REC_DIR=${UPLOAD_DIR}/${REC_FOLDER}
 REC_FILE_PATH=""
 REC_FILE_NAME=""
 REC_FILE_SIZE=""
+REC_FILE_DURATION="0"
 mkdir -p ${REC_DIR}
 
 for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
@@ -82,6 +83,11 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
     LINK="${PUBLIC_URL}${RECORDING_DOWNLOAD_BASE}/${REC_FOLDER}/${new_file_name}"
     # one line for each link
     DOWNLOAD_LINKS="${LINK}"
+
+    # mp4 파일인 경우, REC_FILE_DURATION 추가
+    if [ "$file_extension" == "mp4" ]; then
+        REC_FILE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$REC_FILE_NAME")
+    fi
 done
 
 # sync everything to storage
@@ -92,7 +98,7 @@ AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
 
 curl -v -X POST -H "Date: $DATE" -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
-    -d "{\"uploadVideo\": \"$REC_FILE_NAME\", \"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\", \"enableMeetingMinutes\": ${ENABLE_MEETING_MINUTES}}" \
+    -d "{\"uploadVideo\": \"$REC_FILE_NAME\", \"fileSize\": ${REC_FILE_SIZE}, \"meetingId\": \"${MEETING_ID_FROM_JSON}\", \"recorder\": \"${RECORDER_EMAIL}\", \"roomName\": \"${MEETING_NAME}\", \"roomUrl\": \"${URL}\", \"downloadUrl\": \"${DOWNLOAD_LINKS}\", \"enableMeetingMinutes\": ${ENABLE_MEETING_MINUTES}, \"duration\": ${REC_FILE_DURATION}}" \
     "$ENDPOINT"
 
 #
