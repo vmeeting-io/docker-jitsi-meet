@@ -91,7 +91,7 @@ for f in ${UPLOAD_DIR}/*.{mp4,pdf}; do
 done
 
 # sync everything to storage
-rsync -r $REC_DIR root@storage:/recordings
+rsync -r $REC_DIR --chown=1001:1001 root@storage:/recordings
 
 ENDPOINT="http://vmapi:5000/recordings"
 AUTH_HEADER="Authorization: Bearer $VMEETING_DB_PASS"
