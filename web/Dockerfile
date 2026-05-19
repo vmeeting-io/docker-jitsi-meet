@@ -2,7 +2,7 @@ ARG JITSI_REPO=theun
 ARG VMEETING_TAG
 FROM ${JITSI_REPO}/base
 
-ADD https://raw.githubusercontent.com/acmesh-official/acme.sh/2.8.8/acme.sh /opt
+ADD https://raw.githubusercontent.com/acmesh-official/acme.sh/3.0.7/acme.sh /opt
 
 COPY rootfs/ /
 
