@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bash
+
+cd /web/jitsi-meet
+exec make dev-start

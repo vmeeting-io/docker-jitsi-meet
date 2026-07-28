@@ -1,89 +1,18 @@
 #!/usr/bin/with-contenv bash
 
-# make our folders
-mkdir -p \
-    /config/{nginx/site-confs,keys} \
-    /run \
-    /var/lib/nginx/tmp/client_body \
-    /var/tmp/nginx
+# make our folders
+mkdir -p /config /run
 
-# generate keys (maybe)
-if [[ $DISABLE_HTTPS -ne 1 ]]; then
-    if [[ $ENABLE_LETSENCRYPT -eq 1 ]]; then
-        mkdir -p /config/acme.sh
-        pushd /opt
-        sh ./acme.sh --install --home /config/acme.sh -m $LETSENCRYPT_EMAIL
-        popd
-
-        if [[ $LETSENCRYPT_USE_STAGING -ne 1 || ! -f /config/acme-certs/$LETSENCRYPT_DOMAIN/fullchain.pem ]]; then
-            export LE_WORKING_DIR="/config/acme.sh"
-            # TODO: move away from standalone mode to webroot mode.
-            /config/acme.sh/acme.sh \
-                --issue \
-                --standalone \
-                --pre-hook "if [[ -d /var/run/s6/services/nginx ]]; then s6-svc -d /var/run/s6/services/nginx; fi" \
-                --post-hook "if [[ -d /var/run/s6/services/nginx ]]; then s6-svc -u /var/run/s6/services/nginx; fi" \
-                -d $LETSENCRYPT_DOMAIN
-            rc=$?
-            if [[ $rc -eq 1 ]]; then
-                echo "Failed to obtain a certificate from the Let's Encrypt CA."
-                # this tries to get the user's attention and to spare the
-                # authority's rate limit:
-                sleep 15
-                echo "Exiting."
-                exit 1
-            fi
-            if [[ $rc -eq 0 ]]; then
-                mkdir -p /config/acme-certs/$LETSENCRYPT_DOMAIN
-                if ! /config/acme.sh/acme.sh \
-                        --install-cert -d $LETSENCRYPT_DOMAIN \
-                        --key-file /config/acme-certs/$LETSENCRYPT_DOMAIN/key.pem \
-                        --fullchain-file /config/acme-certs/$LETSENCRYPT_DOMAIN/fullchain.pem ; then
-                    echo "Failed to install certificate."
-                    # this tries to get the user's attention and to spare the
-                    # authority's rate limit:
-                    sleep 15
-                    echo "Exiting."
-                    exit 1
-                fi
-            fi
-        fi
-    else
-        # use self-signed certs
-        if [[ -f /config/keys/cert.key && -f /config/keys/cert.crt ]]; then
-            echo "using keys found in /config/keys"
-        else
-            echo "generating self-signed keys in /config/keys, you can replace these with your own keys if required"
-            SUBJECT="/C=US/ST=TX/L=Austin/O=jitsi.org/OU=Jitsi Server/CN=*"
-            openssl req -new -x509 -days 3650 -nodes -out /config/keys/cert.crt -keyout /config/keys/cert.key -subj "$SUBJECT"
-        fi
+# PUBLIC_URL may omit the port while HTTPS_PORT is non-443 (e.g. dev :8443).
+# Clients must use the same host:port as the page for bosh/websocket.
+PUBLIC_URL_EFFECTIVE="$PUBLIC_URL"
+if [[ -n "$PUBLIC_URL" && -n "$HTTPS_PORT" && "$HTTPS_PORT" != "443" ]]; then
+    if ! echo "$PUBLIC_URL" | grep -qE '://[^/?]+:[0-9]+'; then
+        PUBLIC_URL_EFFECTIVE=$(echo "$PUBLIC_URL" | sed -E "s#(https?://[^/?]+)#\1:${HTTPS_PORT}#")
     fi
 fi
 
-# generate username/password for individual downloading
-if [[ $ENABLE_INDIVIDUAL_REC -eq 1 || x$ENABLE_INDIVIDUAL_REC == xtrue ]]; then
-    [ -z "$IND_REC_DOWNLOAD_USER" ] && echo "ENV IND_REC_DOWNLOAD_USER does NOT set." && exit 1
-    [ -z "$IND_REC_DOWNLOAD_PASSWORD" ] && echo "ENV IND_REC_DOWNLOAD_PASSWORD does NOT set." && exit 1
-    htpasswd -b -c /config/nginx/.htpasswd $IND_REC_DOWNLOAD_USER $IND_REC_DOWNLOAD_PASSWORD
-fi
-# copy config files
-tpl /defaults/nginx.conf > /config/nginx/nginx.conf
-
-if [[ ! -f /config/nginx/whiteboard.conf ]]; then
-    tpl /defaults/whiteboard.conf > /config/nginx/whiteboard.conf
-fi
-
-if [[ ! -f /config/nginx/meet.conf ]]; then
-    tpl /defaults/meet.$NODE_ENV.conf > /config/nginx/meet.conf
-fi
-
-if [[ ! -f /config/nginx/ssl.conf ]]; then
-    tpl /defaults/ssl.conf > /config/nginx/ssl.conf
-fi
-
-if [[ ! -f /config/nginx/site-confs/default ]]; then
-    tpl /defaults/default > /config/nginx/site-confs/default
-fi
+# generate username/password for individual downloading is handled by nginx gateway
 
 for config in /defaults/config*.js
 do
@@ -96,7 +25,7 @@ do
 
         sed -i \
             -e "s#jitsi-meet.example.com#$XMPP_DOMAIN#g" \
-            -e "s#bosh:.*#bosh: '${PUBLIC_URL}/http-bind',#" \
+            -e "s#bosh:.*#bosh: '${PUBLIC_URL_EFFECTIVE}/http-bind',#" \
             -e "s#// focusUserJid:.*#focusUserJid: '${JICOFO_AUTH_USER}@${XMPP_AUTH_DOMAIN}',#" \
             /config/${fname}
 
@@ -129,7 +58,7 @@ do
             fi
 
             sed -i \
-            -e "s#// websocket:.*#websocket: '${PUBLIC_URL/http/ws}/xmpp-websocket',#" \
+            -e "s#// websocket:.*#websocket: '${PUBLIC_URL_EFFECTIVE/http/ws}/xmpp-websocket',#" \
             /config/${fname}
         fi
 
@@ -160,7 +89,7 @@ do
                     /config/${fname}
             elif [[ ! -z "${WHITEBOARD_URL_BASE}" ]]; then
                 sed -i \
-                    -e "/enableWelcomePage/a\    whiteboard_base: '${PUBLIC_URL}/whiteboard/'," \
+                    -e "/enableWelcomePage/a\    whiteboard_base: '${PUBLIC_URL_EFFECTIVE}/whiteboard/'," \
                     /config/${fname}
             fi
         fi
@@ -208,4 +137,11 @@ fi
 
 if [[ ! -f /config/title.html ]]; then
     cp /defaults/title*.html /config/
+fi
+
+# prod: static server only; dev: webpack-dev-server only
+if [[ "${NODE_ENV}" == "development" ]]; then
+    touch /etc/services.d/web/down
+else
+    touch /etc/services.d/webpack/down
 fi
