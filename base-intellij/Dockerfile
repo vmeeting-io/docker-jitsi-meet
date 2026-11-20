@@ -13,10 +13,11 @@ RUN \
     apt-dpkg-wrap apt-get install -y xrdp xorgxrdp && \
     apt-cleanup
 
-# IDEA
-RUN wget -q https://download-cf.jetbrains.com/idea/ideaIC-2020.2.3.tar.gz && \
+# IDEA (download-cf.jetbrains.com returns 404; use download.jetbrains.com which redirects to CDN)
+RUN wget -O ideaIC-2020.2.3.tar.gz https://download.jetbrains.com/idea/ideaIC-2020.2.3.tar.gz && \
     mkdir -p /opt/idea && \
-    tar -xzf ideaIC-2020.2.3.tar.gz -C /opt/idea --strip-components 1
+    tar -xzf ideaIC-2020.2.3.tar.gz -C /opt/idea --strip-components 1 && \
+    rm -f ideaIC-2020.2.3.tar.gz
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
