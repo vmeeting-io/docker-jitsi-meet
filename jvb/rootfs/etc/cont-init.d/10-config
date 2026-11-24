@@ -21,10 +21,39 @@ if [[ -z "${JVB_ADVERTISE_IPS}" ]]; then
     fi
 fi
 
-# On environments like Swarm the IP address used by the default gateway need not be
-# the one used for inter-container traffic. Use that one for our fallback ID.
-XMPP_SERVER_IP=$(dig +short +search ${XMPP_SERVER})
-export JVB_WS_SERVER_ID_FALLBACK=$(ip route get ${XMPP_SERVER_IP} | grep -oP '(?<=src ).*' | awk '{ print $1 '})
+# Colibri server-id is the address nginx dials (overlay IP), not the default route.
+# Resolving XMPP at boot is racy: dig is often empty, or returns A and AAAA together,
+# and `ip route get` then fails — which writes server-id="".
+if [[ -z "${JVB_WS_SERVER_ID}" ]]; then
+    if [[ -n "${JITSI_MEET_SUBNET}" && "${JITSI_MEET_SUBNET}" != "default" ]]; then
+        export JVB_WS_SERVER_ID_FALLBACK=$(ip route | grep -F "${JITSI_MEET_SUBNET}" | sed -n 's/.*src \([0-9.]\+\).*/\1/p' | head -n 1)
+    fi
+
+    if [[ -z "${JVB_WS_SERVER_ID_FALLBACK}" ]]; then
+        XMPP_SERVER_IP=""
+        for _ in 1 2 3 4 5 6 7 8 9 10; do
+            XMPP_SERVER_IP=$(dig +short A +time=1 +tries=1 "${XMPP_SERVER}" 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+            if [[ -n "${XMPP_SERVER_IP}" ]]; then
+                break
+            fi
+            sleep 1
+        done
+        if [[ -n "${XMPP_SERVER_IP}" ]]; then
+            export JVB_WS_SERVER_ID_FALLBACK=$(ip route get "${XMPP_SERVER_IP}" | grep -oP '(?<=src )[0-9.]+' | head -n 1)
+        fi
+    fi
+
+    if [[ -z "${JVB_WS_SERVER_ID_FALLBACK}" ]]; then
+        export JVB_WS_SERVER_ID_FALLBACK=$(ip route get 1.1.1.1 | grep -oP '(?<=src )[0-9.]+' | head -n 1)
+    fi
+fi
+
+if [[ -z "${JVB_WS_SERVER_ID}${JVB_WS_SERVER_ID_FALLBACK}" ]]; then
+    echo 'FATAL ERROR: could not determine JVB websocket server-id'
+    exit 1
+fi
+
+echo "JVB websocket server-id: ${JVB_WS_SERVER_ID:-$JVB_WS_SERVER_ID_FALLBACK}"
 
 # Local IP for the ice4j mapping harvester.
 export LOCAL_ADDRESS=$(ip route get 1 | grep -oP '(?<=src ).*' | awk '{ print $1 '})
